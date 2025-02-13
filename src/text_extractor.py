@@ -8,7 +8,6 @@ sqs_client = boto3.client('sqs')
 
 SQS_QUEUE_URL = os.environ['SQS_QUEUE_URL']
 
-# This lambda function is triggred by S3 event when files are uploaded to S3 and is responsible for writing the extracted json to SQS.
 def lambda_handler(event, context):
     record = event['Records'][0]
     bucket_name = record['s3']['bucket']['name']
@@ -18,7 +17,7 @@ def lambda_handler(event, context):
         Document={'S3Object': {'Bucket': bucket_name, 'Name': document_key}},
         FeatureTypes=['FORMS', 'TABLES']
     )
- 
+    print(response)
     extracted_data = parse_textract_response(response)
 
     # Send extracted data to SQS
@@ -33,7 +32,7 @@ def lambda_handler(event, context):
     return {'statusCode': 200, 'body': json.dumps('Message sent to SQS')}
 
 def parse_textract_response(response):
-    """ Extracts key-value pairs correctly from AWS Textract response. """
+    """ Extracts key-value pairs correctly from AWS Textract response, including confidence scores. """
     key_map = {}  # Stores key text
     value_map = {}  # Stores value text
     block_map = {}  # Stores all blocks by ID
@@ -41,7 +40,7 @@ def parse_textract_response(response):
     # Iterate through each block
     for block in response.get('Blocks', []):
         block_id = block['Id']
-        block_map[block_id] = block  # Store all blocks in a map
+        block_map[block_id] = block
 
         # If it's a key, store in key_map
         if block['BlockType'] == 'KEY_VALUE_SET' and 'EntityTypes' in block and 'KEY' in block['EntityTypes']:
@@ -55,8 +54,8 @@ def parse_textract_response(response):
 
     # Iterate over key_map and find the corresponding value
     for key_id, key_block in key_map.items():
-        key_text = get_text_from_block(key_block, block_map)  # Extract key text
-        value_text = None
+        key_text, key_confidence = get_text_from_block(key_block, block_map)  # Extract key text and confidence
+        value_text, value_confidence = None, None
 
         # Find the corresponding value by checking relationships
         for relationship in key_block.get('Relationships', []):
@@ -64,16 +63,22 @@ def parse_textract_response(response):
                 for value_id in relationship['Ids']:
                     value_block = value_map.get(value_id)
                     if value_block:
-                        value_text = get_text_from_block(value_block, block_map)  # Extract value text
+                        value_text, value_confidence = get_text_from_block(value_block, block_map)
 
         if key_text and value_text:
-            extracted_data[key_text] = value_text  # Store extracted key-value pair
+            extracted_data[key_text] = {
+                "value": value_text,
+                "confidence": value_confidence
+            } 
+
     print(extracted_data)
     return extracted_data
 
 def get_text_from_block(block, block_map):
-    """ Extracts text from a block, handling word and line structures. """
+    """ Extracts text from a block, handling word and line structures, and captures confidence scores. """
     text = ''
+    confidence = block.get('Confidence', 0.0)
+
     if 'Relationships' in block:
         for relationship in block['Relationships']:
             if relationship['Type'] == 'CHILD':
@@ -81,4 +86,5 @@ def get_text_from_block(block, block_map):
                     word_block = block_map.get(child_id)
                     if word_block and 'Text' in word_block:
                         text += word_block['Text'] + ' '
-    return text.strip() 
+
+    return text.strip(), confidence
