@@ -1,7 +1,7 @@
 ---
 name: Bug Report
 description: Use this form to create a new Bug Report
-labels: ["bug", "needs refinement"]
+type: "bug"
 body:
   - type: markdown
     attributes:
