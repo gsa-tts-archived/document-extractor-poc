@@ -4,3 +4,5 @@
 -->
 
 # Document Extractor Proof of Concept
+
+![document_uploader_poc drawio](https://github.com/user-attachments/assets/9607d645-33ee-44a8-9aa3-2a922495b515)
