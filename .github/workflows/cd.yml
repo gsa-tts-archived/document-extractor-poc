@@ -1,0 +1,53 @@
+name: Continuous Delivery
+
+
+on:
+  push:
+    branches:
+      - main
+
+
+permissions:
+  id-token: write
+  contents: read
+
+
+jobs:
+
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    steps:
+
+      - uses: actions/checkout@v4
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_FOR_DEPLOY }}
+          aws-region: us-east-1
+
+      - uses: hashicorp/setup-terraform@v3
+
+      - working-directory: ./ui/
+        run: npm ci
+
+      - working-directory: ./ui/
+        run: npm run build
+
+      - working-directory: ./iac/
+        run: terraform init
+
+      - working-directory: ./iac/
+        run: terraform apply -auto-approve -var 'environment=${{ vars.ENVIRONMENT }}'
+
+      - name: Extract Terraform Output
+        working-directory: ./iac/
+        id: terraformOutput
+        run: |
+          distribution_id=$(terraform output -raw distribution_id)
+          echo "distribution_id=$distribution_id" >> $GITHUB_OUTPUT
+
+      - name: Invalidate Cloudfront Distribution
+        run: |
+          INVALIDATION_ID=$(aws cloudfront create-invalidation --distribution-id ${{ steps.terraformOutput.outputs.distribution_id }} --paths "/*" --query 'Invalidation.Id' --output text)
+          aws cloudfront wait invalidation-completed --distribution-id ${{ steps.terraformOutput.outputs.distribution_id }} --id $INVALIDATION_ID
