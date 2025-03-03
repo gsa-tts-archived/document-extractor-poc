@@ -12,7 +12,7 @@ provider "aws" {
 
   default_tags {
     tags = {
-      project = local.project
+      project = "${local.project}-${var.environment}"
     }
   }
 }
@@ -27,5 +27,5 @@ terraform {
 }
 
 locals {
-  project = "document-extractor-${var.environment}"
+  project = "document-extractor"
 }
