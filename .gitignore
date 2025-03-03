@@ -179,3 +179,16 @@ cython_debug/
 megalinter-reports
 reports
 report.json
+
+# Node
+node_modules/
+
+# Mac
+.DS_Store
+
+# Terraform
+.terraform
+/iac/*.zip
+
+#Parcel
+.parcel-cache/
