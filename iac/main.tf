@@ -20,12 +20,12 @@ provider "aws" {
 terraform {
   backend "s3" {
     bucket         = "document-extractor-terraform-state"
-    key            = "terraform_state.tfstate"
+    key            = ""
     region         = "us-east-1"
     dynamodb_table = "terraform_lock"
   }
 }
 
 locals {
-  project = "document-extractor"
+  project = "document-extractor-${var.environment}"
 }

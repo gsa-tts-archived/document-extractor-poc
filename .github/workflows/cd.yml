@@ -35,7 +35,7 @@ jobs:
         run: npm run build
 
       - working-directory: ./iac/
-        run: terraform init
+        run: terraform init -backend-config="key=terraform_state_gsa_dev.tfstate"
 
       - working-directory: ./iac/
         run: terraform apply -auto-approve -var 'environment=${{ vars.ENVIRONMENT }}'
