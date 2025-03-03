@@ -12,7 +12,7 @@ provider "aws" {
 
   default_tags {
     tags = {
-      project = local.project
+      project = "${local.project}-${var.environment}"
     }
   }
 }
@@ -20,7 +20,7 @@ provider "aws" {
 terraform {
   backend "s3" {
     bucket         = "document-extractor-terraform-state"
-    key            = "terraform_state.tfstate"
+    key            = ""
     region         = "us-east-1"
     dynamodb_table = "terraform_lock"
   }
