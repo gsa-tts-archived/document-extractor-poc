@@ -1,0 +1,90 @@
+resource "aws_lambda_function" "text_extract" {
+  function_name = "${local.project}-${var.environment}-text-extract"
+
+  filename         = data.archive_file.text_extractor_zipped_code.output_path
+  source_code_hash = data.archive_file.text_extractor_zipped_code.output_base64sha256
+
+  handler = "text_extractor.lambda_handler"
+
+  memory_size                    = 256
+  timeout                        = 30
+  runtime                        = "python3.13"
+  reserved_concurrent_executions = -1
+
+  architectures = ["arm64"]
+
+  kms_key_arn = aws_kms_key.encryption.arn
+
+  role = aws_iam_role.execution_role.arn
+
+  environment {
+    variables = {
+      SQS_QUEUE_URL = aws_sqs_queue.queue_to_dynamo.url
+    }
+  }
+}
+
+data "archive_file" "text_extractor_zipped_code" {
+  type        = "zip"
+  source_file = "${path.module}/../src/text_extractor.py"
+  output_path = "${local.project}-text-extractor.zip"
+}
+
+resource "aws_lambda_permission" "allow_bucket_invoke" {
+  statement_id  = "AllowExecutionFromS3Bucket"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.text_extract.arn
+  principal     = "s3.amazonaws.com"
+  source_arn    = aws_s3_bucket.document_storage.arn
+}
+
+resource "aws_lambda_function_event_invoke_config" "tell_sqs_for_dynamo" {
+  function_name = aws_lambda_function.text_extract.arn
+
+  destination_config {
+    on_success {
+      destination = aws_sqs_queue.queue_to_dynamo.arn
+    }
+  }
+}
+
+resource "aws_lambda_function" "write_to_dynamodb" {
+  function_name = "${local.project}-${var.environment}-write-to-dynamodb"
+
+  filename         = data.archive_file.write_to_dynamodb_zipped_code.output_path
+  source_code_hash = data.archive_file.write_to_dynamodb_zipped_code.output_base64sha256
+
+  handler = "sqs_dynamo_writer.lambda_handler"
+
+  memory_size                    = 256
+  timeout                        = 30
+  runtime                        = "python3.13"
+  reserved_concurrent_executions = -1
+
+  architectures = ["arm64"]
+
+  kms_key_arn = aws_kms_key.encryption.arn
+
+  role = aws_iam_role.execution_role.arn
+
+  environment {
+    variables = {
+      SQS_QUEUE_URL  = aws_sqs_queue.queue_to_dynamo.url
+      DYNAMODB_TABLE = aws_dynamodb_table.extract_table.name
+    }
+  }
+}
+
+data "archive_file" "write_to_dynamodb_zipped_code" {
+  type        = "zip"
+  source_file = "${path.module}/../src/sqs_dynamo_writer.py"
+  output_path = "${local.project}-write-to-dynamodb.zip"
+}
+
+resource "aws_lambda_event_source_mapping" "invoke_dynamodb_writer_from_sqs" {
+  event_source_arn                   = aws_sqs_queue.queue_to_dynamo.arn
+  function_name                      = aws_lambda_function.write_to_dynamodb.arn
+  maximum_batching_window_in_seconds = 5
+
+  depends_on = [aws_iam_role_policy_attachment.attach_sqs_permission_to_role]
+}

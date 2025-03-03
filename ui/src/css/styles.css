@@ -1,0 +1,19 @@
+.usa-card__heading {
+    font-weight: 400;
+}
+
+.font-ui-xl{
+    font-size: 32px;
+}
+
+.usa-identifier {
+    background-color: #112e51;
+}
+
+.usa-identifier__required-link, .usa-identifier__required-link.usa-link {
+    color: #D9E8F6;
+}
+
+.file-preview-col, .verify-col{
+    border: none;
+}

@@ -1,0 +1,27 @@
+{
+  "name": "package.json",
+  "version": "1.0.0",
+  "description": "[![MegaLinter](https://github.com/flexion/document-extractor-poc/actions/workflows/megalinter.yml/badge.svg)](https://github.com/flexion/document-extractor-poc/actions/workflows/megalinter.yml) <!-- [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/flexion/document-extractor-poc/badge)](https://scorecard.dev/viewer/?uri=github.com/flexion/document-extractor-poc) -->",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "dev": "parcel src/index.html",
+    "build": "parcel build src/index.html",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@uswds/uswds": "^3.11.0",
+    "axios": "^1.7.9",
+    "dotenv": "^16.4.7",
+    "parcel": "^2.13.3",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-router": "^7.2.0"
+  },
+  "devDependencies": {
+    "process": "^0.11.10"
+  }
+}
