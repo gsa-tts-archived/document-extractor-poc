@@ -20,3 +20,22 @@ select = [
     "SIM", # flake8-simplify
     "I", # isort
 ]
+
+#[build-system]
+#requires = ["poetry-core", "poetry-plugin-lambda-build"]
+#build-backend = "poetry.core.masonry.api"
+#
+#[tool.poetry.build]
+#script = "build-extension.py"
+#
+#[tool.poetry-plugin-lambda-build]
+#package-artifact-path = "package.zip"
+
+#[tool.hatch.build.targets.custom]
+#path = "hatch_build.py"
+
+#[tool.hatch.build.targets.zipped-directory]
+#install-name = "org.example.test"
+#sources = [
+#    "/src",
+#]
