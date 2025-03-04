@@ -1,9 +1,8 @@
 # uv run build.py
 
+import shutil
 import subprocess
 from pathlib import Path
-import shutil
-import os
 
 
 def execute(program, *args):
@@ -34,16 +33,21 @@ def build():
     uv("export", "--frozen", "--no-dev", "--no-editable", "-o", requirements_txt.as_posix())
 
     print(f"Generating dependency distribution in {build_dir.as_posix()}")
-    uv("pip", "install", "--no-installer-metadata", "--no-compile-bytecode", "--target", build_dir.as_posix(), "-r", requirements_txt.as_posix())
+    uv(
+        "pip",
+        "install",
+        "--no-installer-metadata",
+        "--no-compile-bytecode",
+        "--target",
+        build_dir.as_posix(),
+        "-r",
+        requirements_txt.as_posix(),
+    )
 
     our_code_path = "src"
     our_code = build_dir.joinpath(our_code_path)
     print(f"Copying our code to {our_code.as_posix()}")
-    shutil.copytree(
-        src=our_code_path,
-        dst=our_code,
-        dirs_exist_ok=True
-    )
+    shutil.copytree(src=our_code_path, dst=our_code, dirs_exist_ok=True)
 
     lambda_zip = dist_folder.joinpath("lambda")
     print(f"Creating distribution zip at {lambda_zip.as_posix()}.zip")
