@@ -31,6 +31,8 @@ jobs:
           enable-cache: true
           cache-dependency-glob: ./backend/uv.lock
 
+      - uses: hashicorp/setup-terraform@v3
+
       - name: Python lint check
         working-directory: ./backend/
         run: uvx ruff check
@@ -38,3 +40,7 @@ jobs:
       - name: Python format check
         working-directory: ./backend/
         run: uvx ruff format --check
+
+      - run: pip install pre-commit
+
+      - run: pre-commit run --all-files

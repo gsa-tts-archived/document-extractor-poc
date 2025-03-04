@@ -52,7 +52,7 @@ export default function DownloadPage() {
       if (verifiedData.extracted_data.hasOwnProperty(key)) {
         const field = verifiedData.extracted_data[key];
 
-          const value = field.value !== undefined ? field.value : "N/A";          
+          const value = field.value !== undefined ? field.value : "N/A";
           csvContent += `"${key}","${value}""\n`;
       }
   }
