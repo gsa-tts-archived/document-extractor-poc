@@ -26,5 +26,10 @@
   },
   "engines": {
     "node": "23"
+  },
+  "targets": {
+    "default": {
+      "context": "browser"
+    }
   }
 }
