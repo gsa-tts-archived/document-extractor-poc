@@ -44,6 +44,9 @@ jobs:
           cache: npm
           cache-dependency-path: ./ui/package-lock.json
 
+      - working-directory: ./src/
+        run: uv run build.py
+
       - working-directory: ./ui/
         run: npm ci
 
