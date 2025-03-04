@@ -20,7 +20,6 @@ def cp(*args):
 
 def build():
     dist_folder = Path("dist")
-    # build_dir = Path(__file__).parent.joinpath("dist", "build")
     build_dir = dist_folder.joinpath("build")
     build_dir.mkdir(parents=True, exist_ok=True)
 
