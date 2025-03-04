@@ -7,7 +7,7 @@ export default function VerifyPage() {
   const [responseData, setResponseData] = useState(null) // API response
   const [loading, setLoading] = useState(true) // tracks if page is loading
 
-  async function pollApiRequest(attempts = 10, delay = 1000) {
+  async function pollApiRequest(attempts = 30, delay = 2000) {
     if (!documentId) {
       console.error("No document Id found")
       setLoading(false)
