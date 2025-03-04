@@ -7,7 +7,7 @@ export default function VerifyPage() {
   const [responseData, setResponseData] = useState(null) // API response
   const [loading, setLoading] = useState(true) // tracks if page is loading
 
-  async function pollApiRequest(documentId, attempts = 10, delay = 1000) {
+  async function pollApiRequest(attempts = 10, delay = 1000) {
     if (!documentId) {
       console.error("No document Id found")
       setLoading(false)
@@ -15,7 +15,7 @@ export default function VerifyPage() {
 
     for (let i = 0; i < attempts; i++) {
       try {
-          const response = await fetch(`/api/document/${documentId}`, {
+        const response = await fetch(`/api/document/${documentId}`, {
           method: "GET",
           mode: "cors",
           headers: {
@@ -28,7 +28,6 @@ export default function VerifyPage() {
 
           setResponseData(result) // store API data in state
           setLoading(false) // stop loading when data is received
-          console.log("response data", result)
           return;
         } else {
           console.warn(`Attempt ${i + 1} failed: ${response.statusText}`);
@@ -80,8 +79,12 @@ export default function VerifyPage() {
       alert("An error occurred while saving.");
     }
   }
-  
+
   useEffect(() => {
+    if (!documentId) {
+      console.error("No documentId found in sessionStorage")
+      return
+    }
     pollApiRequest()
   }, []) // runs only once when the component mounts
 
@@ -130,7 +133,6 @@ export default function VerifyPage() {
 
     return (
       <div id="file-display-container">
-        <p>Display image</p>
         {fileExtension === "pdf" ? (
           <iframe src={base64Src} width="100%" height="600px" title="Document Preview"></iframe>
         ) : (
@@ -181,9 +183,9 @@ export default function VerifyPage() {
                   <div className="usa-card__container file-preview-col">
                     <div className="usa-card__body">
                       <div id="file-display-container"></div>
-                      <p>{displayFileName()}</p>
-                      {documentId ? (<p>processing data</p>) : (<p>no data found</p>)}
+                      {loading ? (<p>Processing...Please wait</p>) : ""}
                       <div>{displayFilePreview()}</div>
+                      <p>{displayFileName()}</p>
                     </div>
                   </div>
                 </li>
