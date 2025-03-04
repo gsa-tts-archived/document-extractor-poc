@@ -24,12 +24,6 @@ resource "aws_lambda_function" "text_extract" {
   }
 }
 
-# data "archive_file" "text_extractor_zipped_code" {
-#   type        = "zip"
-#   source_file = "${path.module}/../src/text_extractor.py"
-#   output_path = "${local.project}-text-extractor.zip"
-# }
-
 resource "aws_lambda_permission" "allow_bucket_invoke" {
   statement_id  = "AllowExecutionFromS3Bucket"
   action        = "lambda:InvokeFunction"
@@ -74,12 +68,6 @@ resource "aws_lambda_function" "write_to_dynamodb" {
     }
   }
 }
-
-# data "archive_file" "write_to_dynamodb_zipped_code" {
-#   type        = "zip"
-#   source_file = "${path.module}/../src/sqs_dynamo_writer.py"
-#   output_path = "${local.project}-write-to-dynamodb.zip"
-# }
 
 resource "aws_lambda_event_source_mapping" "invoke_dynamodb_writer_from_sqs" {
   event_source_arn                   = aws_sqs_queue.queue_to_dynamo.arn
