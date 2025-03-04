@@ -6,8 +6,8 @@ module "document_endpoints" {
   handler_method_mapping = [
     {
       name              = "create-document"
-      handler_file_path = "${path.module}/../src/s3_file_upload.py"
-      handler_package   = "s3_file_upload.lambda_handler"
+      handler_file_path = "${path.module}/../src/dist/lambda.zip"
+      handler_package   = "src.lambda.s3_file_upload.lambda_handler"
       http_method       = "POST"
     },
   ]
@@ -33,14 +33,14 @@ module "document_id_endpoints" {
   handler_method_mapping = [
     {
       name              = "get-document"
-      handler_file_path = "${path.module}/../src/get_extracted_document.py"
-      handler_package   = "get_extracted_document.lambda_handler"
+      handler_file_path = "${path.module}/../src/dist/lambda.zip"
+      handler_package   = "src.lambda.get_extracted_document.lambda_handler"
       http_method       = "GET"
     },
     {
       name              = "update-document"
-      handler_file_path = "${path.module}/../src/update_extracted_document.py"
-      handler_package   = "update_extracted_document.lambda_handler"
+      handler_file_path = "${path.module}/../src/dist/lambda.zip"
+      handler_package   = "src.lambda.update_extracted_document.lambda_handler"
       http_method       = "PUT"
     },
   ]

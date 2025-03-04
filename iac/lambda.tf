@@ -1,10 +1,10 @@
 resource "aws_lambda_function" "text_extract" {
   function_name = "${local.project}-${var.environment}-text-extract"
 
-  filename         = data.archive_file.text_extractor_zipped_code.output_path
-  source_code_hash = data.archive_file.text_extractor_zipped_code.output_base64sha256
+  filename         = "${path.module}/../src/dist/lambda.zip"
+  source_code_hash = filebase64sha256("${path.module}/../src/dist/lambda.zip")
 
-  handler = "text_extractor.lambda_handler"
+  handler = "src.lambda.text_extractor.lambda_handler"
 
   memory_size                    = 256
   timeout                        = 30
@@ -24,11 +24,11 @@ resource "aws_lambda_function" "text_extract" {
   }
 }
 
-data "archive_file" "text_extractor_zipped_code" {
-  type        = "zip"
-  source_file = "${path.module}/../src/text_extractor.py"
-  output_path = "${local.project}-text-extractor.zip"
-}
+# data "archive_file" "text_extractor_zipped_code" {
+#   type        = "zip"
+#   source_file = "${path.module}/../src/text_extractor.py"
+#   output_path = "${local.project}-text-extractor.zip"
+# }
 
 resource "aws_lambda_permission" "allow_bucket_invoke" {
   statement_id  = "AllowExecutionFromS3Bucket"
@@ -51,10 +51,10 @@ resource "aws_lambda_function_event_invoke_config" "tell_sqs_for_dynamo" {
 resource "aws_lambda_function" "write_to_dynamodb" {
   function_name = "${local.project}-${var.environment}-write-to-dynamodb"
 
-  filename         = data.archive_file.write_to_dynamodb_zipped_code.output_path
-  source_code_hash = data.archive_file.write_to_dynamodb_zipped_code.output_base64sha256
+  filename         = "${path.module}/../src/dist/lambda.zip"
+  source_code_hash = filebase64sha256("${path.module}/../src/dist/lambda.zip")
 
-  handler = "sqs_dynamo_writer.lambda_handler"
+  handler = "src.lambda.sqs_dynamo_writer.lambda_handler"
 
   memory_size                    = 256
   timeout                        = 30
@@ -75,11 +75,11 @@ resource "aws_lambda_function" "write_to_dynamodb" {
   }
 }
 
-data "archive_file" "write_to_dynamodb_zipped_code" {
-  type        = "zip"
-  source_file = "${path.module}/../src/sqs_dynamo_writer.py"
-  output_path = "${local.project}-write-to-dynamodb.zip"
-}
+# data "archive_file" "write_to_dynamodb_zipped_code" {
+#   type        = "zip"
+#   source_file = "${path.module}/../src/sqs_dynamo_writer.py"
+#   output_path = "${local.project}-write-to-dynamodb.zip"
+# }
 
 resource "aws_lambda_event_source_mapping" "invoke_dynamodb_writer_from_sqs" {
   event_source_arn                   = aws_sqs_queue.queue_to_dynamo.arn
