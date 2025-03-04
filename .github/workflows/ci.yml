@@ -39,4 +39,6 @@ jobs:
         working-directory: ./backend/
         run: uvx ruff format --check
 
+      - run: pip install pre-commit
+
       - run: pre-commit run --all-files
