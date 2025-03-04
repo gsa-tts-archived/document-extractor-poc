@@ -38,3 +38,5 @@ jobs:
       - name: Python format check
         working-directory: ./backend/
         run: uvx ruff format --check
+
+      - run: pre-commit run --all-files
