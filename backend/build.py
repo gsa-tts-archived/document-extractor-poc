@@ -20,20 +20,34 @@ def cp(*args):
 
 def build():
     dist_folder = Path("dist")
+
+    if dist_folder.exists():
+        print(f"Cleaning {dist_folder.as_posix()} folder")
+        shutil.rmtree(dist_folder)
+
     build_dir = dist_folder.joinpath("build")
     build_dir.mkdir(parents=True, exist_ok=True)
 
-    uv("export", "--frozen", "--no-dev", "--no-editable", "-o", "requirements.txt")
-    uv("pip", "install", "--no-installer-metadata", "--no-compile-bytecode", "--target", build_dir.as_posix(), "-r", "requirements.txt")
+    requirements_txt = dist_folder.joinpath("requirements.txt")
+
+    print(f"Exporting uv dependencies to {requirements_txt.as_posix()}")
+    uv("export", "--frozen", "--no-dev", "--no-editable", "-o", requirements_txt.as_posix())
+
+    print(f"Generating dependency distribution in {build_dir.as_posix()}")
+    uv("pip", "install", "--no-installer-metadata", "--no-compile-bytecode", "--target", build_dir.as_posix(), "-r", requirements_txt.as_posix())
 
     our_code_path = "src"
+    our_code = build_dir.joinpath(our_code_path)
+    print(f"Copying our code to {our_code.as_posix()}")
     shutil.copytree(
         src=our_code_path,
-        dst=build_dir.joinpath(our_code_path).as_posix(),
+        dst=our_code,
         dirs_exist_ok=True
     )
 
-    shutil.make_archive(dist_folder.joinpath("lambda"), "zip", build_dir)
+    lambda_zip = dist_folder.joinpath("lambda")
+    print(f"Creating distribution zip at {lambda_zip.as_posix()}.zip")
+    shutil.make_archive(lambda_zip, "zip", build_dir)
 
 
 if __name__ == "__main__":
