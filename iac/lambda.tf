@@ -1,5 +1,5 @@
 locals {
-  lambda_filename = "${path.module}/../backend/dist/lambda.zip"
+  lambda_filename         = "${path.module}/../backend/dist/lambda.zip"
   lambda_source_code_hash = filebase64sha256(local.lambda_filename)
 }
 
