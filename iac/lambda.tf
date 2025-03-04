@@ -1,8 +1,13 @@
+locals {
+  lambda_filename = "${path.module}/../backend/dist/lambda.zip"
+  lambda_source_code_hash = filebase64sha256(local.lambda_filename)
+}
+
 resource "aws_lambda_function" "text_extract" {
   function_name = "${local.project}-${var.environment}-text-extract"
 
-  filename         = "${path.module}/../backend/dist/lambda.zip"
-  source_code_hash = filebase64sha256("${path.module}/../src/dist/lambda.zip")
+  filename         = local.lambda_filename
+  source_code_hash = local.lambda_source_code_hash
 
   handler = "src.lambda.text_extractor.lambda_handler"
 
@@ -45,8 +50,8 @@ resource "aws_lambda_function_event_invoke_config" "tell_sqs_for_dynamo" {
 resource "aws_lambda_function" "write_to_dynamodb" {
   function_name = "${local.project}-${var.environment}-write-to-dynamodb"
 
-  filename         = "${path.module}/../backend/dist/lambda.zip"
-  source_code_hash = filebase64sha256("${path.module}/../backend/dist/lambda.zip")
+  filename         = local.lambda_filename
+  source_code_hash = local.lambda_source_code_hash
 
   handler = "src.lambda.sqs_dynamo_writer.lambda_handler"
 
