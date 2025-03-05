@@ -41,6 +41,14 @@ jobs:
         working-directory: ./backend/
         run: uvx ruff format --check
 
+      - name: Javascript eslint check
+        working-directory: ./ui/
+        run: npm run lint
+
+      - name: Prettier format check
+        working-directory: ./ui/
+        run: npm run format
+
       - run: pip install pre-commit
 
       - run: pre-commit run --all-files
