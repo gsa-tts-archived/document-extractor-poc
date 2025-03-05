@@ -47,6 +47,9 @@ jobs:
         working-directory: ./backend/
         run: uvx ruff format --check
 
+      - working-directory: ./ui/
+        run: npm ci
+
       - name: Javascript eslint check
         working-directory: ./ui/
         run: npm run lint
