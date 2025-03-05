@@ -4,26 +4,23 @@
 
 ### Request
 
-```text
-POST /upload
+```http request
+POST /api/document
 ```
 
-```JSON
+```json
 {
-  "body": {
-    "file_content": "<base64-encoded-content>",
-    "file_name": "test-file.txt"
-  }
+    "file_content": "<base64-encoded content of the uploaded file>",
+    "file_name": "<name of the file>"
 }
 ```
 
 ### Response
 
-```JSON
+```json
 {
-  "resultCode": 200,
-  "resultString": "File accepted for procesing.",
-  "documentId": "1234567890abcdef1234567890abcdef"
+    "message": "File uploaded successfully.",
+    "documentId": "<random UUID>"
 }
 ```
 
