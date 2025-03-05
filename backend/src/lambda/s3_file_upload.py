@@ -1,8 +1,7 @@
 import base64
 import json
 import os
-from datetime import UTC, datetime
-from hashlib import sha256
+import uuid
 
 import boto3
 
@@ -17,12 +16,9 @@ def generate_secure_filename(original_filename):
     """
     ext = os.path.splitext(original_filename)[1].lower() if "." in original_filename else ""
 
-    timestamp = datetime.now(UTC).isoformat()
-    unique_string = f"{original_filename}{timestamp}".encode()
+    document_id = str(uuid.uuid4())
 
-    file_hash = sha256(unique_string).hexdigest()[:12]  # Using first 12 chars for brevity
-
-    return f"{file_hash}{ext}", file_hash
+    return f"{document_id}{ext}", document_id
 
 
 def lambda_handler(event, context):
