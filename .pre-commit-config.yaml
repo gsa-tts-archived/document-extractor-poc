@@ -30,3 +30,19 @@ repos:
         types_or:
           - terraform
         pass_filenames: false
+
+  - repo: local
+    hooks:
+      - id: eslint
+        name: eslint
+        entry: bash -c 'cd ui && npm run lint'
+        language: system
+        pass_filenames: false
+
+  - repo: local
+    hooks:
+      - id: prettier
+        name: prettier
+        entry: bash -c 'cd ui && npm run format'
+        language: system
+        pass_filenames: false

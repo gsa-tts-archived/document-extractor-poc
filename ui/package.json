@@ -1,7 +1,7 @@
 {
   "name": "package.json",
   "version": "1.0.0",
-  "description": "[![MegaLinter](https://github.com/flexion/document-extractor-poc/actions/workflows/megalinter.yml/badge.svg)](https://github.com/flexion/document-extractor-poc/actions/workflows/megalinter.yml) <!-- [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/flexion/document-extractor-poc/badge)](https://scorecard.dev/viewer/?uri=github.com/flexion/document-extractor-poc) -->",
+  "description": "Public Benefits Studio's Document Extractor to automate document data extraction with AI and OCR.",
   "directories": {
     "doc": "docs"
   },
