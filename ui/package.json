@@ -31,5 +31,13 @@
     "globals": "^16.0.0",
     "prettier": "3.5.3",
     "process": "^0.11.10"
+  },
+  "engines": {
+    "node": "23"
+  },
+  "targets": {
+    "default": {
+      "context": "browser"
+    }
   }
 }

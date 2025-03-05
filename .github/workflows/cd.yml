@@ -28,6 +28,25 @@ jobs:
 
       - uses: hashicorp/setup-terraform@v3
 
+      - uses: actions/setup-python@v5
+        with:
+          python-version-file: ./backend/.python-version
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: ./backend/uv.lock
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: ./ui/package.json
+          cache: npm
+          cache-dependency-path: ./ui/package-lock.json
+
+      - working-directory: ./backend/
+        run: uv run build.py
+
       - working-directory: ./ui/
         run: npm ci
 
