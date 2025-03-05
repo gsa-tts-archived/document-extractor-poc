@@ -31,6 +31,12 @@ jobs:
           enable-cache: true
           cache-dependency-glob: ./backend/uv.lock
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: ./ui/package.json
+          cache: npm
+          cache-dependency-path: ./ui/package-lock.json
+
       - uses: hashicorp/setup-terraform@v3
 
       - name: Python lint check
