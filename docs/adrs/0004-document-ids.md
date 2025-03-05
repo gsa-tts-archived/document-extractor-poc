@@ -10,8 +10,8 @@ Accepted
 
 We need to be able to have a unique ID that follows a work session with a file.
 That is, from the moment a file is uploaded, we ought to be able to reference
-that file, its data, the results, etc. when we make a RESTful API call using
-that Document ID.
+that file, its data, the results, etc. when we make a ReSTful API call using
+that document ID.
 
 ## Decision
 
@@ -27,13 +27,13 @@ Python documentation for
 
 Because we're using very large unique identifiers, it's extremely unlikely
 that we'll experience reference collision.  At the same time, because of the
-size of these IDs, a simple request will have keys that are 32 characters
+size of these IDs, a simple request will have keys that are 36 characters
 long:
 
 ```text
-0123456789abcdef0123456789abcdef
+A6B3839B-27C4-4DFC-AA17-8D08F7475062
 ```
 
 Also, because we're using an RFC-provided specification, we can be relatively
-assured that we'll be able interact with, validate, etc. keys like these
+assured that we'll be able to interact with, validate, etc. keys like these
 regardless of the platform, language, tech stack, etc. being used.
