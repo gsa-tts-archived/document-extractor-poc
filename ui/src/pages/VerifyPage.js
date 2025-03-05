@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import Layout from "../components/Layout";
 
 export default function VerifyPage() {
-  const [documentId, setDocumentId] = useState(() => sessionStorage.getItem("documentId"))
+  const [documentId] = useState(() => sessionStorage.getItem("documentId"))
   const [responseData, setResponseData] = useState(null) // API response
   const [loading, setLoading] = useState(true) // tracks if page is loading
 

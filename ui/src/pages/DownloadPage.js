@@ -3,7 +3,7 @@ import Layout from "../components/Layout"
 
 export default function DownloadPage() {
   // holds document data
-  const [verifiedData, setVerifiedData] = useState(() => {
+  const [verifiedData] = useState(() => {
     const storedData = sessionStorage.getItem("verifiedData")
     return storedData ? JSON.parse(storedData)?.updated_document : null
   })
@@ -49,7 +49,7 @@ export default function DownloadPage() {
     let csvContent = "data:text/csv;charset=utf-8,Field,Value\n";
 
     for (let key in verifiedData.extracted_data) {
-      if (verifiedData.extracted_data.hasOwnProperty(key)) {
+      if (Object.prototype.hasOwnProperty.call(verifiedData.extracted_data, key)) {
         const field = verifiedData.extracted_data[key];
 
           const value = field.value !== undefined ? field.value : "N/A";          

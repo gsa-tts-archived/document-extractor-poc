@@ -15,6 +15,13 @@ export default [
   },
   pluginReact.configs.flat.recommended,
   {
+    settings:{
+      react: {
+        version: "detect"
+      }
+    }
+  },
+  {
     rules: {
       'react/react-in-jsx-scope': 0,
       'react/jsx-uses-react': 0,
