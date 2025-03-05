@@ -1,6 +1,6 @@
 # Example API Requests and Responses
 
-## Upload API
+## Upload Document
 
 ### Request
 
@@ -24,29 +24,30 @@ POST /api/document
 }
 ```
 
-## Verify API
+## Get Document
 
 ### Request
 
-```text
-POST /verify
-```
-
-```JSON
-{
-  "documentId": "1234567890abcdef1234567890abcdef"
-}
+```http request
+GET /api/document/<document ID>
 ```
 
 ### Response
 
-```JSON
+```json
 {
-  "resultCode": 200,
-  "resultString": "Extract finished.",
-  "resultsData": {
-    "foq": "bat"
-  }
+    "document_id": "<random UUID>",
+    "document_key": "<file path>",
+    "document_type": "<the type of document>",
+    "signed_url": "<URL to temporarily allow you to download the document>",
+    "base64_encoded_file": "<base64 encoding of the document>",
+    "extracted_data": {
+        "<key extracted from the document>": {
+            "value": "<value extracted from the document>",
+            "confidence": <decimal number 0 - 100 representing how confident the system is in the key and value being correct>
+        }
+        // ...more...
+    }
 }
 ```
 
