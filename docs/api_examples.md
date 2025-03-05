@@ -51,41 +51,41 @@ GET /api/document/<document ID>
 }
 ```
 
-## Update API
+## Update Document
 
 ### Request
 
-```text
-POST /update
+```http request
+PUT /api/document/<document ID>
 ```
 
-```JSON
+```json
 {
-  "documentId": "1234567890abcdef1234567890abcdef",
-  "updates": [
-    {
-      "oldField": "foq",
-      "oldValue": "bat",
-      "newField": "foo",
-      "newValue": "bar"
+    "extracted_data": {
+        "<key extracted from the document to update>": {
+            "value": "<value extracted from the document to update>"
+        }
+        // ...more...
     }
-  ]
 }
 ```
 
 ### Response
 
-```JSON
+```json
 {
-  "documentId": "1234567890abcdef1234567890abcdef",
-  "resultCode": 200,
-  "resultString": "Update accepted.",
-  "resultsData": {
-    "foo": "bar"
-  },
-  "links": {
-    "CSV": "https://url.of/data.csv",
-    "JSON": "https://url.of/data.json"
-  }
+    "message": "Document updated successfully",
+    "updated_document": {
+        "document_id": "<random UUID>",
+        "document_key": "<file path>",
+        "document_type": "<the type of document>",
+        "extracted_data": {
+            "<key extracted from the document>": {
+                "value": "<updated value extracted from the document>",
+                "confidence": <decimal number 0 - 100 representing how confident the system is in the key and value being correct>
+            }
+            // ...more...
+        }
+    }
 }
 ```
