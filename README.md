@@ -59,6 +59,10 @@ The additional requirements needed to contribute towards development are...
 
 - [Pre-Commit](https://pre-commit.com).
 
+### Running Locally
+
+_To be implemented_.
+
 ### Pre-Commit Hooks
 
 We use [`pre-commit`](https://pre-commit.com) to run [some hooks](.pre-commit-config.yaml) on every commit.  These
