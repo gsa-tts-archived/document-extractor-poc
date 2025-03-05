@@ -1,25 +1,78 @@
-[![MegaLinter](https://github.com/flexion/document-extractor-poc/actions/workflows/megalinter.yml/badge.svg)](https://github.com/flexion/document-extractor-poc/actions/workflows/megalinter.yml)
-<!--
-[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/flexion/document-extractor-poc/badge)](https://scorecard.dev/viewer/?uri=github.com/flexion/document-extractor-poc)
--->
-
 # Document Extractor Proof of Concept
 
-![document_uploader_poc drawio](docs/document_uploader_poc.drawio.png)
+Public Benefits Studio's Document Extractor to automate document data extraction with AI and OCR.
 
-[source](https://drive.google.com/file/d/1Ev9UzL8j8pEjpyM0r93MwGahs8yXCajJ/view?usp=drive_link) in [Draw.io](https://draw.io/)
+## Using and Running
 
+Using your browser of choice, navigate to the CloudFront distribution URL to start using.
 
-## Testing `uploadFileForTextExtractor` in AWS Console
+## Development
 
-1. **Open AWS Lambda** → Select **`uploadFileForTextExtractor`**.
-2. **Go to Test Tab** → Click **Create new test event**.
-3. **Enter Event Name** → Use `"TestUploadFile"`.
-4. **Paste JSON Payload**:
+### Requirements to Deploy
 
-   ```
-   {
-     "body": "{\"file_content\": \"<base64-encoded-content>\", \"file_name\": \"test-file.txt\"}"
-   }
-   ```
-5. Save & Run Test → Click Test
+The requirements needed to deploy are...
+
+- [Python](https://docs.python-guide.org/starting/installation/).
+- [uv](https://docs.astral.sh/uv/).
+- [Terraform](https://www.terraform.io).
+- [Node.js](https://nodejs.org).
+- An [AWS](https://aws.amazon.com/) account.
+
+### Deploying
+
+You can mimic the steps in our [Continuous Delivery GitHub Action](.github/workflows/cd.yml).
+
+The basic steps to accomplish this are...
+1. Build the backend.
+2. Build the frontend.
+3. Deploy using the Infrastructure as Code (IaC).
+
+### Building
+
+#### Backend
+
+To build the backend, execute...
+
+```shell
+cd ./backend/
+uv sync
+uv run build.py
+```
+
+The built artifact is `backend/dist/lambda.zip`.
+
+#### Frontend
+
+To build the frontend, execute...
+
+```shell
+cd ./ui/
+npm ci
+npm run build
+```
+
+The built artifact is in `ui/dist/`.
+
+### Additional Requirements to Develop
+
+The additional requirements needed to contribute towards development are...
+
+- [Pre-Commit](https://pre-commit.com).
+
+### Running Locally
+
+_To be implemented_.
+
+### Pre-Commit Hooks
+
+We use [`pre-commit`](https://pre-commit.com) to run [some hooks](.pre-commit-config.yaml) on every commit.  These
+hooks do linting to ensure things are in a good spot before a commit is made.  Please install `pre-commit` and then
+install the hooks.
+
+```shell
+pre-commit install
+```
+
+Most of the time any errors encountered by pre-commit are automatically fixed.  Run `git status` to see the fixed files,
+run `git add .` to add the fixes, and rerun the commit.  You will need to manually fix any errors that are not
+automatically fixed.
