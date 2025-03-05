@@ -1,4 +1,4 @@
-# 6. Upload API endpoint responses
+# 6. Upload API Endpoint Responses
 
 Date: 2025-02-17
 

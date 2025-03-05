@@ -1,4 +1,4 @@
-# 3. user interface to s3 data flow
+# 3. User Interface to S3 Data Flow
 
 Date: 2025-02-14
 
@@ -35,6 +35,6 @@ pre-signed S3 URLs in the future.
 Files that are uploaded must pass through API gateway and a Lambda function
 prior to being written to S3.  This gives us control over file names and allows
 us to manipulate or filter files prior to their being written to S3.  At the
-same time, we're bottlenecked (processing, bandwidth) on API gateway and
+same time, we're bottlenecked (processing, bandwidth) on API Gateway and
 Lambda whereas a pre-signed URL upload directly to S3 wouldn't have those
 bottlenecks.

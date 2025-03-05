@@ -21,5 +21,5 @@ We'll be using Python for backend development.
 ## Consequences
 
 This is a POC and we expect changes.  Adopting other languages (e.g., Node)
-is more likely than with an established project.  If we adpot another language,
+is more likely than with an established project.  If we adopt another language,
 it may be possible to include it along with Python.

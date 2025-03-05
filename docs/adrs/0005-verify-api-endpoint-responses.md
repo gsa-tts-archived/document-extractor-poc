@@ -1,4 +1,4 @@
-# 5. Verify API endpoint responses
+# 5. Verify API Endpoint Responses
 
 Date: 2025-02-17
 
