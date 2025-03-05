@@ -1,10 +1,10 @@
-# 1. Record architecture decisions
+# 1. Record Architecture Decisions
 
 Date: 2025-02-10
 
 ## Status
 
-Accepted
+Accepted.
 
 ## Context
 
