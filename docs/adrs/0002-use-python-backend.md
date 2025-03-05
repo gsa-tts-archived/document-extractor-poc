@@ -1,4 +1,4 @@
-# 2. Use Python backend
+# 2. Use Python Backend
 
 Date: 2025-02-13
 
