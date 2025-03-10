@@ -42,17 +42,29 @@ __Make the application unavailable__
   - Have access to GitHub.
     - [x] GSA requires a user have a GSA e-mail, which requires a background check.
     - [x] GitHub accounts in the GSA GitHub organization requires two-factor authentication.
-  - Have access to AWS.
+  - Have access to AWS to change code or other configuration.
     - [x] Protected by two-factor authentication and only specific individuals are given access.
-  - Suppy chain attack.
-    - [x] We use well known dependencies distributed through well known distribution channels like PyPi and NPM.
-    - [ ] Improve dependabot to automatically update dependencies.
-    - [ ] Do SCA scanning.
+- Suppy chain attack to make the larger application inoperable.
+  - [x] We use well known dependencies distributed through well known distribution channels like PyPi and NPM.
+  - [ ] Improve dependabot to automatically update dependencies.
+  - [ ] Do SCA scanning.
 ```
 
 ```threatdown
 __Steal the raw, uploaded documents__
-- stuff
+- Access the S3 bucket.
+  - Have access to AWS.
+    - [x] Protected by two-factor authentication and only specific individuals are given access.
+  - [x] Public access is completely disabled.
+  - [ ] Set a lifecycle policy to delete documents after a period of time.
+- Change the code to exfiltrate the raw document.
+  - Have access to GitHub.
+    - [x] GSA requires a user have a GSA e-mail, which requires a background check.
+    - [x] GitHub accounts in the GSA GitHub organization requires two-factor authentication.
+- Suppy chain attack to exfiltrate the raw document.
+  - [x] We use well known dependencies distributed through well known distribution channels like PyPi and NPM.
+  - [ ] Improve dependabot to automatically update dependencies.
+  - [ ] Do SCA scanning.
 ```
 
 ```threatdown
