@@ -20,6 +20,9 @@
   border: none;
 }
 
-.grid-container, .usa-nav-container, .usa-banner__content, .usa-banner__inner {
+.grid-container,
+.usa-nav-container,
+.usa-banner__content,
+.usa-banner__inner {
   max-width: 80rem;
 }

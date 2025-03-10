@@ -110,28 +110,30 @@ export default function VerifyPage() {
       return;
     }
     return Object.entries(responseData.extracted_data)
-    .sort(([keyA],[keyB])=> keyA.localeCompare(keyB, undefined,{numeric: true}))
-    .map(([key, field]) => {
-      return (
-        <div key={key}>
-          <label className="usa-label" htmlFor="input-type-text">
-            {key}{' '}
-            <span className="text-accent-cool-darker display-inline-block width-full padding-top-2px">
-              {field.confidence
-                ? `(Confidence ${field?.confidence.toFixed(2)})`
-                : 'N/A'}
-            </span>
-          </label>
-          <input
-            className="usa-input"
-            id="input-type-text"
-            name="input-type-text"
-            value={field.value || ''}
-            onChange={(event) => handleInputChange(event, key, field)}
-          />
-        </div>
-      );
-    });
+      .sort(([keyA], [keyB]) =>
+        keyA.localeCompare(keyB, undefined, { numeric: true })
+      )
+      .map(([key, field]) => {
+        return (
+          <div key={key}>
+            <label className="usa-label" htmlFor="input-type-text">
+              {key}{' '}
+              <span className="text-accent-cool-darker display-inline-block width-full padding-top-2px">
+                {field.confidence
+                  ? `(Confidence ${field?.confidence.toFixed(2)})`
+                  : 'N/A'}
+              </span>
+            </label>
+            <input
+              className="usa-input"
+              id="input-type-text"
+              name="input-type-text"
+              value={field.value || ''}
+              onChange={(event) => handleInputChange(event, key, field)}
+            />
+          </div>
+        );
+      });
   }
 
   function displayFilePreview() {

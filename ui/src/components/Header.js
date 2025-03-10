@@ -114,7 +114,9 @@ export default function Headers() {
         <div className="usa-nav-container">
           <div className="usa-navbar">
             <div className="usa-logo">
-           <a href='/'><em className="usa-logo__text">DocExtractor.gov</em></a> 
+              <a href="/">
+                <em className="usa-logo__text">DocExtractor.gov</em>
+              </a>
             </div>
           </div>
         </div>
