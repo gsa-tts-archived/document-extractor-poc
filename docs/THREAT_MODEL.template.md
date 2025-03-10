@@ -55,7 +55,7 @@ __Steal the raw, uploaded documents__
 - Access the S3 bucket.
   - Have access to AWS.
     - [x] Protected by two-factor authentication and only specific individuals are given access.
-  - [x] Public access is completely disabled.
+  - [x] Public access is completely disabled on the bucket.
   - [ ] Set a lifecycle policy to delete documents after a period of time.
 - Change the code to exfiltrate the raw document.
   - Have access to GitHub.
@@ -65,11 +65,31 @@ __Steal the raw, uploaded documents__
   - [x] We use well known dependencies distributed through well known distribution channels like PyPi and NPM.
   - [ ] Improve dependabot to automatically update dependencies.
   - [ ] Do SCA scanning.
+- Set a UUID in the frontend or call the API with UUID to get an S3 pre-signed URL.
+  - [x] UUIDs are hard to guess because the range of values is so large
+    > This is not good enough at all.  Someone could brute force the numbers and eventually encounter a document which will be devastating.  This must be fixed before real data is used.
+  - [ ] Add AuthN/AuthZ so only allowed people are able to call the API with a UUID associated with them.
+  - [ ] Add API trottling to slow down the brute force checking of a bunch of UUIDs.
 ```
 
 ```threatdown
 __Steal the extracted data__
-- stuff
+- Access the DynamoDB table.
+  - Have access to AWS.
+    - [x] Protected by two-factor authentication and only specific individuals are given access.
+- Change the code to exfiltrate the extracted data.
+  - Have access to GitHub.
+    - [x] GSA requires a user have a GSA e-mail, which requires a background check.
+    - [x] GitHub accounts in the GSA GitHub organization requires two-factor authentication.
+- Suppy chain attack to exfiltrate the extracted data.
+  - [x] We use well known dependencies distributed through well known distribution channels like PyPi and NPM.
+  - [ ] Improve dependabot to automatically update dependencies.
+  - [ ] Do SCA scanning.
+- Set a UUID in the frontend or call the API with UUID to get the extracted data.
+  - [x] UUIDs are hard to guess because the range of values is so large
+    > This is not good enough at all.  Someone could brute force the numbers and eventually encounter a document which will be devastating.  This must be fixed before real data is used.
+  - [ ] Add AuthN/AuthZ so only allowed people are able to call the API with a UUID associated with them.
+  - [ ] Add API trottling to slow down the brute force checking of a bunch of UUIDs.
 ```
 
 ```threatdown

@@ -92,7 +92,7 @@ __Steal the raw, uploaded documents__
 - Access the S3 bucket.
   - Have access to AWS.
     - [x] Protected by two-factor authentication and only specific individuals are given access.
-  - [x] Public access is completely disabled.
+  - [x] Public access is completely disabled on the bucket.
   - [ ] Set a lifecycle policy to delete documents after a period of time.
 - Change the code to exfiltrate the raw document.
   - Have access to GitHub.
@@ -102,6 +102,11 @@ __Steal the raw, uploaded documents__
   - [x] We use well known dependencies distributed through well known distribution channels like PyPi and NPM.
   - [ ] Improve dependabot to automatically update dependencies.
   - [ ] Do SCA scanning.
+- Set a UUID in the frontend or call the API with UUID to get an S3 pre-signed URL.
+  - [x] UUIDs are hard to guess because the range of values is so large
+    > This is not good enough at all.  Someone could brute force the numbers and eventually encounter a document which will be devastating.  This must be fixed before real data is used.
+  - [ ] Add AuthN/AuthZ so only allowed people are able to call the API with a UUID associated with them.
+  - [ ] Add API trottling to slow down the brute force checking of a bunch of UUIDs.
 ``` -->
 ```mermaid
 flowchart TD
@@ -111,7 +116,7 @@ flowchart TD
         C1---D1(((OR))):::booleanOr
           D1---E1(Have access to AWS.):::condition
             E1-- mitigated by ---F1(Protected by two-factor authentication and only specific individuals are given access.):::condition
-          D1-- mitigated by ---E2(Public access is completely disabled.):::condition
+          D1-- mitigated by ---E2(Public access is completely disabled on the bucket.):::condition
           D1-. mitigated by .-E3(Set a lifecycle policy to delete documents after a period of time.):::condition
       B1---C2(Change the code to exfiltrate the raw document.):::condition
         C2---D2(Have access to GitHub.):::condition
@@ -123,6 +128,11 @@ flowchart TD
           D3-- mitigated by ---E5(We use well known dependencies distributed through well known distribution channels like PyPi and NPM.):::condition
           D3-. mitigated by .-E6(Improve dependabot to automatically update dependencies.):::condition
           D3-. mitigated by .-E7(Do SCA scanning.):::condition
+      B1---C4(Set a UUID in the frontend or call the API with UUID to get an S3 pre-signed URL.):::condition
+        C4---D4(((OR))):::booleanOr
+          D4-- mitigated by ---E8(UUIDs are hard to guess because the range of values is so large):::condition
+          D4-. mitigated by .-E9(Add AuthN/AuthZ so only allowed people are able to call the API with a UUID associated with them.):::condition
+          D4-. mitigated by .-E10(Add API trottling to slow down the brute force checking of a bunch of UUIDs.):::condition
   classDef objective fill:#0c0b0e,color:#ffffff,stroke:#3e3b4e,stroke-width:2px
   classDef condition fill:#0c0b0e,color:#ffffff,stroke:#3e3b4e,stroke-width:2px
   classDef assumption fill:#0c0b0e,color:#ffffff,stroke:#3e3b4e,stroke-width:2px
@@ -136,24 +146,69 @@ flowchart TD
   style E5 stroke:#4a3dff,stroke-width:2px,fill:#0c0b0e,color:#ffffff,stroke:#3e3b4e,stroke-width:2px
   style E6 stroke:#4a3dff,stroke-width:2px
   style E7 stroke:#4a3dff,stroke-width:2px
-  linkStyle 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16 stroke:#4a3dff,stroke-width:2px
+  style E8 stroke:#4a3dff,stroke-width:2px,fill:#0c0b0e,color:#ffffff,stroke:#3e3b4e,stroke-width:2px
+  style E9 stroke:#4a3dff,stroke-width:2px
+  style E10 stroke:#4a3dff,stroke-width:2px
+  linkStyle 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21 stroke:#4a3dff,stroke-width:2px
 ```
 
 
 <!-- ```threatdown
 __Steal the extracted data__
-- stuff
+- Access the DynamoDB table.
+  - Have access to AWS.
+    - [x] Protected by two-factor authentication and only specific individuals are given access.
+- Change the code to exfiltrate the extracted data.
+  - Have access to GitHub.
+    - [x] GSA requires a user have a GSA e-mail, which requires a background check.
+    - [x] GitHub accounts in the GSA GitHub organization requires two-factor authentication.
+- Suppy chain attack to exfiltrate the extracted data.
+  - [x] We use well known dependencies distributed through well known distribution channels like PyPi and NPM.
+  - [ ] Improve dependabot to automatically update dependencies.
+  - [ ] Do SCA scanning.
+- Set a UUID in the frontend or call the API with UUID to get the extracted data.
+  - [x] UUIDs are hard to guess because the range of values is so large
+    > This is not good enough at all.  Someone could brute force the numbers and eventually encounter a document which will be devastating.  This must be fixed before real data is used.
+  - [ ] Add AuthN/AuthZ so only allowed people are able to call the API with a UUID associated with them.
+  - [ ] Add API trottling to slow down the brute force checking of a bunch of UUIDs.
 ``` -->
 ```mermaid
 flowchart TD
   A0{Steal the extracted data}:::objective
-    A0---B1(stuff):::condition
+    A0---B1(((OR))):::booleanOr
+      B1---C1(Access the DynamoDB table.):::condition
+        C1---D1(Have access to AWS.):::condition
+          D1-- mitigated by ---E1(Protected by two-factor authentication and only specific individuals are given access.):::condition
+      B1---C2(Change the code to exfiltrate the extracted data.):::condition
+        C2---D2(Have access to GitHub.):::condition
+          D2---E2(((OR))):::booleanOr
+            E2-- mitigated by ---F1(GSA requires a user have a GSA e-mail, which requires a background check.):::condition
+            E2-- mitigated by ---F2(GitHub accounts in the GSA GitHub organization requires two-factor authentication.):::condition
+      B1---C3(Suppy chain attack to exfiltrate the extracted data.):::condition
+        C3---D3(((OR))):::booleanOr
+          D3-- mitigated by ---E3(We use well known dependencies distributed through well known distribution channels like PyPi and NPM.):::condition
+          D3-. mitigated by .-E4(Improve dependabot to automatically update dependencies.):::condition
+          D3-. mitigated by .-E5(Do SCA scanning.):::condition
+      B1---C4(Set a UUID in the frontend or call the API with UUID to get the extracted data.):::condition
+        C4---D4(((OR))):::booleanOr
+          D4-- mitigated by ---E6(UUIDs are hard to guess because the range of values is so large):::condition
+          D4-. mitigated by .-E7(Add AuthN/AuthZ so only allowed people are able to call the API with a UUID associated with them.):::condition
+          D4-. mitigated by .-E8(Add API trottling to slow down the brute force checking of a bunch of UUIDs.):::condition
   classDef objective fill:#0c0b0e,color:#ffffff,stroke:#3e3b4e,stroke-width:2px
   classDef condition fill:#0c0b0e,color:#ffffff,stroke:#3e3b4e,stroke-width:2px
   classDef assumption fill:#0c0b0e,color:#ffffff,stroke:#3e3b4e,stroke-width:2px
   classDef booleanAnd fill:#4a3dff,color:#ffffff,stroke:#ffffff,stroke-width:2px
   classDef booleanOr fill:#4a3dff,color:#ffffff,stroke:#ffffff,stroke-width:2px
-  linkStyle 0 stroke:#4a3dff,stroke-width:2px
+  style E1 stroke:#4a3dff,stroke-width:2px,fill:#0c0b0e,color:#ffffff,stroke:#3e3b4e,stroke-width:2px
+  style F1 stroke:#4a3dff,stroke-width:2px,fill:#0c0b0e,color:#ffffff,stroke:#3e3b4e,stroke-width:2px
+  style F2 stroke:#4a3dff,stroke-width:2px,fill:#0c0b0e,color:#ffffff,stroke:#3e3b4e,stroke-width:2px
+  style E3 stroke:#4a3dff,stroke-width:2px,fill:#0c0b0e,color:#ffffff,stroke:#3e3b4e,stroke-width:2px
+  style E4 stroke:#4a3dff,stroke-width:2px
+  style E5 stroke:#4a3dff,stroke-width:2px
+  style E6 stroke:#4a3dff,stroke-width:2px,fill:#0c0b0e,color:#ffffff,stroke:#3e3b4e,stroke-width:2px
+  style E7 stroke:#4a3dff,stroke-width:2px
+  style E8 stroke:#4a3dff,stroke-width:2px
+  linkStyle 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18 stroke:#4a3dff,stroke-width:2px
 ```
 
 
