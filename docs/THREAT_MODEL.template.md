@@ -36,6 +36,18 @@ to the individuals doing development and deployment and can be modified in conce
 ```threatdown
 __Make the application unavailable__
 - Harness a botnet and throw a bunch of traffic at the website or API.
+  - [x] AWS has built-in DDOS mitigations.
+  - [ ] Pay for AWS Shield Advaced that provides additional protections.
+- Change the code to become inoperable.
+  - Have access to GitHub.
+    - [x] GSA requires a user have a GSA e-mail, which requires a background check.
+    - [x] GitHub accounts in the GSA GitHub organization requires two-factor authentication.
+  - Have access to AWS.
+    - [x] Protected by two-factor authentication and only specific individuals are given access.
+  - Suppy chain attack.
+    - [x] We use well known dependencies distributed through well known distribution channels like PyPi and NPM.
+    - [ ] Improve dependabot to automatically update dependencies.
+    - [ ] Do SCA scanning.
 ```
 
 ```threatdown
