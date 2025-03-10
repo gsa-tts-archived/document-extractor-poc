@@ -18,24 +18,67 @@ to the individuals doing development and deployment and can be modified in conce
 
 ## Entry Points
 
-1. asdf
+1. Website.  Users interact with our application through the website.  Anyone can interact with the website.
+2. API.  Users can interact with the API through the website or directly.
+3. AWS console.  AWS credentials can be used to log into the AWS console directly and access data, code, and
+   configuration.
+4. S3 bucket document bucket.  The S3 bucket stores the documents and is written to by the application.
 
 ## Assets
 
-1. asdf
+1. The code itself.
+2. The website.
+3. Documents uploaded to the application.
+4. The extracted data from the documents.
 
 ## Threats
 
 <!-- ```threatdown
-__DDOS the application__
+__Make the application unavailable DDOS__
+- stuff
 ``` -->
 ```mermaid
 flowchart TD
-  A0{DDOS the application}:::objective
+  A0{Make the application unavailable DDOS}:::objective
+    A0---B1(stuff):::condition
   classDef objective fill:#0c0b0e,color:#ffffff,stroke:#3e3b4e,stroke-width:2px
   classDef condition fill:#0c0b0e,color:#ffffff,stroke:#3e3b4e,stroke-width:2px
   classDef assumption fill:#0c0b0e,color:#ffffff,stroke:#3e3b4e,stroke-width:2px
   classDef booleanAnd fill:#4a3dff,color:#ffffff,stroke:#ffffff,stroke-width:2px
   classDef booleanOr fill:#4a3dff,color:#ffffff,stroke:#ffffff,stroke-width:2px
-  linkStyle  stroke:#4a3dff,stroke-width:2px
+  linkStyle 0 stroke:#4a3dff,stroke-width:2px
+```
+
+
+<!-- ```threatdown
+__Steal the raw, uploaded documents__
+- stuff
+``` -->
+```mermaid
+flowchart TD
+  A0{Steal the raw, uploaded documents}:::objective
+    A0---B1(stuff):::condition
+  classDef objective fill:#0c0b0e,color:#ffffff,stroke:#3e3b4e,stroke-width:2px
+  classDef condition fill:#0c0b0e,color:#ffffff,stroke:#3e3b4e,stroke-width:2px
+  classDef assumption fill:#0c0b0e,color:#ffffff,stroke:#3e3b4e,stroke-width:2px
+  classDef booleanAnd fill:#4a3dff,color:#ffffff,stroke:#ffffff,stroke-width:2px
+  classDef booleanOr fill:#4a3dff,color:#ffffff,stroke:#ffffff,stroke-width:2px
+  linkStyle 0 stroke:#4a3dff,stroke-width:2px
+```
+
+
+<!-- ```threatdown
+__Steal the extracted data__
+- stuff
+``` -->
+```mermaid
+flowchart TD
+  A0{Steal the extracted data}:::objective
+    A0---B1(stuff):::condition
+  classDef objective fill:#0c0b0e,color:#ffffff,stroke:#3e3b4e,stroke-width:2px
+  classDef condition fill:#0c0b0e,color:#ffffff,stroke:#3e3b4e,stroke-width:2px
+  classDef assumption fill:#0c0b0e,color:#ffffff,stroke:#3e3b4e,stroke-width:2px
+  classDef booleanAnd fill:#4a3dff,color:#ffffff,stroke:#ffffff,stroke-width:2px
+  classDef booleanOr fill:#4a3dff,color:#ffffff,stroke:#ffffff,stroke-width:2px
+  linkStyle 0 stroke:#4a3dff,stroke-width:2px
 ```
