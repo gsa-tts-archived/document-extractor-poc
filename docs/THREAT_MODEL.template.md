@@ -42,6 +42,7 @@ __Make the application unavailable__
   - Have access to GitHub.
     - [x] GSA requires a user have a GSA e-mail, which requires a background check.
     - [x] GitHub accounts in the GSA GitHub organization requires two-factor authentication.
+    - [x] main branch is protected and requires a code review approval from another person before code is accepted.
   - Have access to AWS to change code or other configuration.
     - [x] Protected by two-factor authentication and only specific individuals are given access.
 - Suppy chain attack to make the larger application inoperable.
@@ -61,6 +62,7 @@ __Steal the raw, uploaded documents__
   - Have access to GitHub.
     - [x] GSA requires a user have a GSA e-mail, which requires a background check.
     - [x] GitHub accounts in the GSA GitHub organization requires two-factor authentication.
+    - [x] main branch is protected and requires a code review approval from another person before code is accepted.
 - Suppy chain attack to exfiltrate the raw document.
   - [x] We use well known dependencies distributed through well known distribution channels like PyPi and NPM.
   - [ ] Improve dependabot to automatically update dependencies.
@@ -81,6 +83,7 @@ __Steal the extracted data__
   - Have access to GitHub.
     - [x] GSA requires a user have a GSA e-mail, which requires a background check.
     - [x] GitHub accounts in the GSA GitHub organization requires two-factor authentication.
+    - [x] main branch is protected and requires a code review approval from another person before code is accepted.
 - Suppy chain attack to exfiltrate the extracted data.
   - [x] We use well known dependencies distributed through well known distribution channels like PyPi and NPM.
   - [ ] Improve dependabot to automatically update dependencies.
@@ -94,5 +97,14 @@ __Steal the extracted data__
 
 ```threatdown
 __Vandalize the website__
-- stuff
+- Access the S3 bucket.
+- Change the code to vandalize the website.
+  - Have access to GitHub.
+    - [x] GSA requires a user have a GSA e-mail, which requires a background check.
+    - [x] GitHub accounts in the GSA GitHub organization requires two-factor authentication.
+    - [x] main branch is protected and requires a code review approval from another person before code is accepted.
+- Suppy chain attack to vandalize the resulting website.
+  - [x] We use well known dependencies distributed through well known distribution channels like PyPi and NPM.
+  - [ ] Improve dependabot to automatically update dependencies.
+  - [ ] Do SCA scanning.
 ```

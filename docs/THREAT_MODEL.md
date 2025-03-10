@@ -42,6 +42,7 @@ __Make the application unavailable__
   - Have access to GitHub.
     - [x] GSA requires a user have a GSA e-mail, which requires a background check.
     - [x] GitHub accounts in the GSA GitHub organization requires two-factor authentication.
+    - [x] main branch is protected and requires a code review approval from another person before code is accepted.
   - Have access to AWS to change code or other configuration.
     - [x] Protected by two-factor authentication and only specific individuals are given access.
 - Suppy chain attack to make the larger application inoperable.
@@ -63,6 +64,7 @@ flowchart TD
             E3---F1(((OR))):::booleanOr
               F1-- mitigated by ---G1(GSA requires a user have a GSA e-mail, which requires a background check.):::condition
               F1-- mitigated by ---G2(GitHub accounts in the GSA GitHub organization requires two-factor authentication.):::condition
+              F1-- mitigated by ---G3(main branch is protected and requires a code review approval from another person before code is accepted.):::condition
           D2---E4(Have access to AWS to change code or other configuration.):::condition
             E4-- mitigated by ---F2(Protected by two-factor authentication and only specific individuals are given access.):::condition
       B1---C3(Suppy chain attack to make the larger application inoperable.):::condition
@@ -79,11 +81,12 @@ flowchart TD
   style E2 stroke:#4a3dff,stroke-width:2px
   style G1 stroke:#4a3dff,stroke-width:2px,fill:#0c0b0e,color:#ffffff,stroke:#3e3b4e,stroke-width:2px
   style G2 stroke:#4a3dff,stroke-width:2px,fill:#0c0b0e,color:#ffffff,stroke:#3e3b4e,stroke-width:2px
+  style G3 stroke:#4a3dff,stroke-width:2px,fill:#0c0b0e,color:#ffffff,stroke:#3e3b4e,stroke-width:2px
   style F2 stroke:#4a3dff,stroke-width:2px,fill:#0c0b0e,color:#ffffff,stroke:#3e3b4e,stroke-width:2px
   style E5 stroke:#4a3dff,stroke-width:2px,fill:#0c0b0e,color:#ffffff,stroke:#3e3b4e,stroke-width:2px
   style E6 stroke:#4a3dff,stroke-width:2px
   style E7 stroke:#4a3dff,stroke-width:2px
-  linkStyle 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17 stroke:#4a3dff,stroke-width:2px
+  linkStyle 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18 stroke:#4a3dff,stroke-width:2px
 ```
 
 
@@ -98,6 +101,7 @@ __Steal the raw, uploaded documents__
   - Have access to GitHub.
     - [x] GSA requires a user have a GSA e-mail, which requires a background check.
     - [x] GitHub accounts in the GSA GitHub organization requires two-factor authentication.
+    - [x] main branch is protected and requires a code review approval from another person before code is accepted.
 - Suppy chain attack to exfiltrate the raw document.
   - [x] We use well known dependencies distributed through well known distribution channels like PyPi and NPM.
   - [ ] Improve dependabot to automatically update dependencies.
@@ -123,6 +127,7 @@ flowchart TD
           D2---E4(((OR))):::booleanOr
             E4-- mitigated by ---F2(GSA requires a user have a GSA e-mail, which requires a background check.):::condition
             E4-- mitigated by ---F3(GitHub accounts in the GSA GitHub organization requires two-factor authentication.):::condition
+            E4-- mitigated by ---F4(main branch is protected and requires a code review approval from another person before code is accepted.):::condition
       B1---C3(Suppy chain attack to exfiltrate the raw document.):::condition
         C3---D3(((OR))):::booleanOr
           D3-- mitigated by ---E5(We use well known dependencies distributed through well known distribution channels like PyPi and NPM.):::condition
@@ -143,13 +148,14 @@ flowchart TD
   style E3 stroke:#4a3dff,stroke-width:2px
   style F2 stroke:#4a3dff,stroke-width:2px,fill:#0c0b0e,color:#ffffff,stroke:#3e3b4e,stroke-width:2px
   style F3 stroke:#4a3dff,stroke-width:2px,fill:#0c0b0e,color:#ffffff,stroke:#3e3b4e,stroke-width:2px
+  style F4 stroke:#4a3dff,stroke-width:2px,fill:#0c0b0e,color:#ffffff,stroke:#3e3b4e,stroke-width:2px
   style E5 stroke:#4a3dff,stroke-width:2px,fill:#0c0b0e,color:#ffffff,stroke:#3e3b4e,stroke-width:2px
   style E6 stroke:#4a3dff,stroke-width:2px
   style E7 stroke:#4a3dff,stroke-width:2px
   style E8 stroke:#4a3dff,stroke-width:2px,fill:#0c0b0e,color:#ffffff,stroke:#3e3b4e,stroke-width:2px
   style E9 stroke:#4a3dff,stroke-width:2px
   style E10 stroke:#4a3dff,stroke-width:2px
-  linkStyle 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21 stroke:#4a3dff,stroke-width:2px
+  linkStyle 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22 stroke:#4a3dff,stroke-width:2px
 ```
 
 
@@ -162,6 +168,7 @@ __Steal the extracted data__
   - Have access to GitHub.
     - [x] GSA requires a user have a GSA e-mail, which requires a background check.
     - [x] GitHub accounts in the GSA GitHub organization requires two-factor authentication.
+    - [x] main branch is protected and requires a code review approval from another person before code is accepted.
 - Suppy chain attack to exfiltrate the extracted data.
   - [x] We use well known dependencies distributed through well known distribution channels like PyPi and NPM.
   - [ ] Improve dependabot to automatically update dependencies.
@@ -184,6 +191,7 @@ flowchart TD
           D2---E2(((OR))):::booleanOr
             E2-- mitigated by ---F1(GSA requires a user have a GSA e-mail, which requires a background check.):::condition
             E2-- mitigated by ---F2(GitHub accounts in the GSA GitHub organization requires two-factor authentication.):::condition
+            E2-- mitigated by ---F3(main branch is protected and requires a code review approval from another person before code is accepted.):::condition
       B1---C3(Suppy chain attack to exfiltrate the extracted data.):::condition
         C3---D3(((OR))):::booleanOr
           D3-- mitigated by ---E3(We use well known dependencies distributed through well known distribution channels like PyPi and NPM.):::condition
@@ -202,28 +210,56 @@ flowchart TD
   style E1 stroke:#4a3dff,stroke-width:2px,fill:#0c0b0e,color:#ffffff,stroke:#3e3b4e,stroke-width:2px
   style F1 stroke:#4a3dff,stroke-width:2px,fill:#0c0b0e,color:#ffffff,stroke:#3e3b4e,stroke-width:2px
   style F2 stroke:#4a3dff,stroke-width:2px,fill:#0c0b0e,color:#ffffff,stroke:#3e3b4e,stroke-width:2px
+  style F3 stroke:#4a3dff,stroke-width:2px,fill:#0c0b0e,color:#ffffff,stroke:#3e3b4e,stroke-width:2px
   style E3 stroke:#4a3dff,stroke-width:2px,fill:#0c0b0e,color:#ffffff,stroke:#3e3b4e,stroke-width:2px
   style E4 stroke:#4a3dff,stroke-width:2px
   style E5 stroke:#4a3dff,stroke-width:2px
   style E6 stroke:#4a3dff,stroke-width:2px,fill:#0c0b0e,color:#ffffff,stroke:#3e3b4e,stroke-width:2px
   style E7 stroke:#4a3dff,stroke-width:2px
   style E8 stroke:#4a3dff,stroke-width:2px
-  linkStyle 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18 stroke:#4a3dff,stroke-width:2px
+  linkStyle 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19 stroke:#4a3dff,stroke-width:2px
 ```
 
 
 <!-- ```threatdown
 __Vandalize the website__
-- stuff
+- Access the S3 bucket.
+- Change the code to vandalize the website.
+  - Have access to GitHub.
+    - [x] GSA requires a user have a GSA e-mail, which requires a background check.
+    - [x] GitHub accounts in the GSA GitHub organization requires two-factor authentication.
+    - [x] main branch is protected and requires a code review approval from another person before code is accepted.
+- Suppy chain attack to vandalize the resulting website.
+  - [x] We use well known dependencies distributed through well known distribution channels like PyPi and NPM.
+  - [ ] Improve dependabot to automatically update dependencies.
+  - [ ] Do SCA scanning.
 ``` -->
 ```mermaid
 flowchart TD
   A0{Vandalize the website}:::objective
-    A0---B1(stuff):::condition
+    A0---B1(((OR))):::booleanOr
+      B1---C1(Access the S3 bucket.):::condition
+      B1---C2(Change the code to vandalize the website.):::condition
+        C2---D1(Have access to GitHub.):::condition
+          D1---E1(((OR))):::booleanOr
+            E1-- mitigated by ---F1(GSA requires a user have a GSA e-mail, which requires a background check.):::condition
+            E1-- mitigated by ---F2(GitHub accounts in the GSA GitHub organization requires two-factor authentication.):::condition
+            E1-- mitigated by ---F3(main branch is protected and requires a code review approval from another person before code is accepted.):::condition
+      B1---C3(Suppy chain attack to vandalize the resulting website.):::condition
+        C3---D2(((OR))):::booleanOr
+          D2-- mitigated by ---E2(We use well known dependencies distributed through well known distribution channels like PyPi and NPM.):::condition
+          D2-. mitigated by .-E3(Improve dependabot to automatically update dependencies.):::condition
+          D2-. mitigated by .-E4(Do SCA scanning.):::condition
   classDef objective fill:#0c0b0e,color:#ffffff,stroke:#3e3b4e,stroke-width:2px
   classDef condition fill:#0c0b0e,color:#ffffff,stroke:#3e3b4e,stroke-width:2px
   classDef assumption fill:#0c0b0e,color:#ffffff,stroke:#3e3b4e,stroke-width:2px
   classDef booleanAnd fill:#4a3dff,color:#ffffff,stroke:#ffffff,stroke-width:2px
   classDef booleanOr fill:#4a3dff,color:#ffffff,stroke:#ffffff,stroke-width:2px
-  linkStyle 0 stroke:#4a3dff,stroke-width:2px
+  style F1 stroke:#4a3dff,stroke-width:2px,fill:#0c0b0e,color:#ffffff,stroke:#3e3b4e,stroke-width:2px
+  style F2 stroke:#4a3dff,stroke-width:2px,fill:#0c0b0e,color:#ffffff,stroke:#3e3b4e,stroke-width:2px
+  style F3 stroke:#4a3dff,stroke-width:2px,fill:#0c0b0e,color:#ffffff,stroke:#3e3b4e,stroke-width:2px
+  style E2 stroke:#4a3dff,stroke-width:2px,fill:#0c0b0e,color:#ffffff,stroke:#3e3b4e,stroke-width:2px
+  style E3 stroke:#4a3dff,stroke-width:2px
+  style E4 stroke:#4a3dff,stroke-width:2px
+  linkStyle 0,1,2,3,4,5,6,7,8,9,10,11,12 stroke:#4a3dff,stroke-width:2px
 ```
