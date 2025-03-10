@@ -109,7 +109,9 @@ export default function VerifyPage() {
       console.warn('No extracted data found.');
       return;
     }
-    return Object.entries(responseData.extracted_data)?.map(([key, field]) => {
+    return Object.entries(responseData.extracted_data)
+    .sort(([keyA],[keyB])=> keyA.localeCompare(keyB, undefined,{numeric: true}))
+    .map(([key, field]) => {
       return (
         <div key={key}>
           <label className="usa-label" htmlFor="input-type-text">
