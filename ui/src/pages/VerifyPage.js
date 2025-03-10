@@ -169,79 +169,115 @@ export default function VerifyPage() {
     );
   }
 
-  return (
-    <Layout>
-      {/* Start step indicator section  */}
-      <div className="grid-container">
-        <div className="usa-step-indicator usa-step-indicator--counters margin-y-2">
-          <ol className="usa-step-indicator__segments">
-            <li className="usa-step-indicator__segment usa-step-indicator__segment--complete">
-              <span className="usa-step-indicator__segment-label">
-                Upload documents <span className="usa-sr-only">completed</span>
-              </span>
-            </li>
-            <li className="usa-step-indicator__segment usa-step-indicator__segment--current">
-              <span className="usa-step-indicator__segment-label">
-                Verify documents and data
-                <span className="usa-sr-only">not completed</span>
-              </span>
-            </li>
-            <li className="usa-step-indicator__segment">
-              <span className="usa-step-indicator__segment-label">
-                Save and download CSV file
-                <span className="usa-sr-only">not completed</span>
-              </span>
-            </li>
-          </ol>
-        </div>
-      </div>
-      {/* End step indicator section  */}
-      <div className="border-top-2px border-base-lighter">
-        <div className="grid-container">
-          <div className="grid-row">
-            <div className="grid-col-12 tablet:grid-col-8">
-              {/* Start card section  */}
-              <ul className="usa-card-group">
-                <li className="usa-card width-full">
-                  <div className="usa-card__container file-preview-col">
-                    <div className="usa-card__body">
-                      <div id="file-display-container"></div>
-                      {loading ? <p>Processing...Please wait</p> : ''}
-                      <div>{displayFilePreview()}</div>
-                      <p>{displayFileName()}</p>
-                    </div>
-                  </div>
-                </li>
-              </ul>
-              {/* End card section  */}
+  function displayLoadingMessage() {
+    if (loading) {
+      return (
+        <div className="loading-overlay">
+          <div className="loading-content-el">
+            <div className="loading-content">
+              <p className="font-body-lg text-semi-bold">
+                Processing your document
+              </p>
+              <p>We&apos;re extracting your data and it&apos;s on the way.</p>
+              <a href="/">Upload document</a>
+              <div className="spinner" aria-label="loading"></div>
             </div>
-            <div className="grid-col-12 maxh-viewport border-bottom-2px border-base-lighter tablet:grid-col-4 tablet:border-left-2px tablet:border-base-lighter tablet:border-bottom-0">
-              {/* Start verify form section  */}
-              <form id="verify-form" onSubmit={handleVerifySubmit}>
+          </div>
+        </div>
+      );
+    } else {
+      return (
+        <div className="loading-overlay">
+          <div className="loading-content-el">
+            <div className="loading-content">
+              <p className="font-body-lg text-semi-bold">No data found</p>
+              <p>
+                We couldn&apos;t extract the data from this document. Please
+                check the file format and then try again. If the issue persists,
+                reach out to support.
+              </p>
+              <a href="/">Upload document</a>
+            </div>
+          </div>
+        </div>
+      );
+    }
+  }
+
+  return (
+      <Layout>
+      {displayLoadingMessage()}
+        {/* Start step indicator section  */}
+        <div className="grid-container">
+          <div className="usa-step-indicator usa-step-indicator--counters margin-y-2">
+            <ol className="usa-step-indicator__segments">
+              <li className="usa-step-indicator__segment usa-step-indicator__segment--complete">
+                <span className="usa-step-indicator__segment-label">
+                  Upload documents{' '}
+                  <span className="usa-sr-only">completed</span>
+                </span>
+              </li>
+              <li className="usa-step-indicator__segment usa-step-indicator__segment--current">
+                <span className="usa-step-indicator__segment-label">
+                  Verify documents and data
+                  <span className="usa-sr-only">not completed</span>
+                </span>
+              </li>
+              <li className="usa-step-indicator__segment">
+                <span className="usa-step-indicator__segment-label">
+                  Save and download CSV file
+                  <span className="usa-sr-only">not completed</span>
+                </span>
+              </li>
+            </ol>
+          </div>
+        </div>
+        {/* End step indicator section  */}
+        <div className="border-top-2px border-base-lighter">
+          <div className="grid-container">
+            <div className="grid-row">
+              <div className="grid-col-12 tablet:grid-col-8">
+                {/* Start card section  */}
                 <ul className="usa-card-group">
                   <li className="usa-card width-full">
-                    <div className="usa-card__container verify-col">
-                      <div className="usa-card__body overflow-y-scroll minh-mobile-lg maxh-mobile-lg">
-                        {displayExtractedData()}
-                      </div>
-                      <div className="usa-card__footer border-top-1px border-base-lighter">
-                        <button
-                          id="verify-button"
-                          className="usa-button"
-                          type="submit"
-                        >
-                          Data verified
-                        </button>
+                    <div className="usa-card__container file-preview-col">
+                      <div className="usa-card__body">
+                        <div id="file-display-container"></div>
+                        <div>{displayFilePreview()}</div>
+                        <p>{displayFileName()}</p>
                       </div>
                     </div>
                   </li>
                 </ul>
-              </form>
-              {/* End verify form section  */}
+                {/* End card section  */}
+              </div>
+              <div className="grid-col-12 maxh-viewport border-bottom-2px border-base-lighter tablet:grid-col-4 tablet:border-left-2px tablet:border-base-lighter tablet:border-bottom-0">
+                {/* Start verify form section  */}
+                <form id="verify-form" onSubmit={handleVerifySubmit}>
+                  <ul className="usa-card-group">
+                    <li className="usa-card width-full">
+                      <div className="usa-card__container verify-col">
+                        <div className="usa-card__body overflow-y-scroll minh-mobile-lg maxh-mobile-lg">
+                          {displayExtractedData()}
+                        </div>
+                        <div className="usa-card__footer border-top-1px border-base-lighter">
+                          <button
+                            id="verify-button"
+                            className="usa-button"
+                            type="submit"
+                          >
+                            Data verified
+                          </button>
+                        </div>
+                      </div>
+                    </li>
+                  </ul>
+                </form>
+                {/* End verify form section  */}
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </Layout>
+      </Layout>
   );
 }
