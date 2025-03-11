@@ -22,19 +22,23 @@ export default function DownloadPage() {
           </tr>
         </thead>
         <tbody>
-          {Object.entries(verifiedData?.extracted_data).map(([key, field]) => {
-            return (
-              <tr key={key}>
-                <td>{key}</td>
-                <td> {field.value ? field.value : 'N/A'}</td>
-                <td>
-                  {field.confidence
-                    ? parseFloat(field.confidence).toFixed(2) + '%'
-                    : 'N/A'}
-                </td>
-              </tr>
-            );
-          })}
+          {Object.entries(verifiedData?.extracted_data)
+            .sort(([keyA], [keyB]) =>
+              keyA.localeCompare(keyB, undefined, { numeric: true })
+            )
+            .map(([key, field]) => {
+              return (
+                <tr key={key}>
+                  <td>{key}</td>
+                  <td> {field.value ? field.value : 'N/A'}</td>
+                  <td>
+                    {field.confidence
+                      ? parseFloat(field.confidence).toFixed(2) + '%'
+                      : 'N/A'}
+                  </td>
+                </tr>
+              );
+            })}
         </tbody>
       </table>
     );
