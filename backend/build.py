@@ -2,6 +2,7 @@
 
 import shutil
 import subprocess
+import uuid
 from pathlib import Path
 
 
@@ -15,6 +16,10 @@ def uv(*args):
 
 def cp(*args):
     execute("cp", *args)
+
+
+def docker(*args):
+    execute("docker", *args)
 
 
 def build():
@@ -44,11 +49,29 @@ def build():
         requirements_txt.as_posix(),
     )
 
+    # put our code in the build
     our_code_path = "src"
     our_code = build_dir.joinpath(our_code_path)
     print(f"Copying our code to {our_code.as_posix()}")
     shutil.copytree(src=our_code_path, dst=our_code, dirs_exist_ok=True)
 
+    # build the docker image
+    docker_image_id = str(uuid.uuid4())
+    print(f"Building docker image {docker_image_id} for tesseract")
+    docker("build", ".", "-t", docker_image_id)
+
+    # run the docker container with a volume to mount the bin and lib64 directories
+    docker_container_id = str(uuid.uuid4())
+    print(f"Create docker container {docker_container_id}")
+    docker("create", "--name", docker_container_id, docker_image_id)
+
+    # copy the bin and lib64 directories
+    lib_dir = build_dir.joinpath("lib")
+    docker("cp", f"{docker_container_id}:/usr/lib64", lib_dir.as_posix())
+    bin_dir = build_dir.joinpath("bin")
+    docker("cp", f"{docker_container_id}:/usr/bin/tesseract", bin_dir.as_posix())
+
+    # zip everything
     lambda_zip = dist_folder.joinpath("lambda")
     print(f"Creating distribution zip at {lambda_zip.as_posix()}.zip")
     shutil.make_archive(lambda_zip, "zip", build_dir)
