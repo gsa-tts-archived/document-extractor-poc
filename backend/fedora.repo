@@ -1,0 +1,12 @@
+[fedora]
+name=Fedora 36 - $basearch
+#baseurl=http://download.example/pub/fedora/linux/releases/36/Everything/$basearch/os/
+metalink=https://mirrors.fedoraproject.org/metalink?repo=fedora-36&arch=$basearch
+enabled=1
+countme=1
+metadata_expire=7d
+repo_gpgcheck=0
+type=rpm
+gpgcheck=1
+gpgkey=https://src.fedoraproject.org/rpms/fedora-repos/raw/f36/f/RPM-GPG-KEY-fedora-36-primary
+skip_if_unavailable=False
