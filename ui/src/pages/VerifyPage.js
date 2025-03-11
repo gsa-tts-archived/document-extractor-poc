@@ -121,7 +121,7 @@ export default function VerifyPage() {
               <span className="text-accent-cool-darker display-inline-block width-full padding-top-2px">
                 {field.confidence
                   ? `(Confidence ${field?.confidence.toFixed(2)})`
-                  : 'N/A'}
+                  : 'Confidence'}
               </span>
             </label>
             <input

@@ -30,11 +30,11 @@ export default function DownloadPage() {
               return (
                 <tr key={key}>
                   <td>{key}</td>
-                  <td> {field.value ? field.value : 'N/A'}</td>
+                  <td> {field.value ? field.value : ''}</td>
                   <td>
                     {field.confidence
                       ? parseFloat(field.confidence).toFixed(2) + '%'
-                      : 'N/A'}
+                      : ''}
                   </td>
                 </tr>
               );
@@ -57,7 +57,7 @@ export default function DownloadPage() {
       ) {
         const field = verifiedData.extracted_data[key];
 
-        const value = field.value !== undefined ? field.value : 'N/A';
+        const value = field.value !== undefined ? field.value : '';
         csvContent += `"${key}","${value}""\n`;
       }
     }
