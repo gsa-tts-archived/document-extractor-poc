@@ -121,12 +121,6 @@ export default function DownloadPage() {
   return (
     <Layout>
       <div className="grid-container margin-bottom-15">
-        <div className="usa-alert usa-alert--info">
-          <div className="usa-alert__body">
-            <h4 className="usa-alert__heading"></h4>
-            <p className="usa-alert__text">Data is ready for download</p>
-          </div>
-        </div>
         {/* Start step indicator section  */}
         <div className="usa-step-indicator usa-step-indicator--counters margin-top-2 margin-bottom-6">
           <ol className="usa-step-indicator__segments">
