@@ -5,13 +5,9 @@ export default function VerifyPage() {
   const [documentId] = useState(() => sessionStorage.getItem('documentId'));
   const [responseData, setResponseData] = useState(null); // API response
   const [loading, setLoading] = useState(true); // tracks if page is loading
+  const [error, setError] = useState(false); // tracks when there is an error
 
   async function pollApiRequest(attempts = 30, delay = 2000) {
-    if (!documentId) {
-      console.error('No document Id found');
-      setLoading(false);
-    }
-
     for (let i = 0; i < attempts; i++) {
       try {
         const response = await fetch(`/api/document/${documentId}`, {
@@ -27,6 +23,7 @@ export default function VerifyPage() {
 
           setResponseData(result); // store API data in state
           setLoading(false); // stop loading when data is received
+          setError(false); // clear any previous errors
           return;
         } else {
           console.warn(`Attempt ${i + 1} failed: ${response.statusText}`);
@@ -39,6 +36,7 @@ export default function VerifyPage() {
     }
     console.error('Attempt failed after max attempts');
     setLoading(false);
+    setError(true);
   }
 
   async function handleVerifySubmit(event) {
@@ -82,6 +80,8 @@ export default function VerifyPage() {
   useEffect(() => {
     if (!documentId) {
       console.error('No documentId found in sessionStorage');
+      setLoading(false);
+      setError(true);
       return;
     }
     pollApiRequest();
@@ -169,6 +169,41 @@ export default function VerifyPage() {
     );
   }
 
+  function displayStatusMessage() {
+    if (loading) {
+      return (
+        <div className="loading-overlay">
+          <div className="loading-content-el">
+            <div className="loading-content">
+              <p className="font-body-lg text-semi-bold">
+                Processing your document
+              </p>
+              <p>We&apos;re extracting your data and it&apos;s on the way.</p>
+              <div className="spinner" aria-label="loading"></div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+    if (error) {
+      return (
+        <div className="loading-overlay">
+          <div className="loading-content-el">
+            <div className="loading-content">
+              <p className="font-body-lg text-semi-bold">No data found</p>
+              <p>
+                We couldn&apos;t extract the data from this document. Please
+                check the file format and then try again. If the issue persists,
+                reach out to support.
+              </p>
+              <a href="/">Upload document</a>
+            </div>
+          </div>
+        </div>
+      );
+    }
+  }
+
   return (
     <Layout>
       {/* Start step indicator section  */}
@@ -197,7 +232,8 @@ export default function VerifyPage() {
       </div>
       {/* End step indicator section  */}
       <div className="border-top-2px border-base-lighter">
-        <div className="grid-container">
+        <div className="grid-container position-relative">
+          {displayStatusMessage()}
           <div className="grid-row">
             <div className="grid-col-12 tablet:grid-col-8">
               {/* Start card section  */}
@@ -206,7 +242,6 @@ export default function VerifyPage() {
                   <div className="usa-card__container file-preview-col">
                     <div className="usa-card__body">
                       <div id="file-display-container"></div>
-                      {loading ? <p>Processing...Please wait</p> : ''}
                       <div>{displayFilePreview()}</div>
                       <p>{displayFileName()}</p>
                     </div>

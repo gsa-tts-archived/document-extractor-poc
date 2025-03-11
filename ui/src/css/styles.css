@@ -26,3 +26,39 @@
 .usa-banner__inner {
   max-width: 80rem;
 }
+
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 500;
+  background-color: #ffffff;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+}
+
+.loading-content {
+  text-align: center;
+  max-width: 480px;
+  line-height: 1.5;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  margin: 0 auto;
+  border: 5px solid #d9e8f6;
+  border-left-color: #005ea2;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
