@@ -22,19 +22,23 @@ export default function DownloadPage() {
           </tr>
         </thead>
         <tbody>
-          {Object.entries(verifiedData?.extracted_data).map(([key, field]) => {
-            return (
-              <tr key={key}>
-                <td>{key}</td>
-                <td> {field.value ? field.value : 'N/A'}</td>
-                <td>
-                  {field.confidence
-                    ? parseFloat(field.confidence).toFixed(2) + '%'
-                    : 'N/A'}
-                </td>
-              </tr>
-            );
-          })}
+          {Object.entries(verifiedData?.extracted_data)
+            .sort(([keyA], [keyB]) =>
+              keyA.localeCompare(keyB, undefined, { numeric: true })
+            )
+            .map(([key, field]) => {
+              return (
+                <tr key={key}>
+                  <td>{key}</td>
+                  <td> {field.value ? field.value : ''}</td>
+                  <td>
+                    {field.confidence
+                      ? parseFloat(field.confidence).toFixed(2) + '%'
+                      : ''}
+                  </td>
+                </tr>
+              );
+            })}
         </tbody>
       </table>
     );
@@ -53,7 +57,7 @@ export default function DownloadPage() {
       ) {
         const field = verifiedData.extracted_data[key];
 
-        const value = field.value !== undefined ? field.value : 'N/A';
+        const value = field.value !== undefined ? field.value : '';
         csvContent += `"${key}","${value}""\n`;
       }
     }
@@ -117,12 +121,6 @@ export default function DownloadPage() {
   return (
     <Layout>
       <div className="grid-container margin-bottom-15">
-        <div className="usa-alert usa-alert--info">
-          <div className="usa-alert__body">
-            <h4 className="usa-alert__heading"></h4>
-            <p className="usa-alert__text">Data is ready for download</p>
-          </div>
-        </div>
         {/* Start step indicator section  */}
         <div className="usa-step-indicator usa-step-indicator--counters margin-top-2 margin-bottom-6">
           <ol className="usa-step-indicator__segments">
