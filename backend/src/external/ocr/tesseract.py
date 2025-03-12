@@ -1,4 +1,5 @@
 import io
+from pathlib import Path
 from typing import Any
 from urllib.parse import urlparse
 
@@ -14,7 +15,10 @@ class Tesseract(Ocr):
         self.s3_client = boto3.client("s3")
 
         # Initialize tesserocr API
-        self.api = tesserocr.PyTessBaseAPI(path="/opt/homebrew/share/tessdata")
+        current_file_path = Path(__file__).resolve()
+        tessdata_folder = current_file_path.parent.parent.parent.parent.joinpath("share").joinpath("tessdata")
+        print(current_file_path)
+        self.api = tesserocr.PyTessBaseAPI(path=tessdata_folder.as_posix())
 
     def _parse_s3_url(self, s3_url: str) -> tuple[str, str]:
         parsed_url = urlparse(s3_url)

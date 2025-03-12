@@ -70,13 +70,15 @@ def build():
     # copy the bin and lib64 directories
     lib_dir = build_dir.joinpath("lib")
     lib_dir.mkdir(parents=True, exist_ok=True)
-    # docker("cp", f"{docker_container_id}:/usr/lib64", lib_dir.as_posix())
     docker("cp", "-L", f"{docker_container_id}:/usr/lib64/liblept.so", lib_dir.as_posix())
     docker("cp", "-L", f"{docker_container_id}:/usr/lib64/libtesseract.so", lib_dir.as_posix())
     docker("cp", "-L", f"{docker_container_id}:/usr/lib64/libpng16.so.16", lib_dir.as_posix())
     bin_dir = build_dir.joinpath("bin")
     bin_dir.mkdir(parents=True, exist_ok=True)
     docker("cp", f"{docker_container_id}:/usr/bin/tesseract", bin_dir.as_posix())
+    share_dir = build_dir.joinpath("share")
+    share_dir.mkdir(parents=True, exist_ok=True)
+    docker("cp", f"{docker_container_id}:/usr/share/tesseract/tessdata", share_dir.as_posix())
 
     # zip everything
     lambda_zip = dist_folder.joinpath("lambda")
