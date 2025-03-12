@@ -64,7 +64,7 @@ def lambda_handler(event, context):
     #         }
 
     tesseract = Tesseract()
-    extracted_data = tesseract.scan(record["s3"]["object"]["url"])
+    extracted_data = tesseract.scan(f"s3://{bucket_name}/{document_key}")
 
     print(f"Extracted Data: {json.dumps(extracted_data, indent=2)}")
 
