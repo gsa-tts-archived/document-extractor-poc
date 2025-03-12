@@ -3,6 +3,8 @@ import os
 
 import boto3
 
+from src.external.ocr.tesseract import Tesseract
+
 s3_client = boto3.client("s3")
 textract_client = boto3.client("textract")
 sqs_client = boto3.client("sqs")
@@ -31,35 +33,38 @@ def lambda_handler(event, context):
             ),
         }
 
-    try:
-        print("Attempting AnalyzeDocument (Structured Mode)...")
-        response = textract_client.analyze_document(
-            Document={"S3Object": {"Bucket": bucket_name, "Name": document_key}},
-            FeatureTypes=["FORMS", "TABLES"],
-        )
-        extracted_data = parse_textract_response(response)
+    # try:
+    #     print("Attempting AnalyzeDocument (Structured Mode)...")
+    #     response = textract_client.analyze_document(
+    #         Document={"S3Object": {"Bucket": bucket_name, "Name": document_key}},
+    #         FeatureTypes=["FORMS", "TABLES"],
+    #     )
+    #     extracted_data = parse_textract_response(response)
+    #
+    #     # Check if AnalyzeDocument works
+    #     if not extracted_data:
+    #         print("AnalyzeDocument yielded no data. Falling back to DetectDocumentText...")
+    #         response = textract_client.detect_document_text(
+    #             Document={"S3Object": {"Bucket": bucket_name, "Name": document_key}}
+    #         )
+    #         extracted_data = parse_ocr_response(response)
+    #
+    # except Exception as e:
+    #     print(f"AnalyzeDocument failed: {e}. Falling back to DetectDocumentText...")
+    #     try:
+    #         response = textract_client.detect_document_text(
+    #             Document={"S3Object": {"Bucket": bucket_name, "Name": document_key}}
+    #         )
+    #         extracted_data = parse_ocr_response(response)
+    #     except Exception as ocr_error:
+    #         print(f"OCR extraction also failed: {ocr_error}")
+    #         return {
+    #             "statusCode": 500,
+    #             "body": json.dumps(f"Failed to process document: {ocr_error}"),
+    #         }
 
-        # Check if AnalyzeDocument works
-        if not extracted_data:
-            print("AnalyzeDocument yielded no data. Falling back to DetectDocumentText...")
-            response = textract_client.detect_document_text(
-                Document={"S3Object": {"Bucket": bucket_name, "Name": document_key}}
-            )
-            extracted_data = parse_ocr_response(response)
-
-    except Exception as e:
-        print(f"AnalyzeDocument failed: {e}. Falling back to DetectDocumentText...")
-        try:
-            response = textract_client.detect_document_text(
-                Document={"S3Object": {"Bucket": bucket_name, "Name": document_key}}
-            )
-            extracted_data = parse_ocr_response(response)
-        except Exception as ocr_error:
-            print(f"OCR extraction also failed: {ocr_error}")
-            return {
-                "statusCode": 500,
-                "body": json.dumps(f"Failed to process document: {ocr_error}"),
-            }
+    tesseract = Tesseract()
+    extracted_data = tesseract.scan(record["s3"]["object"]["url"])
 
     print(f"Extracted Data: {json.dumps(extracted_data, indent=2)}")
 
