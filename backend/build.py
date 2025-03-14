@@ -30,7 +30,7 @@ def build():
     requirements_txt = dist_folder.joinpath("requirements.txt")
 
     print(f"Exporting uv dependencies to {requirements_txt.as_posix()}")
-    uv("export", "--frozen", "--no-dev", "--no-editable", "-o", requirements_txt.as_posix())
+    uv("export", "--frozen", "--no-dev", "--no-editable", "--no-build", "-o", requirements_txt.as_posix())
 
     print(f"Generating dependency distribution in {build_dir.as_posix()}")
     uv(
@@ -38,6 +38,8 @@ def build():
         "install",
         "--no-installer-metadata",
         "--no-compile-bytecode",
+        "--python-platform",
+        "aarch64-manylinux_2_28",  # because the AWS Lambdas use arm64 architecture
         "--target",
         build_dir.as_posix(),
         "-r",
