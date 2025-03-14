@@ -1,4 +1,4 @@
-# 2. Use JavaScript and React Frontend
+# 8. Use JavaScript and React Frontend
 
 Date: 2025-03-05
 
