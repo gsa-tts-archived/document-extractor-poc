@@ -1,0 +1,2 @@
+class OcrException(Exception):
+    pass
