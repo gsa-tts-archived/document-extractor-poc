@@ -43,7 +43,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: ${{ needs.build.outputs.BACKEND_ARTIFACT_NAME }}
-          path: backend/dist/lambda.zip
+          path: backend/dist/
 
       - name: Restore Frontend Artifact
         uses: actions/download-artifact@v4
