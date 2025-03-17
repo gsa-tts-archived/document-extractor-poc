@@ -35,6 +35,18 @@ jobs:
 
       - uses: hashicorp/setup-terraform@v3
 
+      - name: Restore Backend Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: backend
+          path: backend/dist/lambda.zip
+
+      - name: Restore Frontend Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend
+          path: ui/dist/
+
       - working-directory: ./iac/
         run: terraform init -backend-config="key=terraform_state_gsa_dev.tfstate"
 

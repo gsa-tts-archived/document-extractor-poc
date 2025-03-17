@@ -3,6 +3,13 @@ name: Build
 
 on:
   workflow_call:
+    outputs:
+      BACKEND_ARTIFACT_NAME:
+        description: asdf
+        value: dogcow
+      FRONTEND_ARTIFACT_NAME:
+        description: asdf
+        value: dogcow
 
 
 permissions:
@@ -33,6 +40,13 @@ jobs:
       - working-directory: ./backend/
         run: uv run build.py
 
+      - name: Store Backend Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend
+          path: backend/dist/lambda.zip
+          overwrite: true
+
 
   build-frontend:
     name: Build Frontend
@@ -53,3 +67,10 @@ jobs:
 
       - working-directory: ./ui/
         run: npm run build
+
+      - name: Store Frontend Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend
+          path: ui/dist/
+          overwrite: true
