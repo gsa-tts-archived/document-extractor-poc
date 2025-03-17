@@ -107,6 +107,3 @@ class Textract(Ocr):
                 line_count += 1
 
         return extracted_data
-
-    def __del__(self):
-        self.api.End()
