@@ -41,13 +41,13 @@ jobs:
       - name: Restore Backend Artifact
         uses: actions/download-artifact@v4
         with:
-          name: ${{ jobs.build.outputs.BACKEND_ARTIFACT_NAME }}
+          name: ${{ needs.build.outputs.BACKEND_ARTIFACT_NAME }}
           path: backend/dist/lambda.zip
 
       - name: Restore Frontend Artifact
         uses: actions/download-artifact@v4
         with:
-          name: ${{ jobs.build.outputs.FRONTEND_ARTIFACT_NAME }}
+          name: ${{ needs.build.outputs.FRONTEND_ARTIFACT_NAME }}
           path: ui/dist/
 
       - working-directory: ./iac/
