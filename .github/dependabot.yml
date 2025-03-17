@@ -18,7 +18,7 @@ updates:
     schedule:
       interval: daily
     groups:
-      minor-and-patch-github-actions:
+      minor-and-patch-terraform:
         update-types:
           - minor
           - patch
@@ -29,6 +29,16 @@ updates:
       interval: daily
     groups:
       minor-and-patch-python:
+        update-types:
+          - minor
+          - patch
+
+  - package-ecosystem: npm
+    directory: ui
+    schedule:
+      interval: daily
+    groups:
+      minor-and-patch-npm:
         update-types:
           - minor
           - patch
