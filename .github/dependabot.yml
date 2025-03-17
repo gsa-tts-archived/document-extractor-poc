@@ -2,8 +2,19 @@
 
 version: 2
 updates:
+
   - package-ecosystem: github-actions
     directory: /
+    schedule:
+      interval: daily
+    groups:
+      minor-and-patch-github-actions:
+        update-types:
+          - minor
+          - patch
+
+  - package-ecosystem: terraform
+    directory: iac
     schedule:
       interval: daily
     groups:
