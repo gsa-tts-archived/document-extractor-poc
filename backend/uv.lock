@@ -4,7 +4,7 @@ requires-python = ">=3.13"
 
 [[package]]
 name = "boto3"
-version = "1.37.1"
+version = "1.37.13"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "botocore" },
