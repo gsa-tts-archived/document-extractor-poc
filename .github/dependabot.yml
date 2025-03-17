@@ -1,31 +1,44 @@
----
-# To get started with Dependabot version updates, you'll need to specify which
-# package ecosystems to update and where the package manifests are located.
-# Please see the documentation for all configuration options:
 # https://docs.github.com/github/administering-a-repository/configuration-options-for-dependency-updates
 
 version: 2
 updates:
-  - package-ecosystem: "github-actions"
-    directory: "/"
-    target-branch: "main"
-    schedule:
-      interval: "weekly"
-    groups:
-      minor-and-patch:
-        applies-to: version-updates
-        update-types:
-          - "minor"
-          - "patch"
 
-  - package-ecosystem: "pip"
-    directory: "/"
-    target-branch: "main"
+  - package-ecosystem: github-actions
+    directory: /
     schedule:
-      interval: "weekly"
+      interval: daily
     groups:
-      minor-and-patch:
-        applies-to: version-updates
+      minor-and-patch-github-actions:
         update-types:
-          - "minor"
-          - "patch"
+          - minor
+          - patch
+
+  - package-ecosystem: terraform
+    directory: iac
+    schedule:
+      interval: daily
+    groups:
+      minor-and-patch-terraform:
+        update-types:
+          - minor
+          - patch
+
+  - package-ecosystem: uv
+    directory: backend
+    schedule:
+      interval: daily
+    groups:
+      minor-and-patch-python:
+        update-types:
+          - minor
+          - patch
+
+  - package-ecosystem: npm
+    directory: ui
+    schedule:
+      interval: daily
+    groups:
+      minor-and-patch-npm:
+        update-types:
+          - minor
+          - patch
