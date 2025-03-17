@@ -8,7 +8,6 @@ from src.ocr import Ocr, OcrException
 
 class Textract(Ocr):
     def __init__(self) -> None:
-        self.s3_client = boto3.client("s3")
         self.textract_client = boto3.client("textract")
 
     def _parse_s3_url(self, s3_url: str) -> tuple[str, str]:
