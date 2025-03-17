@@ -61,3 +61,13 @@ jobs:
       - run: pip install pre-commit
 
       - run: pre-commit run --all-files
+
+
+  build-backend:
+    name: Build Backend
+    uses: ./.github/workflows/build-backend.yml
+
+
+  build-frontend:
+    name: Build Front
+    uses: ./.github/workflows/build-frontend.yml

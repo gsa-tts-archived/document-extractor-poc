@@ -1,0 +1,27 @@
+name: Build Frontend
+
+
+on:
+  workflow_call:
+
+
+jobs:
+  build-backend:
+    name: Build Frontend
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: ./ui/package.json
+          cache: npm
+          cache-dependency-path: ./ui/package-lock.json
+
+      - working-directory: ./ui/
+        run: npm ci
+
+      - working-directory: ./ui/
+        run: npm run build
