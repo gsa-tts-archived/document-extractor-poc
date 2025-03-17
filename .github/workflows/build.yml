@@ -5,11 +5,11 @@ on:
   workflow_call:
     outputs:
       BACKEND_ARTIFACT_NAME:
-        description: asdf
-        value: dogcow
+        description: Unique name of the uploaded backend artifact
+        value: ${{ jobs.build-backend.outputs.BACKEND_ARTIFACT_NAME }}
       FRONTEND_ARTIFACT_NAME:
-        description: asdf
-        value: dogcow
+        description: Unique name of the uploaded frontend artifact
+        value: ${{ jobs.build-frontend.outputs.FRONTEND_ARTIFACT_NAME }}
 
 
 permissions:
@@ -22,6 +22,10 @@ jobs:
   build-backend:
     name: Build Backend
     runs-on: ubuntu-latest
+    env:
+      BACKEND_ARTIFACT_NAME: backend
+    outputs:
+      BACKEND_ARTIFACT_NAME: ${{ env.BACKEND_ARTIFACT_NAME }}
 
     steps:
 
@@ -43,7 +47,7 @@ jobs:
       - name: Store Backend Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: backend
+          name: ${{ env.BACKEND_ARTIFACT_NAME }}
           path: backend/dist/lambda.zip
           overwrite: true
 
@@ -51,6 +55,10 @@ jobs:
   build-frontend:
     name: Build Frontend
     runs-on: ubuntu-latest
+    env:
+      FRONTEND_ARTIFACT_NAME: frontend
+    outputs:
+      FRONTEND_ARTIFACT_NAME: ${{ env.FRONTEND_ARTIFACT_NAME }}
 
     steps:
 
@@ -71,6 +79,6 @@ jobs:
       - name: Store Frontend Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: frontend
+          name: ${{ env.FRONTEND_ARTIFACT_NAME }}
           path: ui/dist/
           overwrite: true
