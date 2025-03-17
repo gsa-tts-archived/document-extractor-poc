@@ -37,16 +37,6 @@ resource "aws_lambda_permission" "allow_bucket_invoke" {
   source_arn    = aws_s3_bucket.document_storage.arn
 }
 
-resource "aws_lambda_function_event_invoke_config" "tell_sqs_for_dynamo" {
-  function_name = aws_lambda_function.text_extract.arn
-
-  destination_config {
-    on_success {
-      destination = aws_sqs_queue.queue_to_dynamo.arn
-    }
-  }
-}
-
 resource "aws_lambda_function" "write_to_dynamodb" {
   function_name = "${local.project}-${var.environment}-write-to-dynamodb"
 
@@ -77,7 +67,7 @@ resource "aws_lambda_function" "write_to_dynamodb" {
 resource "aws_lambda_event_source_mapping" "invoke_dynamodb_writer_from_sqs" {
   event_source_arn                   = aws_sqs_queue.queue_to_dynamo.arn
   function_name                      = aws_lambda_function.write_to_dynamodb.arn
-  maximum_batching_window_in_seconds = 5
+  maximum_batching_window_in_seconds = 0
 
   depends_on = [aws_iam_role_policy_attachment.attach_sqs_permission_to_role]
 }
