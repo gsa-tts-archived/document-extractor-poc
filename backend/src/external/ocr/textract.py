@@ -11,20 +11,6 @@ class Textract(Ocr):
     def __init__(self) -> None:
         self.textract_client = boto3.client("textract")
 
-    def _parse_s3_url(self, s3_url: str) -> tuple[str, str]:
-        parsed_url = parse.urlparse(s3_url)
-
-        if parsed_url.scheme != "s3":
-            raise ValueError(f"Invalid S3 URL scheme: {parsed_url.scheme}. Expected 's3'.")
-
-        bucket_name: str = parsed_url.netloc
-        object_key: str = parsed_url.path.lstrip("/")
-
-        if not bucket_name or not object_key:
-            raise ValueError("Invalid S3 URL format. Expected 's3://bucket-name/key'.")
-
-        return bucket_name, object_key
-
     def scan(self, s3_url: str, queries: list[str] | None = None) -> dict[str, dict[str, str | float]]:
         try:
             # Parse the S3 URL
@@ -53,6 +39,20 @@ class Textract(Ocr):
 
         except Exception as e:
             raise OcrException(f"Unable to OCR the image {s3_url}") from e
+
+    def _parse_s3_url(self, s3_url: str) -> tuple[str, str]:
+        parsed_url = parse.urlparse(s3_url)
+
+        if parsed_url.scheme != "s3":
+            raise ValueError(f"Invalid S3 URL scheme: {parsed_url.scheme}. Expected 's3'.")
+
+        bucket_name: str = parsed_url.netloc
+        object_key: str = parsed_url.path.lstrip("/")
+
+        if not bucket_name or not object_key:
+            raise ValueError("Invalid S3 URL format. Expected 's3://bucket-name/key'.")
+
+        return bucket_name, object_key
 
     def _parse_textract_queries(self, textract_response):
         extracted_data = {}
