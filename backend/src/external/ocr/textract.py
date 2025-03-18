@@ -63,62 +63,74 @@ class Textract(Ocr):
         extracted_data = {}
         block_map = {block["Id"]: block for block in response.get("Blocks", [])}
 
-        # Extract form data
         for block in response.get("Blocks", []):
             if block["BlockType"] == "KEY_VALUE_SET" and "KEY" in block.get("EntityTypes", []):
-                key_text, key_conf = self._get_text_from_relationship_blocks(block, block_map)
-                value_text = ""
-                for rel in block.get("Relationships", []):
-                    if rel["Type"] == "VALUE":
-                        for value_id in rel["Ids"]:
-                            value_block = block_map.get(value_id)
-                            if value_block:
-                                value_text, value_conf = self._get_text_from_relationship_blocks(value_block, block_map)
-                if key_text:
-                    extracted_data[key_text] = {"value": value_text, "confidence": key_conf}
+                key_text, key_confidence = self._get_text_and_confidence_from_relationship_blocks(
+                    block, block_map, "CHILD"
+                )
+
+                relationships = block.get("Relationships", [])
+
+                value_texts = []
+                value_confidences = []
+
+                for relationship in relationships:
+                    if relationship["Type"] != "VALUE":
+                        continue
+
+                    for related_value_block_id in relationship["Ids"]:
+                        value_block = block_map[related_value_block_id]
+                        value_text, value_confidence = self._get_text_and_confidence_from_relationship_blocks(
+                            value_block, block_map, "CHILD"
+                        )
+
+                        if value_text != "":
+                            value_texts.append(value_text)
+                            value_confidences.append(value_confidence)
+
+                confidence = -1
+                if len(value_texts) > 0:
+                    confidence = statistics.fmean(value_confidences)
+                extracted_data[key_text] = {"value": " ".join(value_texts), "confidence": confidence}
 
         return extracted_data
-
-    def _get_text_from_relationship_blocks(self, block, block_map):
-        """Helper to extract text from a block."""
-        text = ""
-        confidence = block.get("Confidence", 0.0)
-        if "Relationships" in block:
-            for rel in block["Relationships"]:
-                if rel["Type"] == "CHILD":
-                    for child_id in rel["Ids"]:
-                        word_block = block_map.get(child_id)
-                        if word_block and word_block.get("Text"):
-                            text += word_block["Text"] + " "
-        return text.strip(), confidence
 
     def _get_text_and_confidence_from_relationship_blocks(
         self, block: Any, blocks: dict[str, Any], wanted_relationship: str
     ) -> tuple[str, float]:
         relationships = block.get("Relationships", [])
 
-        values = []
+        texts = []
         confidences = []
 
         for relationship in relationships:
             if relationship["Type"] != wanted_relationship:
                 continue
 
-            related_query_result_blocks = [
-                blocks.get(related_block_id, {}) for related_block_id in relationship.get("Ids", [])
-            ]
+            related_blocks = [blocks[related_block_id] for related_block_id in relationship.get("Ids", [])]
 
-            relation_value = " ".join(
-                [query_result_block["Text"] for query_result_block in related_query_result_blocks]
-            )
-            values.append(relation_value)
+            relation_texts = []
+            relation_confidences = []
 
-            relation_confidence = statistics.fmean(
-                [query_result_block["Confidence"] for query_result_block in related_query_result_blocks]
-            )
-            confidences.append(relation_confidence)
+            for related_block in related_blocks:
+                if "Text" not in related_block:
+                    continue
 
-        return " ".join(values), statistics.fmean(confidences)
+                relation_texts.append(related_block["Text"])
+                relation_confidences.append(related_block["Confidence"])
+
+            if len(relation_texts) > 0:
+                relation_text = " ".join(relation_texts)
+                texts.append(relation_text)
+
+                relation_confidence = statistics.fmean(relation_confidences)
+                confidences.append(relation_confidence)
+
+        confidence = -1
+        if len(confidences) > 0:
+            confidence = statistics.fmean(confidences)
+
+        return " ".join(texts), confidence
 
     def _parse_textract_queries(self, textract_response):
         extracted_data = {}
