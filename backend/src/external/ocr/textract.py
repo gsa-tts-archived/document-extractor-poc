@@ -1,4 +1,5 @@
 import statistics
+from typing import Any
 from urllib import parse
 
 import boto3
@@ -39,6 +40,7 @@ class Textract(Ocr):
                     Document={"S3Object": {"Bucket": bucket_name, "Name": object_key}},
                     FeatureTypes=["FORMS", "TABLES"],
                 )
+                print("Parsing result")
                 extracted_data = self._parse_textract_forms_and_tables(response)
             else:
                 print("Attempting AnalyzeDocument with queries")
@@ -48,6 +50,7 @@ class Textract(Ocr):
                     FeatureTypes=["QUERIES"],
                     QueriesConfig={"Queries": queries_config},
                 )
+                print("Parsing result")
                 extracted_data = self._parse_textract_queries(response)
 
             return extracted_data
@@ -63,20 +66,20 @@ class Textract(Ocr):
         # Extract form data
         for block in response.get("Blocks", []):
             if block["BlockType"] == "KEY_VALUE_SET" and "KEY" in block.get("EntityTypes", []):
-                key_text, key_conf = self._get_text_from_block(block, block_map)
+                key_text, key_conf = self._get_text_from_relationship_blocks(block, block_map)
                 value_text = ""
                 for rel in block.get("Relationships", []):
                     if rel["Type"] == "VALUE":
                         for value_id in rel["Ids"]:
                             value_block = block_map.get(value_id)
                             if value_block:
-                                value_text, value_conf = self._get_text_from_block(value_block, block_map)
+                                value_text, value_conf = self._get_text_from_relationship_blocks(value_block, block_map)
                 if key_text:
                     extracted_data[key_text] = {"value": value_text, "confidence": key_conf}
 
         return extracted_data
 
-    def _get_text_from_block(self, block, block_map):
+    def _get_text_from_relationship_blocks(self, block, block_map):
         """Helper to extract text from a block."""
         text = ""
         confidence = block.get("Confidence", 0.0)
@@ -89,34 +92,52 @@ class Textract(Ocr):
                             text += word_block["Text"] + " "
         return text.strip(), confidence
 
-    def _parse_textract_queries(self, response):
-        extracted_data = {}
+    def _get_text_and_confidence_from_relationship_blocks(
+        self, block: Any, blocks: dict[str, Any], wanted_relationship: str
+    ) -> tuple[str, float]:
+        relationships = block.get("Relationships", [])
 
-        blocks = response.get("Blocks", [])
-        query_result_blocks = {block["Id"]: block for block in blocks if block["BlockType"] == "QUERY_RESULT"}
+        values = []
+        confidences = []
 
-        for block in blocks:
-            if block["BlockType"] != "QUERY":
+        for relationship in relationships:
+            if relationship["Type"] != wanted_relationship:
                 continue
 
-            relationship_block_pointers = block.get("Relationships", [])
+            related_query_result_blocks = [
+                blocks.get(related_block_id, {}) for related_block_id in relationship.get("Ids", [])
+            ]
 
-            for relationship_block_pointer in relationship_block_pointers:
-                if relationship_block_pointer["Type"] == "QUERY_RESULT":
-                    continue
+            relation_value = " ".join(
+                [query_result_block["Text"] for query_result_block in related_query_result_blocks]
+            )
+            values.append(relation_value)
 
-                related_query_result_blocks = [
-                    query_result_blocks.get(related_block_id, {})
-                    for related_block_id in relationship_block_pointer.get("Ids", [])
-                ]
+            relation_confidence = statistics.fmean(
+                [query_result_block["Confidence"] for query_result_block in related_query_result_blocks]
+            )
+            confidences.append(relation_confidence)
 
-                value_text = " ".join(
-                    [query_result_block["Text"] for query_result_block in related_query_result_blocks]
-                )
-                confidence = statistics.fmean(
-                    [query_result_block["Confidence"] for query_result_block in related_query_result_blocks]
-                )
+        return " ".join(values), statistics.fmean(confidences)
 
-                extracted_data[block["Query"]["Text"]] = {"value": value_text, "confidence": confidence}
+    def _parse_textract_queries(self, textract_response):
+        extracted_data = {}
+
+        blocks = textract_response.get("Blocks", [])
+        query_blocks = []
+        query_result_blocks = {}
+
+        for block in blocks:
+            if block["BlockType"] == "QUERY":
+                query_blocks.append(block)
+            elif block["BlockType"] == "QUERY_RESULT":
+                query_result_blocks[block["Id"]] = block
+
+        for query_block in query_blocks:
+            value, confidence = self._get_text_and_confidence_from_relationship_blocks(
+                query_block, query_result_blocks, "ANSWER"
+            )
+
+            extracted_data[query_block["Query"]["Text"]] = {"value": value, "confidence": confidence}
 
         return extracted_data
