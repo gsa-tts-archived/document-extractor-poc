@@ -51,16 +51,16 @@ export default function DownloadPage() {
     }
     let csvContent = 'data:text/csv;charset=utf-8,Field,Value\n';
 
-    for (let key in verifiedData.extracted_data) {
-      if (
-        Object.prototype.hasOwnProperty.call(verifiedData.extracted_data, key)
-      ) {
-        const field = verifiedData.extracted_data[key];
+    const sortedEntries = Object.entries(verifiedData.extracted_data).sort(
+      ([keyA], [keyB]) => keyA.localeCompare(keyB, undefined, { numeric: true })
+    );
 
-        const value = field.value !== undefined ? field.value : '';
-        csvContent += `"${key}","${value}""\n`;
-      }
-    }
+    // Construct CSV content
+    sortedEntries.forEach(([key, field]) => {
+      let value = field.value !== undefined ? `"${field.value}"` : '""';
+      csvContent += `"${key}",${value}\n`;
+    });
+
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement('a');
 
