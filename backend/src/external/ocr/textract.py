@@ -1,4 +1,5 @@
 import statistics
+from time import sleep
 from typing import Any
 from urllib import parse
 
@@ -26,12 +27,7 @@ class Textract(Ocr):
                 extracted_data = self._parse_textract_forms(response)
             else:
                 print("Attempting AnalyzeDocument with queries")
-                queries_config = [{"Text": query, "Pages": ["*"]} for query in queries]
-                response = self.textract_client.analyze_document(
-                    Document={"S3Object": {"Bucket": bucket_name, "Name": object_key}},
-                    FeatureTypes=["QUERIES"],
-                    QueriesConfig={"Queries": queries_config},
-                )
+                response = self._paginated_textract_with_queries(queries, bucket_name, object_key)
                 print("Parsing result")
                 extracted_data = self._parse_textract_queries(response)
 
@@ -53,6 +49,31 @@ class Textract(Ocr):
             raise ValueError("Invalid S3 URL format. Expected 's3://bucket-name/key'.")
 
         return bucket_name, object_key
+
+    def _split_list_by_30(self, the_list: list[Any]) -> list[list[Any]]:
+        sublist_size = 30
+        return [the_list[i : i + sublist_size] for i in range(0, len(the_list), sublist_size)]
+
+    def _paginated_textract_with_queries(self, queries, bucket_name, object_key):
+        queries_config = [{"Text": query, "Pages": ["*"]} for query in queries]
+
+        # TODO: grab the queries beyond 30 and do a call for them too
+        paginated_queries_config = self._split_list_by_30(queries_config)
+
+        initiate_response = self.textract_client.start_document_analysis(
+            DocumentLocation={"S3Object": {"Bucket": bucket_name, "Name": object_key}},
+            FeatureTypes=["QUERIES"],
+            QueriesConfig={"Queries": paginated_queries_config[0]},
+        )
+
+        job_id = initiate_response["JobId"]
+
+        response = self.textract_client.get_document_analysis(JobId=job_id)
+        while response["JobStatus"] == "IN_PROGRESS":
+            sleep(1)
+            response = self.textract_client.get_document_analysis(JobId=job_id)
+
+        return response
 
     def _parse_textract_queries(self, textract_response):
         extracted_data = {}
