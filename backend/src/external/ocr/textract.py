@@ -1,4 +1,3 @@
-from typing import Any
 from urllib import parse
 
 import boto3
@@ -24,7 +23,7 @@ class Textract(Ocr):
 
         return bucket_name, object_key
 
-    def scan(self, s3_url: str) -> dict[str, dict[str, Any]]:
+    def scan(self, s3_url: str, queries: list[str] | None = None) -> dict[str, dict[str, str | float]]:
         try:
             # Parse the S3 URL
             bucket_name, object_key = self._parse_s3_url(s3_url)
