@@ -1,13 +1,18 @@
+import statistics
 from urllib import parse
 
 import boto3
+import botocore
 
 from src.ocr import Ocr, OcrException
 
 
 class Textract(Ocr):
     def __init__(self) -> None:
-        self.textract_client = boto3.client("textract")
+        try:
+            self.textract_client = boto3.client("textract")
+        except botocore.exceptions.NoRegionError:
+            self.textract_client = boto3.client("textract", region_name="us-east-1")
 
     def _parse_s3_url(self, s3_url: str) -> tuple[str, str]:
         parsed_url = parse.urlparse(s3_url)
@@ -28,28 +33,29 @@ class Textract(Ocr):
             # Parse the S3 URL
             bucket_name, object_key = self._parse_s3_url(s3_url)
 
-            # Download the image
-            print("Attempting AnalyzeDocument (Structured Mode)...")
-            response = self.textract_client.analyze_document(
-                Document={"S3Object": {"Bucket": bucket_name, "Name": object_key}},
-                FeatureTypes=["FORMS", "TABLES"],
-            )
-            extracted_data = self._parse_textract_analyze_document_response(response)
-
-            # Check if AnalyzeDocument works
-            if not extracted_data:
-                print("AnalyzeDocument yielded no data. Falling back to DetectDocumentText...")
-                response = self.textract_client.detect_document_text(
-                    Document={"S3Object": {"Bucket": bucket_name, "Name": object_key}}
+            if queries is None:
+                print("Attempting AnalyzeDocument with forms and tables")
+                response = self.textract_client.analyze_document(
+                    Document={"S3Object": {"Bucket": bucket_name, "Name": object_key}},
+                    FeatureTypes=["FORMS", "TABLES"],
                 )
-                extracted_data = self._parse_ocr_response(response)
+                extracted_data = self._parse_textract_forms_and_tables(response)
+            else:
+                print("Attempting AnalyzeDocument with queries")
+                queries_config = [{"Text": query, "Pages": ["*"]} for query in queries]
+                response = self.textract_client.analyze_document(
+                    Document={"S3Object": {"Bucket": bucket_name, "Name": object_key}},
+                    FeatureTypes=["QUERIES"],
+                    QueriesConfig={"Queries": queries_config},
+                )
+                extracted_data = self._parse_textract_queries(response)
 
             return extracted_data
 
         except Exception as e:
             raise OcrException(f"Unable to OCR the image {s3_url}") from e
 
-    def _parse_textract_analyze_document_response(self, response):
+    def _parse_textract_forms_and_tables(self, response):
         """Parses structured data from AnalyzeDocument response into a simple key-value format."""
         extracted_data = {}
         block_map = {block["Id"]: block for block in response.get("Blocks", [])}
@@ -83,25 +89,34 @@ class Textract(Ocr):
                             text += word_block["Text"] + " "
         return text.strip(), confidence
 
-    def _parse_ocr_response(self, response):
-        """Parses text from DetectDocumentText response with pseudo-keys based on content."""
+    def _parse_textract_queries(self, response):
         extracted_data = {}
-        line_count = 1
 
-        for block in response.get("Blocks", []):
-            if block["BlockType"] == "LINE":
-                line_text = block.get("DetectedText", "")
-                confidence = block.get("Confidence", 0.0)
+        blocks = response.get("Blocks", [])
+        query_result_blocks = {block["Id"]: block for block in blocks if block["BlockType"] == "QUERY_RESULT"}
 
-                # Generate a key based on the first 3 words
-                words = line_text.split()[:3]
-                key = "_".join(words).replace(":", "").replace(".", "").strip() or f"Line_{line_count}"
+        for block in blocks:
+            if block["BlockType"] != "QUERY":
+                continue
 
-                # Ensure key uniqueness
-                while key in extracted_data:
-                    key += f"_{line_count}"
+            relationship_block_pointers = block.get("Relationships", [])
 
-                extracted_data[key] = {"value": line_text, "confidence": confidence}
-                line_count += 1
+            for relationship_block_pointer in relationship_block_pointers:
+                if relationship_block_pointer["Type"] == "QUERY_RESULT":
+                    continue
+
+                related_query_result_blocks = [
+                    query_result_blocks.get(related_block_id, {})
+                    for related_block_id in relationship_block_pointer.get("Ids", [])
+                ]
+
+                value_text = " ".join(
+                    [query_result_block["Text"] for query_result_block in related_query_result_blocks]
+                )
+                confidence = statistics.fmean(
+                    [query_result_block["Confidence"] for query_result_block in related_query_result_blocks]
+                )
+
+                extracted_data[block["Query"]["Text"]] = {"value": value_text, "confidence": confidence}
 
         return extracted_data
