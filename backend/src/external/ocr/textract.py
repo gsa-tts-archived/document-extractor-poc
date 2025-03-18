@@ -37,7 +37,7 @@ class Textract(Ocr):
                     FeatureTypes=["FORMS"],
                 )
                 print("Parsing result")
-                extracted_data = self._parse_textract_forms_and_tables(response)
+                extracted_data = self._parse_textract_forms(response)
             else:
                 print("Attempting AnalyzeDocument with queries")
                 queries_config = [{"Text": query, "Pages": ["*"]} for query in queries]
@@ -54,7 +54,29 @@ class Textract(Ocr):
         except Exception as e:
             raise OcrException(f"Unable to OCR the image {s3_url}") from e
 
-    def _parse_textract_forms_and_tables(self, response):
+    def _parse_textract_queries(self, textract_response):
+        extracted_data = {}
+
+        blocks = textract_response.get("Blocks", [])
+        query_blocks = []
+        query_result_blocks = {}
+
+        for block in blocks:
+            if block["BlockType"] == "QUERY":
+                query_blocks.append(block)
+            elif block["BlockType"] == "QUERY_RESULT":
+                query_result_blocks[block["Id"]] = block
+
+        for query_block in query_blocks:
+            value, confidence = self._get_text_and_confidence_from_relationship_blocks(
+                query_block, query_result_blocks, "ANSWER"
+            )
+
+            extracted_data[query_block["Query"]["Text"]] = {"value": value, "confidence": confidence}
+
+        return extracted_data
+
+    def _parse_textract_forms(self, response):
         """Parses structured data from AnalyzeDocument response into a simple key-value format."""
         extracted_data = {}
         block_map = {block["Id"]: block for block in response.get("Blocks", [])}
@@ -127,25 +149,3 @@ class Textract(Ocr):
             confidence = statistics.fmean(confidences)
 
         return " ".join(texts), confidence
-
-    def _parse_textract_queries(self, textract_response):
-        extracted_data = {}
-
-        blocks = textract_response.get("Blocks", [])
-        query_blocks = []
-        query_result_blocks = {}
-
-        for block in blocks:
-            if block["BlockType"] == "QUERY":
-                query_blocks.append(block)
-            elif block["BlockType"] == "QUERY_RESULT":
-                query_result_blocks[block["Id"]] = block
-
-        for query_block in query_blocks:
-            value, confidence = self._get_text_and_confidence_from_relationship_blocks(
-                query_block, query_result_blocks, "ANSWER"
-            )
-
-            extracted_data[query_block["Query"]["Text"]] = {"value": value, "confidence": confidence}
-
-        return extracted_data
