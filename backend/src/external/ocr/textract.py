@@ -3,17 +3,13 @@ from typing import Any
 from urllib import parse
 
 import boto3
-import botocore
 
 from src.ocr import Ocr, OcrException
 
 
 class Textract(Ocr):
     def __init__(self) -> None:
-        try:
-            self.textract_client = boto3.client("textract")
-        except botocore.exceptions.NoRegionError:
-            self.textract_client = boto3.client("textract", region_name="us-east-1")
+        self.textract_client = boto3.client("textract")
 
     def _parse_s3_url(self, s3_url: str) -> tuple[str, str]:
         parsed_url = parse.urlparse(s3_url)
@@ -38,7 +34,7 @@ class Textract(Ocr):
                 print("Attempting AnalyzeDocument with forms and tables")
                 response = self.textract_client.analyze_document(
                     Document={"S3Object": {"Bucket": bucket_name, "Name": object_key}},
-                    FeatureTypes=["FORMS", "TABLES"],
+                    FeatureTypes=["FORMS"],
                 )
                 print("Parsing result")
                 extracted_data = self._parse_textract_forms_and_tables(response)
@@ -64,34 +60,34 @@ class Textract(Ocr):
         block_map = {block["Id"]: block for block in response.get("Blocks", [])}
 
         for block in response.get("Blocks", []):
-            if block["BlockType"] == "KEY_VALUE_SET" and "KEY" in block.get("EntityTypes", []):
-                key_text, key_confidence = self._get_text_and_confidence_from_relationship_blocks(
-                    block, block_map, "CHILD"
-                )
+            if block["BlockType"] != "KEY_VALUE_SET" or "KEY" not in block.get("EntityTypes", []):
+                continue
 
-                relationships = block.get("Relationships", [])
+            key_text, key_confidence = self._get_text_and_confidence_from_relationship_blocks(block, block_map, "CHILD")
 
-                value_texts = []
-                value_confidences = []
+            relationships = block.get("Relationships", [])
 
-                for relationship in relationships:
-                    if relationship["Type"] != "VALUE":
-                        continue
+            value_texts = []
+            value_confidences = []
 
-                    for related_value_block_id in relationship["Ids"]:
-                        value_block = block_map[related_value_block_id]
-                        value_text, value_confidence = self._get_text_and_confidence_from_relationship_blocks(
-                            value_block, block_map, "CHILD"
-                        )
+            for relationship in relationships:
+                if relationship["Type"] != "VALUE":
+                    continue
 
-                        if value_text != "":
-                            value_texts.append(value_text)
-                            value_confidences.append(value_confidence)
+                for related_value_block_id in relationship["Ids"]:
+                    value_block = block_map[related_value_block_id]
+                    value_text, value_confidence = self._get_text_and_confidence_from_relationship_blocks(
+                        value_block, block_map, "CHILD"
+                    )
 
-                confidence = -1
-                if len(value_texts) > 0:
-                    confidence = statistics.fmean(value_confidences)
-                extracted_data[key_text] = {"value": " ".join(value_texts), "confidence": confidence}
+                    if value_text != "":
+                        value_texts.append(value_text)
+                        value_confidences.append(value_confidence)
+
+            confidence = -1
+            if len(value_texts) > 0:
+                confidence = statistics.fmean(value_confidences)
+            extracted_data[key_text] = {"value": " ".join(value_texts), "confidence": confidence}
 
         return extracted_data
 
