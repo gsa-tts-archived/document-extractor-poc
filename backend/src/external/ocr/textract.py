@@ -1,9 +1,10 @@
+import asyncio
 import statistics
-from time import sleep
 from typing import Any
 from urllib import parse
 
 import boto3
+import iterator_chain
 
 from src.ocr import Ocr, OcrException
 
@@ -27,9 +28,13 @@ class Textract(Ocr):
                 extracted_data = self._parse_textract_forms(response)
             else:
                 print("Attempting AnalyzeDocument with queries")
-                response = self._paginated_textract_with_queries(queries, bucket_name, object_key)
+                response_list = asyncio.run(self._paginated_textract_with_queries(queries, bucket_name, object_key))
                 print("Parsing result")
-                extracted_data = self._parse_textract_queries(response)
+                extracted_data = (
+                    iterator_chain.from_iterable(response_list)
+                    .map(self._parse_textract_queries)
+                    .reduce(lambda a_dict, b_dict: {**a_dict, **b_dict}, initial={})
+                )
 
             return extracted_data
 
@@ -54,25 +59,33 @@ class Textract(Ocr):
         sublist_size = 30
         return [the_list[i : i + sublist_size] for i in range(0, len(the_list), sublist_size)]
 
-    def _paginated_textract_with_queries(self, queries, bucket_name, object_key):
+    async def _paginated_textract_with_queries(self, queries, bucket_name, object_key) -> list[Any]:
         queries_config = [{"Text": query, "Pages": ["*"]} for query in queries]
 
-        # TODO: grab the queries beyond 30 and do a call for them too
         paginated_queries_config = self._split_list_by_30(queries_config)
 
+        tasks = [
+            asyncio.create_task(self._call_textract_with_queries(bucket_name, object_key, sub_queries_config))
+            for sub_queries_config in paginated_queries_config
+        ]
+        results_list = await asyncio.gather(*tasks)
+        return results_list
+
+    async def _call_textract_with_queries(self, bucket_name, object_key, queries_config):
+        print("Initiating document analysis")
         initiate_response = self.textract_client.start_document_analysis(
             DocumentLocation={"S3Object": {"Bucket": bucket_name, "Name": object_key}},
             FeatureTypes=["QUERIES"],
-            QueriesConfig={"Queries": paginated_queries_config[0]},
+            QueriesConfig={"Queries": queries_config},
         )
-
         job_id = initiate_response["JobId"]
-
         response = self.textract_client.get_document_analysis(JobId=job_id)
         while response["JobStatus"] == "IN_PROGRESS":
-            sleep(1)
+            await asyncio.sleep(1)
+            print(f"Checking if job {job_id} is complete")
             response = self.textract_client.get_document_analysis(JobId=job_id)
 
+        print(f"Completed document analysis for job {job_id}")
         return response
 
     def _parse_textract_queries(self, textract_response):
