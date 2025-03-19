@@ -4,7 +4,6 @@ import os
 import boto3
 
 from src.external.ocr.textract import Textract
-from src.forms import w2
 from src.ocr import OcrException
 
 s3_client = boto3.client("s3")
@@ -36,7 +35,7 @@ def lambda_handler(event, context):
 
     try:
         ocr_engine = Textract()
-        extracted_data = ocr_engine.scan(f"s3://{bucket_name}/{document_key}", queries=w2.queries)
+        extracted_data = ocr_engine.scan(f"s3://{bucket_name}/{document_key}")
     except OcrException as e:
         exception_message = f"Failed to extract text from S3 object s3://{bucket_name}/{document_key}: {e}"
         print(exception_message)
