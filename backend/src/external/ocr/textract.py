@@ -35,7 +35,7 @@ class Textract(Ocr):
                     break
 
         except Exception as e:
-            raise OcrException(f"Unable to detect the document type of {s3_url}") from e
+            raise OcrException(f"Failure while trying to detect the document type of {s3_url}") from e
 
         return document_type
 
