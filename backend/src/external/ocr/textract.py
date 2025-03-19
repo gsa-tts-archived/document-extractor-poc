@@ -11,27 +11,31 @@ class Textract(Ocr):
         self.textract_client = boto3.client("textract")
 
     def detect_document_type(self, s3_url: str) -> str | None:
-        bucket_name, object_key = self._parse_s3_url(s3_url)
+        try:
+            bucket_name, object_key = self._parse_s3_url(s3_url)
 
-        response = self.textract_client.detect_document_text(
-            Document={"S3Object": {"Bucket": bucket_name, "Name": object_key}}
-        )
+            response = self.textract_client.detect_document_text(
+                Document={"S3Object": {"Bucket": bucket_name, "Name": object_key}}
+            )
 
-        document_type = None
+            document_type = None
 
-        for block in response.get("Blocks", []):
-            if block.get("BlockType") != "WORD":
-                continue
+            for block in response.get("Blocks", []):
+                if block.get("BlockType") != "WORD":
+                    continue
 
-            if block.get("Text") == "W-2":
-                document_type = "W2"
-                break
-            elif block.get("Text") == "1099":
-                document_type = "1099"
-                break
-            elif block.get("Text") == "DD214":
-                document_type = "DD214"
-                break
+                if block.get("Text") == "W-2":
+                    document_type = "W2"
+                    break
+                elif block.get("Text") == "1099":
+                    document_type = "1099"
+                    break
+                elif block.get("Text") == "DD214":
+                    document_type = "DD214"
+                    break
+
+        except Exception as e:
+            raise OcrException(f"Unable to detect the document type of {s3_url}") from e
 
         return document_type
 
