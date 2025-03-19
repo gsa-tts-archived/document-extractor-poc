@@ -21,7 +21,7 @@ class Textract(Ocr):
             document_type = None
 
             for block in response.get("Blocks", []):
-                if block.get("BlockType") != "WORD":
+                if block.get("BlockType") != "WORD" and block.get("BlockType") != "LINE":
                     continue
 
                 if block.get("Text") == "W-2":
@@ -30,7 +30,7 @@ class Textract(Ocr):
                 elif block.get("Text") == "1099-NEC":
                     document_type = "1099-NEC"
                     break
-                elif block.get("Text") == "DD214":
+                elif block.get("Text").startswith("DD FORM 214"):
                     document_type = "DD214"
                     break
 
