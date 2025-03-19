@@ -27,8 +27,8 @@ class Textract(Ocr):
                 if block.get("Text") == "W-2":
                     document_type = "W2"
                     break
-                elif block.get("Text") == "1099":
-                    document_type = "1099"
+                elif block.get("Text") == "1099-NEC":
+                    document_type = "1099-NEC"
                     break
                 elif block.get("Text") == "DD214":
                     document_type = "DD214"
