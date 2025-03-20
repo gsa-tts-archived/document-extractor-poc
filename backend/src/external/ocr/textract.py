@@ -41,6 +41,35 @@ class Textract(Ocr):
         except Exception as e:
             raise OcrException(f"Unable to OCR the image {s3_url}") from e
 
+    def detect_document_type(self, s3_url: str) -> str | None:
+        try:
+            bucket_name, object_key = self._parse_s3_url(s3_url)
+
+            response = self.textract_client.detect_document_text(
+                Document={"S3Object": {"Bucket": bucket_name, "Name": object_key}}
+            )
+
+            document_type = None
+
+            for block in response.get("Blocks", []):
+                if block.get("BlockType") != "WORD" and block.get("BlockType") != "LINE":
+                    continue
+
+                if block.get("Text") == "W-2":
+                    document_type = "W2"
+                    break
+                elif block.get("Text") == "1099-NEC":
+                    document_type = "1099-NEC"
+                    break
+                elif block.get("Text").startswith("DD FORM 214"):
+                    document_type = "DD214"
+                    break
+
+        except Exception as e:
+            raise OcrException(f"Failure while trying to detect the document type of {s3_url}") from e
+
+        return document_type
+
     def _parse_s3_url(self, s3_url: str) -> tuple[str, str]:
         parsed_url = parse.urlparse(s3_url)
 
