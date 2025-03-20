@@ -33,8 +33,19 @@ def lambda_handler(event, context):
             ),
         }
 
+    ocr_engine = Textract()
+
     try:
-        ocr_engine = Textract()
+        document_type = ocr_engine.detect_document_type(f"s3://{bucket_name}/{document_key}")
+    except OcrException as e:
+        exception_message = f"Failed to detect the document type of s3://{bucket_name}/{document_key}: {e}"
+        print(exception_message)
+        return {
+            "statusCode": 500,
+            "body": json.dumps(exception_message),
+        }
+
+    try:
         extracted_data = ocr_engine.scan(f"s3://{bucket_name}/{document_key}")
     except OcrException as e:
         exception_message = f"Failed to extract text from S3 object s3://{bucket_name}/{document_key}: {e}"
@@ -52,6 +63,7 @@ def lambda_handler(event, context):
                 {
                     "document_key": document_key,
                     "extracted_data": extracted_data,
+                    "document_type": document_type,
                 }
             ),
         )
