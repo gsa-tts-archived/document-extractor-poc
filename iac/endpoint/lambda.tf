@@ -32,3 +32,14 @@ resource "aws_lambda_permission" "api_gateway" {
 
   source_arn = "${data.aws_api_gateway_rest_api.api.execution_arn}/*/*/*"
 }
+
+data "aws_lambda_alias" "api_function_aliases" {
+  function_name = "${var.resource_prefix}-create-document"
+  name          = "${var.resource_prefix}-create-document-alias"
+}
+
+resource "aws_lambda_provisioned_concurrency_config" "api_function_concurrency" {
+  function_name                     = data.aws_lambda_alias.api_function_aliases.function_name
+  provisioned_concurrent_executions = 1
+  qualifier                         = data.aws_lambda_alias.api_function_aliases.name
+}

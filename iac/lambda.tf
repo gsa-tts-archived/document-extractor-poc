@@ -71,3 +71,25 @@ resource "aws_lambda_event_source_mapping" "invoke_dynamodb_writer_from_sqs" {
 
   depends_on = [aws_iam_role_policy_attachment.attach_sqs_permission_to_role]
 }
+
+data "aws_lambda_alias" "text_extract_alias" {
+  function_name = "${local.project}-${var.environment}-text-extract"
+  name          = "${local.project}-${var.environment}-text-extract-alias"
+}
+
+resource "aws_lambda_provisioned_concurrency_config" "text_extract_concurrency" {
+  function_name                     = data.aws_lambda_alias.text_extract_alias.function_name
+  provisioned_concurrent_executions = 1
+  qualifier                         = data.aws_lambda_alias.text_extract_alias.name
+}
+
+data "aws_lambda_alias" "write_to_dynamodb_alias" {
+  function_name = "${local.project}-${var.environment}-write-to-dynamodb"
+  name          = "${local.project}-${var.environment}-write-to-dynamodb-alias"
+}
+
+resource "aws_lambda_provisioned_concurrency_config" "write_to_dynamodb_concurrency" {
+  function_name                     = data.aws_lambda_alias.write_to_dynamodb_alias.function_name
+  provisioned_concurrent_executions = 1
+  qualifier                         = data.aws_lambda_alias.write_to_dynamodb_alias.name
+}
