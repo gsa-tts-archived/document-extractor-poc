@@ -7,6 +7,11 @@ export default function VerifyPage() {
   const [loading, setLoading] = useState(true); // tracks if page is loading
   const [error, setError] = useState(false); // tracks when there is an error
 
+  const multilineFields = [
+    "c Employer's name address, and ZIP code",
+    "e Employee's name, suffix",
+  ];
+
   async function pollApiRequest(attempts = 30, delay = 2000) {
     for (let i = 0; i < attempts; i++) {
       try {
@@ -104,6 +109,10 @@ export default function VerifyPage() {
     }));
   }
 
+  function isMultilineField(key) {
+    return multilineFields.some((label) => key.startsWith(label));
+  }
+
   function displayExtractedData() {
     if (!responseData?.extracted_data) {
       console.warn('No extracted data found.');
@@ -124,13 +133,23 @@ export default function VerifyPage() {
                   : 'Confidence'}
               </span>
             </label>
-            <input
-              className="usa-input"
-              id="input-type-text"
-              name="input-type-text"
-              value={field.value || ''}
-              onChange={(event) => handleInputChange(event, key, field)}
-            />
+            {isMultilineField(key) ? (
+              <textarea
+                className="usa-textarea"
+                id="textarea-type-text"
+                rows={2}
+                value={field.value || ''}
+                onChange={(event) => handleInputChange(event, key, field)}
+              />
+            ) : (
+              <input
+                className="usa-input"
+                id="input-type-text"
+                name="input-type-text"
+                value={field.value || ''}
+                onChange={(event) => handleInputChange(event, key, field)}
+              />
+            )}
           </div>
         );
       });
