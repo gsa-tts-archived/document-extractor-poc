@@ -12,6 +12,8 @@ sqs_client = boto3.client("sqs")
 
 SQS_QUEUE_URL = os.environ["SQS_QUEUE_URL"]
 
+instantiated_supported_forms = [form() for form in supported_forms]
+
 
 def lambda_handler(event, context):
     record = event["Records"][0]
@@ -49,7 +51,7 @@ def lambda_handler(event, context):
     identified_form = None
 
     for text in document_text:
-        for form in supported_forms:
+        for form in instantiated_supported_forms:
             if form.form_matches() in text:
                 identified_form = form
                 break

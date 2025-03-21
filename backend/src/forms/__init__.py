@@ -12,7 +12,7 @@ def find_form_implementations():
     # Iterate over all modules in the package
     for _, module_name, _ in pkgutil.iter_modules([os.path.dirname(__file__)]):
         # Import the module
-        module = importlib.import_module(module_name)
+        module = importlib.import_module(f"{__name__}.{module_name}")
 
         # Iterate over all classes in the module
         for _, obj in inspect.getmembers(module, inspect.isclass):
