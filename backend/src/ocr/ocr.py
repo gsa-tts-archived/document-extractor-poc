@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 
 class Ocr(ABC):
     @abstractmethod
-    def detect_document_type(self, s3_url: str) -> str | None:
+    def extract_raw_text(self, s3_url: str) -> list[str]:
         pass
 
     @abstractmethod

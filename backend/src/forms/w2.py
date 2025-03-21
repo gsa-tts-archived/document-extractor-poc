@@ -5,8 +5,8 @@ class W2(Form):
     def identifier(self) -> str:
         return "W2"
 
-    def form_matches(self, text: str) -> bool:
-        return text == "W-2"
+    def form_matches(self) -> str:
+        return "W-2"
 
     def queries(self) -> list[str]:
         return [

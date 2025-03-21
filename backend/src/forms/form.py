@@ -7,7 +7,7 @@ class Form(ABC):
         pass
 
     @abstractmethod
-    def form_matches(self, text: str) -> bool:
+    def form_matches(self) -> str:
         pass
 
     @abstractmethod

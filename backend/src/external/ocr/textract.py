@@ -18,7 +18,7 @@ class Textract(Ocr):
             # Parse the S3 URL
             bucket_name, object_key = self._parse_s3_url(s3_url)
 
-            if queries is None:
+            if queries is None or len(queries) == 0:
                 print("Attempting AnalyzeDocument with forms and tables")
                 response = self.textract_client.analyze_document(
                     Document={"S3Object": {"Bucket": bucket_name, "Name": object_key}},
@@ -41,7 +41,7 @@ class Textract(Ocr):
         except Exception as e:
             raise OcrException(f"Unable to OCR the image {s3_url}") from e
 
-    def detect_document_type(self, s3_url: str) -> str | None:
+    def extract_raw_text(self, s3_url: str) -> list[str]:
         try:
             bucket_name, object_key = self._parse_s3_url(s3_url)
 
@@ -49,26 +49,16 @@ class Textract(Ocr):
                 Document={"S3Object": {"Bucket": bucket_name, "Name": object_key}}
             )
 
-            document_type = None
-
-            for block in response.get("Blocks", []):
-                if block.get("BlockType") != "WORD" and block.get("BlockType") != "LINE":
-                    continue
-
-                if block.get("Text") == "W-2":
-                    document_type = "W2"
-                    break
-                elif block.get("Text") == "1099-NEC":
-                    document_type = "1099-NEC"
-                    break
-                elif block.get("Text").startswith("DD FORM 214"):
-                    document_type = "DD214"
-                    break
+            return (
+                iterator_chain.from_iterable(response.get("Blocks", []))
+                .filter(lambda block: block["BlockType"] == "LINE")
+                .filter(lambda block: "Text" in block)
+                .map(lambda block: block["Text"])
+                .list()
+            )
 
         except Exception as e:
             raise OcrException(f"Failure while trying to detect the document type of {s3_url}") from e
-
-        return document_type
 
     def _parse_s3_url(self, s3_url: str) -> tuple[str, str]:
         parsed_url = parse.urlparse(s3_url)
