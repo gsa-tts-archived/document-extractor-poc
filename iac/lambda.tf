@@ -15,6 +15,7 @@ resource "aws_lambda_function" "text_extract" {
   timeout                        = 30
   runtime                        = "python3.13"
   reserved_concurrent_executions = -1
+  publish                        = true
 
   architectures = ["arm64"]
 
@@ -29,25 +30,18 @@ resource "aws_lambda_function" "text_extract" {
   }
 }
 
-resource "aws_lambda_alias" "text_extract_alias" {
-  name             = "${aws_lambda_function.text_extract.function_name}-alias"
-  description      = "an alias to be used for provisioned concurrency"
-  function_name    = aws_lambda_function.text_extract.arn
-  function_version = "1"
-}
-
-resource "aws_lambda_provisioned_concurrency_config" "text_extract_concurrency" {
-  function_name                     = aws_lambda_alias.text_extract_alias.function_name
-  provisioned_concurrent_executions = 1
-  qualifier                         = aws_lambda_alias.text_extract_alias.name
-}
-
 resource "aws_lambda_permission" "allow_bucket_invoke" {
   statement_id  = "AllowExecutionFromS3Bucket"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.text_extract.arn
   principal     = "s3.amazonaws.com"
   source_arn    = aws_s3_bucket.document_storage.arn
+}
+
+resource "aws_lambda_provisioned_concurrency_config" "text_extract_concurrency" {
+  function_name                     = aws_lambda_function.text_extract.function_name
+  provisioned_concurrent_executions = 1
+  qualifier                         = aws_lambda_function.text_extract.version
 }
 
 resource "aws_lambda_function" "write_to_dynamodb" {
@@ -62,6 +56,7 @@ resource "aws_lambda_function" "write_to_dynamodb" {
   timeout                        = 30
   runtime                        = "python3.13"
   reserved_concurrent_executions = -1
+  publish                        = true
 
   architectures = ["arm64"]
 
@@ -85,15 +80,8 @@ resource "aws_lambda_event_source_mapping" "invoke_dynamodb_writer_from_sqs" {
   depends_on = [aws_iam_role_policy_attachment.attach_sqs_permission_to_role]
 }
 
-resource "aws_lambda_alias" "write_to_dynamodb_alias" {
-  name             = "${aws_lambda_function.write_to_dynamodb.function_name}-alias"
-  description      = "an alias to be used for provisioned concurrency"
-  function_name    = aws_lambda_function.write_to_dynamodb.arn
-  function_version = "1"
-}
-
 resource "aws_lambda_provisioned_concurrency_config" "write_to_dynamodb_concurrency" {
-  function_name                     = aws_lambda_alias.write_to_dynamodb_alias.function_name
+  function_name                     = aws_lambda_function.write_to_dynamodb.function_name
   provisioned_concurrent_executions = 1
-  qualifier                         = aws_lambda_alias.write_to_dynamodb_alias.name
+  qualifier                         = aws_lambda_function.write_to_dynamodb.version
 }
