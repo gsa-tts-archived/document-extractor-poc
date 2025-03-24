@@ -15,6 +15,7 @@ resource "aws_lambda_function" "text_extract" {
   timeout                        = 30
   runtime                        = "python3.13"
   reserved_concurrent_executions = -1
+  publish                        = true
 
   architectures = ["arm64"]
 
@@ -37,6 +38,12 @@ resource "aws_lambda_permission" "allow_bucket_invoke" {
   source_arn    = aws_s3_bucket.document_storage.arn
 }
 
+resource "aws_lambda_provisioned_concurrency_config" "text_extract_concurrency" {
+  function_name                     = aws_lambda_function.text_extract.function_name
+  provisioned_concurrent_executions = 1
+  qualifier                         = aws_lambda_function.text_extract.version
+}
+
 resource "aws_lambda_function" "write_to_dynamodb" {
   function_name = "${local.project}-${var.environment}-write-to-dynamodb"
 
@@ -49,6 +56,7 @@ resource "aws_lambda_function" "write_to_dynamodb" {
   timeout                        = 30
   runtime                        = "python3.13"
   reserved_concurrent_executions = -1
+  publish                        = true
 
   architectures = ["arm64"]
 
@@ -70,4 +78,10 @@ resource "aws_lambda_event_source_mapping" "invoke_dynamodb_writer_from_sqs" {
   maximum_batching_window_in_seconds = 0
 
   depends_on = [aws_iam_role_policy_attachment.attach_sqs_permission_to_role]
+}
+
+resource "aws_lambda_provisioned_concurrency_config" "write_to_dynamodb_concurrency" {
+  function_name                     = aws_lambda_function.write_to_dynamodb.function_name
+  provisioned_concurrent_executions = 1
+  qualifier                         = aws_lambda_function.write_to_dynamodb.version
 }

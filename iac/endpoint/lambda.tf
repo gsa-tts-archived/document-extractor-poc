@@ -11,6 +11,7 @@ resource "aws_lambda_function" "function" {
   timeout                        = 30
   runtime                        = "python3.13"
   reserved_concurrent_executions = -1
+  publish                        = true
 
   architectures = [var.lambda_arch]
 
@@ -31,4 +32,11 @@ resource "aws_lambda_permission" "api_gateway" {
   principal     = "apigateway.amazonaws.com"
 
   source_arn = "${data.aws_api_gateway_rest_api.api.execution_arn}/*/*/*"
+}
+
+resource "aws_lambda_provisioned_concurrency_config" "api_function_concurrency" {
+  count                             = length(var.handler_method_mapping)
+  function_name                     = aws_lambda_function.function[count.index].function_name
+  provisioned_concurrent_executions = 1
+  qualifier                         = aws_lambda_function.function[count.index].version
 }
