@@ -7,11 +7,6 @@ export default function VerifyPage() {
   const [loading, setLoading] = useState(true); // tracks if page is loading
   const [error, setError] = useState(false); // tracks when there is an error
 
-  const multilineFields = [
-    "c Employer's name address, and ZIP code",
-    "e Employee's name, suffix",
-  ];
-
   async function pollApiRequest(attempts = 30, delay = 2000) {
     for (let i = 0; i < attempts; i++) {
       try {
@@ -109,8 +104,9 @@ export default function VerifyPage() {
     }));
   }
 
-  function isMultilineField(key) {
-    return multilineFields.some((label) => key.startsWith(label));
+  function shouldUseTextarea(value) {
+    if (typeof value !== 'string') return false;
+    return value.includes('\n');
   }
 
   function displayExtractedData() {
@@ -133,7 +129,7 @@ export default function VerifyPage() {
                   : 'Confidence'}
               </span>
             </label>
-            {isMultilineField(key) ? (
+            {shouldUseTextarea(field.value) ? (
               <textarea
                 className="usa-textarea"
                 id="textarea-type-text"
