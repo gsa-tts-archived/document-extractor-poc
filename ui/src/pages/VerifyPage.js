@@ -104,6 +104,11 @@ export default function VerifyPage() {
     }));
   }
 
+  function shouldUseTextarea(value) {
+    if (typeof value !== 'string') return false;
+    return value.includes('\n');
+  }
+
   function displayExtractedData() {
     if (!responseData?.extracted_data) {
       console.warn('No extracted data found.');
@@ -124,13 +129,23 @@ export default function VerifyPage() {
                   : 'Confidence'}
               </span>
             </label>
-            <input
-              className="usa-input"
-              id="input-type-text"
-              name="input-type-text"
-              value={field.value || ''}
-              onChange={(event) => handleInputChange(event, key, field)}
-            />
+            {shouldUseTextarea(field.value) ? (
+              <textarea
+                className="usa-textarea"
+                id="textarea-type-text"
+                rows={2}
+                value={field.value || ''}
+                onChange={(event) => handleInputChange(event, key, field)}
+              />
+            ) : (
+              <input
+                className="usa-input"
+                id="input-type-text"
+                name="input-type-text"
+                value={field.value || ''}
+                onChange={(event) => handleInputChange(event, key, field)}
+              />
+            )}
           </div>
         );
       });
