@@ -3,9 +3,13 @@ import os
 
 import boto3
 
+from src import context
 from src.external.ocr.textract import Textract
-from src.forms import supported_forms
-from src.ocr import OcrException
+from src.forms import Form, supported_forms
+from src.ocr import Ocr, OcrException
+
+appContext = context.ApplicationContext()
+appContext.register("ocr_engine", Textract())
 
 s3_client = boto3.client("s3")
 sqs_client = boto3.client("sqs")
@@ -34,10 +38,8 @@ def lambda_handler(event, context):
             ),
         }
 
-    ocr_engine = Textract()
-
     try:
-        document_text = ocr_engine.extract_raw_text(f"s3://{bucket_name}/{document_key}")
+        document_text = get_document_text(bucket_name, document_key)
     except OcrException as e:
         exception_message = f"Failed to detect the document type of s3://{bucket_name}/{document_key}: {e}"
         print(exception_message)
@@ -55,7 +57,7 @@ def lambda_handler(event, context):
                 break
 
     try:
-        extracted_data = ocr_engine.scan(f"s3://{bucket_name}/{document_key}", queries=identified_form.queries())
+        extracted_data = scan_for_fields(bucket_name, document_key, identified_form)
     except OcrException as e:
         exception_message = f"Failed to extract text from S3 object s3://{bucket_name}/{document_key}: {e}"
         print(exception_message)
@@ -84,3 +86,13 @@ def lambda_handler(event, context):
         "statusCode": 200,
         "body": json.dumps("Document processed successfully and sent to SQS"),
     }
+
+
+@context.inject
+def get_document_text(bucket_name: str, document_key: str, ocr_engine: Ocr = None) -> list[str]:
+    return ocr_engine.extract_raw_text(f"s3://{bucket_name}/{document_key}")
+
+
+@context.inject
+def scan_for_fields(bucket_name: str, document_key: str, identified_form: Form, ocr_engine: Ocr = None):
+    return ocr_engine.scan(f"s3://{bucket_name}/{document_key}", queries=identified_form.queries())
