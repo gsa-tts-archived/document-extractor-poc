@@ -6,7 +6,7 @@ updates:
   - package-ecosystem: github-actions
     directory: /
     schedule:
-      interval: daily
+      interval: weekly
     groups:
       minor-and-patch-github-actions:
         update-types:
@@ -16,7 +16,7 @@ updates:
   - package-ecosystem: terraform
     directory: iac
     schedule:
-      interval: daily
+      interval: weekly
     groups:
       minor-and-patch-terraform:
         update-types:
@@ -26,7 +26,7 @@ updates:
   - package-ecosystem: uv
     directory: backend
     schedule:
-      interval: daily
+      interval: weekly
     groups:
       minor-and-patch-python:
         update-types:
@@ -36,7 +36,7 @@ updates:
   - package-ecosystem: npm
     directory: ui
     schedule:
-      interval: daily
+      interval: weekly
     groups:
       minor-and-patch-npm:
         update-types:
