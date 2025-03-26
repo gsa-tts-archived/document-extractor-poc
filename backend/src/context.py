@@ -1,6 +1,6 @@
 import functools
 import inspect
-from typing import Any
+from typing import Any, get_type_hints
 
 
 def singleton(cls):
@@ -22,20 +22,25 @@ def inject(original_function):
     def wrapper(*args, **kwargs):
         context = ApplicationContext()
 
+        argument_type_hints = get_type_hints(original_function)
+
         argument_specification = inspect.getfullargspec(original_function)
         argument_defaults = argument_specification.defaults or ()
         keyword_arguments = argument_specification.args[-len(argument_defaults) :] if len(argument_defaults) else []
 
         for kwarg in keyword_arguments:
-            if kwarg in kwargs or not context.exists(kwarg):
+            kwarg_type_hint = argument_type_hints.get(kwarg)
+            if kwarg in kwargs or kwarg_type_hint is None or not context.exists(kwarg_type_hint):
                 # if the keyword argument was specified in this specific call to `original_function`
                 # or
-                # if ApplicationContext doesn't have the keyword argument
+                # if there is no type hint for the keyword argument
+                # or
+                # if ApplicationContext doesn't have an implementation for the keyword argument
                 # then
                 # don't inject
                 continue
 
-            kwargs[kwarg] = context.implementation(kwarg)
+            kwargs[kwarg] = context.implementation(kwarg_type_hint)
 
         return original_function(*args, **kwargs)
 
@@ -45,13 +50,13 @@ def inject(original_function):
 @singleton
 class ApplicationContext:
     def __init__(self):
-        self._implementation_map: dict[str, Any] = {}
+        self._implementation_map: dict[type[Any], Any] = {}
 
-    def register(self, identifier: str, implementation: Any):
+    def register(self, identifier: type[Any], implementation: Any):
         self._implementation_map[identifier] = implementation
 
-    def exists(self, identifier: str) -> bool:
+    def exists(self, identifier: type[Any]) -> bool:
         return identifier in self._implementation_map
 
-    def implementation(self, identifier: str) -> Any:
+    def implementation(self, identifier: type[Any]) -> Any:
         return self._implementation_map[identifier]

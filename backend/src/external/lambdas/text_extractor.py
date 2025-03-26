@@ -9,7 +9,7 @@ from src.forms import Form, supported_forms
 from src.ocr import Ocr, OcrException
 
 appContext = context.ApplicationContext()
-appContext.register("ocr_engine", Textract())
+appContext.register(Ocr, Textract())
 
 s3_client = boto3.client("s3")
 sqs_client = boto3.client("sqs")
