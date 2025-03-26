@@ -10,10 +10,8 @@ class W2(Form):
 
     def queries(self) -> list[str]:
         return [
-            "a Employee's social security number",
             "b Employer identification number (EIN)",
             "c Employer's name, address, and ZIP code",
-            "d Control number",
             "e Employee's first name and initial",
             "e Last name",
             "e Suff.",
@@ -33,15 +31,9 @@ class W2(Form):
             "12b Code",
             "12c Code",
             "12d Code",
-            "13 Statutory employee",
-            "13 Retirement plan",
-            "13 Tird-party sick pay",
-            "14 Other",
-            "15 State",
             "15 Employer's state ID number",
             "16 State wages, tips, etc.",
             "17 State income tax",
             "18 Local wages, tips, etc.",
             "19 Local income tax",
-            "20 Locality name",
         ]
