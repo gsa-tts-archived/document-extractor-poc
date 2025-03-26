@@ -7,14 +7,8 @@ appContext = context.ApplicationContext()
 appContext.register(Ocr, Textract())
 
 
-@context.inject
-def get_ocr_engine(ocr_engine: Ocr = None, asdf: str = None):
-    print(f"asdf={asdf}")
-    return ocr_engine
-
-
 if __name__ == "__main__":
-    scanner = get_ocr_engine()
+    scanner = appContext.implementation(Ocr)
     form = DDTwoOneFour()
     result = scanner.scan("s3://document-extractor-gsa-dev-documents/test_dd214.jpg", queries=form.queries())
 

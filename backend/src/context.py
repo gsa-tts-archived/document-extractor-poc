@@ -52,11 +52,11 @@ class ApplicationContext:
     def __init__(self):
         self._implementation_map: dict[type[Any], Any] = {}
 
-    def register(self, identifier: type[Any], implementation: Any):
+    def register[T](self, identifier: type[T], implementation: T):
         self._implementation_map[identifier] = implementation
 
     def exists(self, identifier: type[Any]) -> bool:
         return identifier in self._implementation_map
 
-    def implementation(self, identifier: type[Any]) -> Any:
+    def implementation[T](self, identifier: type[T]) -> T:
         return self._implementation_map[identifier]
