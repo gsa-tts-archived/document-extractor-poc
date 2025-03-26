@@ -21,3 +21,8 @@ select = [
     "SIM", # flake8-simplify
     "I", # isort
 ]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3.5",
+]
