@@ -14,7 +14,6 @@ appContext = context.ApplicationContext()
 appContext.register(Ocr, Textract())
 appContext.register(CloudStorage, S3())
 
-s3_client = boto3.client("s3")
 sqs_client = boto3.client("sqs")
 
 SQS_QUEUE_URL = os.environ["SQS_QUEUE_URL"]
