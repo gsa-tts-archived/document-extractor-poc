@@ -60,3 +60,6 @@ class ApplicationContext:
 
     def implementation[T](self, identifier: type[T]) -> T:
         return self._implementation_map[identifier]
+
+    def clear(self):
+        self._implementation_map.clear()
