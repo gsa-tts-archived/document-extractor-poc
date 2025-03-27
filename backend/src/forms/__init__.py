@@ -6,7 +6,7 @@ import pkgutil
 from src.forms.form import Form
 
 
-def find_form_implementations():
+def find_form_implementations() -> list[Form]:
     implementations = []
 
     # Iterate over all modules in the package
