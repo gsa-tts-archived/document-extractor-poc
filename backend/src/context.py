@@ -61,5 +61,5 @@ class ApplicationContext:
     def implementation[T](self, identifier: type[T]) -> T:
         return self._implementation_map[identifier]
 
-    def clear(self):
+    def reset(self):
         self._implementation_map.clear()
