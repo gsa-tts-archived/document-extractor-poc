@@ -4,12 +4,15 @@ import os
 import boto3
 
 from src import context
+from src.external.aws.s3 import S3
 from src.external.aws.textract import Textract
 from src.forms import Form, supported_forms
 from src.ocr import Ocr, OcrException
+from src.storage import CloudStorage
 
 appContext = context.ApplicationContext()
 appContext.register(Ocr, Textract())
+appContext.register(CloudStorage, S3())
 
 s3_client = boto3.client("s3")
 sqs_client = boto3.client("sqs")
@@ -24,13 +27,7 @@ def lambda_handler(event, context):
 
     print(f"Processing file: s3://{bucket_name}/{document_key}")
 
-    try:
-        metadata = s3_client.head_object(Bucket=bucket_name, Key=document_key)
-        print("S3 Metadata Retrieved Successfully:")
-        print(metadata)
-
-    except Exception as e:
-        print(f"Failed to retrieve S3 object metadata: {e}")
+    if not check_that_file_is_good(bucket_name, document_key):
         return {
             "statusCode": 403,
             "body": json.dumps(
@@ -89,10 +86,17 @@ def lambda_handler(event, context):
 
 
 @context.inject
+def check_that_file_is_good(bucket_name, document_key, cloud_storage: CloudStorage = None) -> bool:
+    return cloud_storage.file_exists_and_allowed_to_access(f"s3://{bucket_name}/{document_key}")
+
+
+@context.inject
 def get_document_text(bucket_name: str, document_key: str, ocr_engine: Ocr = None) -> list[str]:
     return ocr_engine.extract_raw_text(f"s3://{bucket_name}/{document_key}")
 
 
 @context.inject
-def scan_for_fields(bucket_name: str, document_key: str, identified_form: Form, ocr_engine: Ocr = None):
+def scan_for_fields(
+    bucket_name: str, document_key: str, identified_form: Form, ocr_engine: Ocr = None
+) -> dict[str, dict[str, str | float]]:
     return ocr_engine.scan(f"s3://{bucket_name}/{document_key}", queries=identified_form.queries())
