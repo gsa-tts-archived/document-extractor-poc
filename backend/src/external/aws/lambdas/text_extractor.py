@@ -2,6 +2,7 @@ import json
 import os
 
 import boto3
+from types_boto3_sqs import SQSClient
 
 from src import context
 from src.external.aws.s3 import S3
@@ -13,8 +14,9 @@ from src.storage import CloudStorage
 appContext = context.ApplicationContext()
 appContext.register(Ocr, Textract())
 appContext.register(CloudStorage, S3())
+appContext.register(SQSClient, boto3.client("sqs"))
 
-sqs_client = boto3.client("sqs")
+# sqs_client = boto3.client("sqs")
 
 SQS_QUEUE_URL = os.environ["SQS_QUEUE_URL"]
 
@@ -62,11 +64,10 @@ def lambda_handler(event, context):
             "body": json.dumps(exception_message),
         }
 
-    # Send extracted data to SQS
     try:
-        sqs_client.send_message(
-            QueueUrl=SQS_QUEUE_URL,
-            MessageBody=json.dumps(
+        send_queue_message_to_next_step(
+            SQS_QUEUE_URL,
+            json.dumps(
                 {
                     "document_key": document_key,
                     "extracted_data": extracted_data,
@@ -74,9 +75,14 @@ def lambda_handler(event, context):
                 }
             ),
         )
-        print("Message sent to SQS successfully.")
-    except Exception as sqs_error:
-        print(f"Failed to send message to SQS: {sqs_error}")
+        print("Message sent to queue successfully")
+    except Exception as e:
+        exception_message = f"Failed to send message to queue: {e}"
+        print(exception_message)
+        return {
+            "statusCode": 500,
+            "body": json.dumps(exception_message),
+        }
 
     return {
         "statusCode": 200,
@@ -99,3 +105,8 @@ def scan_for_fields(
     bucket_name: str, document_key: str, identified_form: Form, ocr_engine: Ocr = None
 ) -> dict[str, dict[str, str | float]]:
     return ocr_engine.scan(f"s3://{bucket_name}/{document_key}", queries=identified_form.queries())
+
+
+@context.inject
+def send_queue_message_to_next_step(queue_url: str, message: str, sqs_client: SQSClient = None):
+    sqs_client.send_message(QueueUrl=queue_url, MessageBody=message)
