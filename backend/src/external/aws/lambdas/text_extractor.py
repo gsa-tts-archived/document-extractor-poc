@@ -4,7 +4,7 @@ import os
 import boto3
 
 from src import context
-from src.external.ocr.textract import Textract
+from src.external.aws.textract import Textract
 from src.forms import Form, supported_forms
 from src.ocr import Ocr, OcrException
 
