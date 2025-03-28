@@ -2,6 +2,8 @@ import json
 import os
 
 import boto3
+from aws_lambda_typing import context as lambda_context
+from aws_lambda_typing import events
 from types_boto3_sqs import SQSClient
 
 from src import context
@@ -19,7 +21,7 @@ appContext.register(SQSClient, boto3.client("sqs"))
 SQS_QUEUE_URL = os.environ["SQS_QUEUE_URL"]
 
 
-def lambda_handler(event, context):
+def lambda_handler(event: events.S3Event, context: lambda_context.Context):
     record = event["Records"][0]
     bucket_name = record["s3"]["bucket"]["name"]
     document_key = record["s3"]["object"]["key"]
