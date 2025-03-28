@@ -7,9 +7,9 @@ from aws_lambda_typing import events
 from types_boto3_sqs import SQSClient
 
 from src import context
+from src.documents import extract_text
 from src.external.aws.s3 import S3
 from src.external.aws.textract import Textract
-from src.forms import Form, supported_forms
 from src.ocr import Ocr, OcrException
 from src.storage import CloudStorage
 
@@ -18,7 +18,7 @@ appContext.register(Ocr, Textract())
 appContext.register(CloudStorage, S3())
 appContext.register(SQSClient, boto3.client("sqs"))
 
-SQS_QUEUE_URL = os.environ["SQS_QUEUE_URL"]
+sqs_queue_url = os.environ["SQS_QUEUE_URL"]
 
 
 def lambda_handler(event: events.S3Event, context: lambda_context.Context):
@@ -26,56 +26,25 @@ def lambda_handler(event: events.S3Event, context: lambda_context.Context):
     bucket_name = record["s3"]["bucket"]["name"]
     document_key = record["s3"]["object"]["key"]
 
-    print(f"Processing file: s3://{bucket_name}/{document_key}")
-
-    if not check_that_file_is_good(bucket_name, document_key):
-        return {
-            "statusCode": 403,
-            "body": json.dumps(
-                "Failed to access S3 object. Check permissions or other issues with file or configurations."
-            ),
-        }
+    s3_url = f"s3://{bucket_name}/{document_key}"
+    print(f"Processing file {s3_url}")
 
     try:
-        document_text = get_document_text(bucket_name, document_key)
-    except OcrException as e:
-        exception_message = f"Failed to detect the document type of s3://{bucket_name}/{document_key}: {e}"
+        extract_text.extract_text(s3_url, sqs_queue_url)
+    except FileNotFoundError as e:
+        exception_message = f"Failed to find the file {s3_url}: {e}"
         print(exception_message)
         return {
             "statusCode": 500,
             "body": json.dumps(exception_message),
         }
-
-    identified_form = None
-
-    for text in document_text:
-        for form in supported_forms:
-            if form.form_matches() in text:
-                identified_form = form
-                break
-
-    try:
-        extracted_data = scan_for_fields(bucket_name, document_key, identified_form)
     except OcrException as e:
-        exception_message = f"Failed to extract text from S3 object s3://{bucket_name}/{document_key}: {e}"
+        exception_message = f"Failed OCR of {s3_url}: {e}"
         print(exception_message)
         return {
             "statusCode": 500,
             "body": json.dumps(exception_message),
         }
-
-    try:
-        send_queue_message_to_next_step(
-            SQS_QUEUE_URL,
-            json.dumps(
-                {
-                    "document_key": document_key,
-                    "extracted_data": extracted_data,
-                    "document_type": identified_form.identifier(),
-                }
-            ),
-        )
-        print("Message sent to queue successfully")
     except Exception as e:
         exception_message = f"Failed to send message to queue: {e}"
         print(exception_message)
@@ -88,25 +57,3 @@ def lambda_handler(event: events.S3Event, context: lambda_context.Context):
         "statusCode": 200,
         "body": json.dumps("Document processed successfully and sent to SQS"),
     }
-
-
-@context.inject
-def check_that_file_is_good(bucket_name, document_key, cloud_storage: CloudStorage = None) -> bool:
-    return cloud_storage.file_exists_and_allowed_to_access(f"s3://{bucket_name}/{document_key}")
-
-
-@context.inject
-def get_document_text(bucket_name: str, document_key: str, ocr_engine: Ocr = None) -> list[str]:
-    return ocr_engine.extract_raw_text(f"s3://{bucket_name}/{document_key}")
-
-
-@context.inject
-def scan_for_fields(
-    bucket_name: str, document_key: str, identified_form: Form, ocr_engine: Ocr = None
-) -> dict[str, dict[str, str | float]]:
-    return ocr_engine.scan(f"s3://{bucket_name}/{document_key}", queries=identified_form.queries())
-
-
-@context.inject
-def send_queue_message_to_next_step(queue_url: str, message: str, sqs_client: SQSClient = None):
-    sqs_client.send_message(QueueUrl=queue_url, MessageBody=message)
