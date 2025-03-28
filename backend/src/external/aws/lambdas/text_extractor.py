@@ -1,4 +1,5 @@
 import json
+import logging
 import os
 
 import boto3
@@ -27,27 +28,30 @@ def lambda_handler(event: events.S3Event, context: lambda_context.Context):
     document_key = record["s3"]["object"]["key"]
 
     s3_url = f"s3://{bucket_name}/{document_key}"
-    print(f"Processing file {s3_url}")
+    logging.info(f"Processing {s3_url}")
 
     try:
         extract_text.extract_text(s3_url, sqs_queue_url)
     except FileNotFoundError as e:
-        exception_message = f"Failed to find the file {s3_url}: {e}"
-        print(exception_message)
+        exception_message = f"Failed to find the file {s3_url}"
+        logging.error(exception_message)
+        logging.exception(e)
         return {
             "statusCode": 500,
             "body": json.dumps(exception_message),
         }
     except OcrException as e:
-        exception_message = f"Failed OCR of {s3_url}: {e}"
-        print(exception_message)
+        exception_message = f"Failed OCR of {s3_url}"
+        logging.error(exception_message)
+        logging.exception(e)
         return {
             "statusCode": 500,
             "body": json.dumps(exception_message),
         }
     except Exception as e:
-        exception_message = f"Failed to send message to queue: {e}"
-        print(exception_message)
+        exception_message = "Failed to send message to queue"
+        logging.error(exception_message)
+        logging.exception(e)
         return {
             "statusCode": 500,
             "body": json.dumps(exception_message),
