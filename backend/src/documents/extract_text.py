@@ -16,15 +16,17 @@ def extract_text(remote_file_url: str, queue_url: str, ocr_engine: Ocr = None, s
 
     identified_form = identify_form(document_text)
 
-    extracted_data = ocr_engine.scan(remote_file_url, queries=identified_form.queries())
+    queries = identified_form.queries() if identified_form else None
+    extracted_data = ocr_engine.scan(remote_file_url, queries=queries)
 
+    document_type = identified_form.identifier() if identified_form else None
     sqs_client.send_message(
         QueueUrl=queue_url,
         MessageBody=json.dumps(
             {
                 "document_url": remote_file_url,
                 "extracted_data": extracted_data,
-                "document_type": identified_form.identifier(),
+                "document_type": document_type,
             }
         ),
     )
