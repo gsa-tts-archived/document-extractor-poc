@@ -1,6 +1,6 @@
 import json
 
-from helpers.s3_file_upload_helper import generate_file_id_and_upload_to_s3
+from helpers.s3_file_upload_helper import generate_file_data, upload_to_s3
 
 
 def lambda_handler(event, context):
@@ -13,7 +13,8 @@ def lambda_handler(event, context):
 
         body = json.loads(event["body"])
         try:
-            document_id = generate_file_id_and_upload_to_s3(body)
+            file_data = generate_file_data(body)
+            upload_to_s3(file_data)
         except Exception as e:
             return {
                 "statusCode": 400,
@@ -22,7 +23,7 @@ def lambda_handler(event, context):
 
         return {
             "statusCode": 200,
-            "body": json.dumps({"message": "File uploaded successfully.", "documentId": document_id}),
+            "body": json.dumps({"message": "File uploaded successfully.", "documentId": file_data["document_id"]}),
         }
 
     except Exception as e:
