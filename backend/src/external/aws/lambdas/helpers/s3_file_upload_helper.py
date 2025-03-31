@@ -2,13 +2,10 @@ import base64
 import os
 import uuid
 
-import boto3
-
 from src import context
 from src.external.aws.s3 import S3
 from src.storage import CloudStorage
 
-s3 = boto3.client("s3")
 BUCKET_NAME = os.environ.get("S3_BUCKET_NAME", "ocr-poc-flex")
 DEFAULT_FOLDER = "input/"
 appContext = context.ApplicationContext()
