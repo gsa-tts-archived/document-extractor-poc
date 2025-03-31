@@ -24,8 +24,15 @@ def lambda_handler(event, context):
 
     try:
         document_info, storage_access_url, document_data = get_document.get_document(document_id)
+
+        if document_info is None:
+            return {
+                "statusCode": 404,
+                "body": json.dumps(f"Document {document_id} not found"),
+            }
+
         response = {
-            "document_id": document_info["document_id"],
+            "document_id": document_id,
             "document_key": document_info["document_url"],
             "document_type": document_info["document_type"],
             "extracted_data": document_info.get("extracted_data", {}),

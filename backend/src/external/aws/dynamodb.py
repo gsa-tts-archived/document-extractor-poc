@@ -26,11 +26,10 @@ class DynamoDb(Database):
     def _unmarshal_dynamodb_json(self, dynamodb_data: dict[str, Any]) -> dict[str, Any]:
         """Converts DynamoDB JSON format to standard JSON using TypeDeserializer and handles Decimals."""
         deserialized_data = {k: self.deserializer.deserialize(v) for k, v in dynamodb_data.items()}
-        # return self._convert_decimal(deserialized_data)
-        return deserialized_data
+        return self._convert_decimal(deserialized_data)
 
     def _convert_decimal(self, value):
-        """Recursively converts Decimal to float."""
+        """Recursively converts Decimal to float or int."""
         if isinstance(value, Decimal):
             return int(value) if value % 1 == 0 else float(value)
         elif isinstance(value, list):
