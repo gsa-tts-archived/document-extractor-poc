@@ -9,7 +9,7 @@ from src.storage import CloudStorage
 
 
 @context.inject
-def extract_text(remote_file_url: str, queue_url: str, ocr_engine: Ocr = None, sqs_client: SQSClient = None):
+def extract_text(remote_file_url: str, queue_url: str, ocr_engine: Ocr = None):
     check_that_file_is_good(remote_file_url)
 
     document_text = ocr_engine.extract_raw_text(remote_file_url)
@@ -20,9 +20,10 @@ def extract_text(remote_file_url: str, queue_url: str, ocr_engine: Ocr = None, s
     extracted_data = ocr_engine.scan(remote_file_url, queries=queries)
 
     document_type = identified_form.identifier() if identified_form else None
-    sqs_client.send_message(
-        QueueUrl=queue_url,
-        MessageBody=json.dumps(
+
+    send_queue_message_to_next_step(
+        queue_url,
+        json.dumps(
             {
                 "document_url": remote_file_url,
                 "extracted_data": extracted_data,
@@ -30,7 +31,6 @@ def extract_text(remote_file_url: str, queue_url: str, ocr_engine: Ocr = None, s
             }
         ),
     )
-    print("Message sent to queue successfully")
 
 
 def identify_form(document_text: list[str]) -> Form:
@@ -55,3 +55,4 @@ def check_that_file_is_good(remote_file_url: str, cloud_storage: CloudStorage = 
 @context.inject
 def send_queue_message_to_next_step(queue_url: str, message: str, sqs_client: SQSClient = None):
     sqs_client.send_message(QueueUrl=queue_url, MessageBody=message)
+    print("Message sent to queue successfully")
