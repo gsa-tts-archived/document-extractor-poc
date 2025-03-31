@@ -43,7 +43,7 @@ class Textract(Ocr):
 
     def extract_raw_text(self, s3_url: str) -> list[str]:
         try:
-            bucket_name, object_key = self.parse_s3_url(s3_url)
+            bucket_name, object_key = S3.parse_s3_url(s3_url)
 
             response = self.textract_client.detect_document_text(
                 Document={"S3Object": {"Bucket": bucket_name, "Name": object_key}}
