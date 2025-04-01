@@ -3,7 +3,7 @@ from urllib import parse
 import boto3
 from types_boto3_s3 import S3Client
 
-from src.storage import CloudStorage
+from src.storage import CloudStorage, CloudStorageException
 
 
 class S3(CloudStorage):
@@ -37,14 +37,20 @@ class S3(CloudStorage):
         return True
 
     def access_url(self, remote_url: str) -> str:
-        bucket_name, object_key = self.parse_s3_url(remote_url)
-        return self.s3_client.generate_presigned_url(
-            "get_object",
-            Params={"Bucket": bucket_name, "Key": object_key},
-            ExpiresIn=3600,  # URL expires in 1 hour
-        )
+        try:
+            bucket_name, object_key = self.parse_s3_url(remote_url)
+            return self.s3_client.generate_presigned_url(
+                "get_object",
+                Params={"Bucket": bucket_name, "Key": object_key},
+                ExpiresIn=3600,  # URL expires in 1 hour
+            )
+        except Exception as e:
+            raise CloudStorageException(f"Failed to generate an access URL for {remote_url}") from e
 
     def get_file(self, remote_url: str) -> bytes:
-        bucket_name, object_key = self.parse_s3_url(remote_url)
-        s3_object = self.s3_client.get_object(Bucket=bucket_name, Key=object_key)
-        return s3_object["Body"].read()
+        try:
+            bucket_name, object_key = self.parse_s3_url(remote_url)
+            s3_object = self.s3_client.get_object(Bucket=bucket_name, Key=object_key)
+            return s3_object["Body"].read()
+        except Exception as e:
+            raise CloudStorageException(f"Failed to get the file at {remote_url}") from e

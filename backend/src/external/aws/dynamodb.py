@@ -7,6 +7,7 @@ from boto3.dynamodb.types import TypeDeserializer
 from types_boto3_dynamodb import DynamoDBClient
 
 from src.database.database import Database
+from src.database.exception import DatabaseException
 
 
 class DynamoDb(Database):
@@ -16,12 +17,15 @@ class DynamoDb(Database):
         self.deserializer = TypeDeserializer()
 
     def get_document(self, document_id: str) -> dict[str, Any] | None:
-        dynamodb_item = self.dynamodb_client.get_item(TableName=self.table, Key={"document_id": {"S": document_id}})
+        try:
+            dynamodb_item = self.dynamodb_client.get_item(TableName=self.table, Key={"document_id": {"S": document_id}})
 
-        if "Item" not in dynamodb_item:
-            return None
+            if "Item" not in dynamodb_item:
+                return None
 
-        return self._unmarshal_dynamodb_json(dynamodb_item["Item"])
+            return self._unmarshal_dynamodb_json(dynamodb_item["Item"])
+        except Exception as e:
+            raise DatabaseException(f"Failed to get the document {document_id}") from e
 
     def _unmarshal_dynamodb_json(self, dynamodb_data: dict[str, Any]) -> dict[str, Any]:
         """Converts DynamoDB JSON format to standard JSON using TypeDeserializer and handles Decimals."""
