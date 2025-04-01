@@ -32,12 +32,13 @@ class DynamoDb(Database):
         deserialized_data = {k: self.deserializer.deserialize(v) for k, v in dynamodb_data.items()}
         return self._convert_decimal(deserialized_data)
 
-    def _convert_decimal(self, value):
+    @staticmethod
+    def _convert_decimal(value):
         """Recursively converts Decimal to float or int."""
         if isinstance(value, Decimal):
             return int(value) if value % 1 == 0 else float(value)
         elif isinstance(value, list):
-            return [self._convert_decimal(v) for v in value]
+            return [DynamoDb._convert_decimal(v) for v in value]
         elif isinstance(value, dict):
-            return {k: self._convert_decimal(v) for k, v in value.items()}
+            return {k: DynamoDb._convert_decimal(v) for k, v in value.items()}
         return value
