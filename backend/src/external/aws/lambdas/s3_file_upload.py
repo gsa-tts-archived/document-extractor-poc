@@ -1,6 +1,7 @@
 import json
+import os
 
-from helpers.s3_file_upload_helper import generate_file_data, upload_to_s3
+from src.documents.upload_document import upload_file_data
 
 
 def lambda_handler(event, context):
@@ -13,8 +14,9 @@ def lambda_handler(event, context):
 
         body = json.loads(event["body"])
         try:
-            file_data = generate_file_data(body)
-            upload_to_s3(file_data)
+            bucket_name = os.environ.get("S3_BUCKET_NAME", "ocr-poc-flex")
+            default_folder = "input/"
+            document_id = upload_file_data(body, bucket_name, default_folder)
         except Exception as e:
             return {
                 "statusCode": 400,
@@ -23,7 +25,7 @@ def lambda_handler(event, context):
 
         return {
             "statusCode": 200,
-            "body": json.dumps({"message": "File uploaded successfully.", "documentId": file_data["document_id"]}),
+            "body": json.dumps({"message": "File uploaded successfully.", "documentId": document_id}),
         }
 
     except Exception as e:

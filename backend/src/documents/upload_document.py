@@ -6,10 +6,34 @@ from src import context
 from src.external.aws.s3 import S3
 from src.storage import CloudStorage
 
-BUCKET_NAME = os.environ.get("S3_BUCKET_NAME", "ocr-poc-flex")
-DEFAULT_FOLDER = "input/"
 appContext = context.ApplicationContext()
 appContext.register(CloudStorage, S3())
+
+
+def upload_file_data(body, bucket_name, default_folder) -> str:
+    filedata = generate_file_data(body)
+    upload_to_s3(filedata, bucket_name, default_folder)
+    return filedata.get("document_id")
+
+
+def generate_file_data(body):
+    if not all(k in body for k in ["file_content", "file_name"]):
+        raise ValueError("Missing required fields")
+
+    try:
+        decoded_file_data = base64.b64decode(body["file_content"])
+    except Exception as err:
+        raise TypeError("Invalid file content encoding") from err
+
+    original_filename = body["file_name"]
+    secure_filename, document_id = generate_secure_filename(original_filename)
+    file_data = {
+        "secure_filename": secure_filename,
+        "original_filename": original_filename,
+        "decoded_file_data": decoded_file_data,
+        "document_id": document_id,
+    }
+    return file_data
 
 
 def generate_secure_filename(original_filename):
@@ -23,30 +47,10 @@ def generate_secure_filename(original_filename):
     return f"{document_id}{ext}", document_id
 
 
-def generate_file_data(body):
-    if not all(k in body for k in ["file_content", "file_name"]):
-        raise Exception("Missing required fields")
-
-    try:
-        decoded_file_data = base64.b64decode(body["file_content"])
-    except Exception as err:
-        raise Exception("Invalid file content encoding") from err
-
-    original_filename = body["file_name"]
-    secure_filename, document_id = generate_secure_filename(original_filename)
-    file_data = {
-        "secure_filename": secure_filename,
-        "original_filename": original_filename,
-        "decoded_file_data": decoded_file_data,
-        "document_id": document_id,
-    }
-    return file_data
-
-
-def upload_to_s3(file_data: dict):
-    s3_key = f"{DEFAULT_FOLDER}{file_data['secure_filename']}"
+def upload_to_s3(file_data: dict, bucket_name, default_folder):
+    s3_key = f"{default_folder}{file_data['secure_filename']}"
     put_object(
-        BUCKET_NAME, s3_key, file_data["decoded_file_data"], {"original_filename": file_data["original_filename"]}
+        bucket_name, s3_key, file_data["decoded_file_data"], {"original_filename": file_data["original_filename"]}
     )
 
 
