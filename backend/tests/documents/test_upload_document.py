@@ -5,7 +5,7 @@ import pytest
 
 from src import context
 from src.documents.upload_document import generate_file_data, upload_file_data, upload_to_s3
-from src.storage import CloudStorage
+from src.storage import CloudStorage, CloudStorageException
 
 context = context.ApplicationContext()
 
@@ -95,3 +95,18 @@ def test_upload_to_s3():
     upload_to_s3(file_data, "mock_bucket", "mock_folder")
 
     mock_cloud_storage.put_object.assert_called_once()
+
+
+def test_upload_to_s3_returns_cloud_storage_exception():
+    file_data = {
+        "secure_filename": "secure_filename",
+        "original_filename": "original_filename",
+        "decoded_file_data": "decoded_file_data",
+        "document_id": "document_id",
+    }
+    mock_cloud_storage = mock.MagicMock()
+    mock_cloud_storage.put_object.side_effect = CloudStorageException("Mocker!")
+    context.register(CloudStorage, mock_cloud_storage)
+
+    with pytest.raises(CloudStorageException):
+        upload_to_s3(file_data, "mock_bucket", "mock_folder")
