@@ -211,9 +211,6 @@ apigateway = [
 dynamodb = [
     { name = "types-boto3-dynamodb" },
 ]
-lambda = [
-    { name = "types-boto3-lambda" },
-]
 s3 = [
     { name = "types-boto3-s3" },
 ]
@@ -240,15 +237,6 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/ae/36/96834a143f458812479fedd12170cbd627cf5dfc358d7390660b9d5d07e6/types_boto3_dynamodb-1.37.12.tar.gz", hash = "sha256:009178e5eacd2432989ce724a44ae89f03d6cac9b4931783679073d157598244", size = 47123 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/a1/70/e1fd6fe60475fcbb957b96452f40d0b15ea281451e172dde29564feb44b5/types_boto3_dynamodb-1.37.12-py3-none-any.whl", hash = "sha256:f772ad6cf59f87b7ae71274e4672c4d06b7f8ec74b8d1afbb797c448e0bf4e2e", size = 56160 },
-]
-
-[[package]]
-name = "types-boto3-lambda"
-version = "1.37.16"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/5c/04/ff510efe77867b431c17a4d63f9d9dadc9fd89b97b9e6c14e34ae56a10ff/types_boto3_lambda-1.37.16.tar.gz", hash = "sha256:e388adf2dd82e9ab2884d2e52f2fe24731b8521c0595220e99dea435843204a7", size = 41439 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/a2/74/07a41d0e7239169dd49b4dc58d3aca58be7ef69eb1eb5e78061855ba4d6d/types_boto3_lambda-1.37.16-py3-none-any.whl", hash = "sha256:d4c040beb3418f8f10d4faa65d09435311a15249f47b19cca9610f26ced4ac4b", size = 48019 },
 ]
 
 [[package]]
