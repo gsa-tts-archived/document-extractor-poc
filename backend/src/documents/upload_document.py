@@ -2,10 +2,9 @@ import base64
 import os
 import uuid
 
-from dist.build.src.storage import CloudStorageException
 from src import context
 from src.external.aws.s3 import S3
-from src.storage import CloudStorage
+from src.storage import CloudStorage, CloudStorageException
 
 appContext = context.ApplicationContext()
 appContext.register(CloudStorage, S3())
