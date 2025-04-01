@@ -167,7 +167,6 @@ dependencies = [
 [package.dev-dependencies]
 dev = [
     { name = "pytest" },
-    { name = "types-boto3", extra = ["apigateway", "dynamodb", "lambda", "s3", "sqs", "textract"] },
 ]
 
 [package.metadata]
@@ -181,7 +180,6 @@ requires-dist = [
 [package.metadata.requires-dev]
 dev = [
     { name = "pytest", specifier = ">=8.3.5" },
-    { name = "types-boto3", extras = ["apigateway", "dynamodb", "lambda", "s3", "sqs", "textract"], specifier = ">=1.37.22" },
 ]
 
 [[package]]

@@ -27,5 +27,4 @@ select = [
 [dependency-groups]
 dev = [
     "pytest>=8.3.5",
-    "types-boto3[apigateway,dynamodb,lambda,s3,sqs,textract]>=1.37.22",
 ]
