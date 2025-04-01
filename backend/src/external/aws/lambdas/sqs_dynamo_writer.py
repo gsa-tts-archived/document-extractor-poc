@@ -25,7 +25,6 @@ def lambda_handler(event, context):
 
             document_url = message_body["document_url"]
             document_id = convert_document_url_to_id(document_url)
-            document_key = convert_document_url_to_key(document_url)
             document_type = message_body.get("document_type", "Unknown")
             extracted_data = message_body.get("extracted_data", {})
 
@@ -34,7 +33,7 @@ def lambda_handler(event, context):
 
             item_to_store = {
                 "document_id": document_id,
-                "document_key": document_key,
+                "document_url": document_url,
                 "document_type": document_type,
             }
 
@@ -74,9 +73,3 @@ def convert_document_url_to_id(document_url: str):
     document_key = parsed_url.path
     base = os.path.basename(document_key)
     return os.path.splitext(base)[0]
-
-
-def convert_document_url_to_key(document_url: str):
-    """Converts the key in the form of `s3://bucket_name/input/asdf.jgp` and returns `input/asdf.jgp`."""
-    parsed_url = parse.urlparse(document_url)
-    return parsed_url.path.lstrip("/")
