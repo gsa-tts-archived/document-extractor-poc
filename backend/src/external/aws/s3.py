@@ -2,8 +2,7 @@ from urllib import parse
 
 import boto3
 
-from dist.build.src.storage import CloudStorageException
-from src.storage import CloudStorage
+from src.storage import CloudStorage, CloudStorageException
 
 
 class S3(CloudStorage):
