@@ -3,7 +3,7 @@ from decimal import Decimal
 from typing import Any
 
 import boto3
-from boto3.dynamodb.types import TypeDeserializer
+from boto3.dynamodb.types import TypeDeserializer, TypeSerializer
 from types_boto3_dynamodb import DynamoDBClient
 
 from src.database.database import Database
@@ -14,8 +14,8 @@ class DynamoDb(Database):
     def __init__(self) -> None:
         self.dynamodb_client: DynamoDBClient = boto3.client("dynamodb")
         self.table_name = os.getenv("DYNAMODB_TABLE")
-        self.table = self.dynamodb_client.Table(self.table_name)
         self.deserializer = TypeDeserializer()
+        self.serializer = TypeSerializer()
 
     def get_document(self, document_id: str) -> dict[str, Any] | None:
         try:
@@ -31,13 +31,16 @@ class DynamoDb(Database):
             raise DatabaseException(f"Failed to get the document {document_id}") from e
 
     def write_document(self, document: dict[str, Any]):
-        dynamodb_item = self._convert_to_decimal(document)
+        dynamodb_item = self._marshal_dynamodb_json(document)
         self.dynamodb_client.put_item(TableName=self.table_name, Item=dynamodb_item)
-        # self.table.put_item(Item=document)
 
     def _unmarshal_dynamodb_json(self, dynamodb_data: dict[str, Any]) -> dict[str, Any]:
-        """Converts DynamoDB JSON format to standard JSON using TypeDeserializer and handles Decimals."""
         deserialized_data = {k: self.deserializer.deserialize(v) for k, v in dynamodb_data.items()}
+        return self._convert_from_decimal(deserialized_data)
+
+    def _marshal_dynamodb_json(self, item: dict[str, Any]) -> dict[str, Any]:
+        decimal_version = self._convert_to_decimal(item)
+        deserialized_data = {k: self.serializer.serialize(v) for k, v in decimal_version.items()}
         return self._convert_from_decimal(deserialized_data)
 
     @staticmethod
@@ -54,7 +57,7 @@ class DynamoDb(Database):
     @staticmethod
     def _convert_to_decimal(value):
         """Recursively converts float values in a dictionary to Decimal for DynamoDB compatibility."""
-        if isinstance(value, float):
+        if isinstance(value, float | int):
             return Decimal(str(value))
         elif isinstance(value, list):
             return [DynamoDb._convert_to_decimal(i) for i in value]
