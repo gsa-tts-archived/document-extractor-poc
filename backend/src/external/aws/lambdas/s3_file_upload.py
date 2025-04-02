@@ -1,24 +1,13 @@
-import base64
 import json
 import os
-import uuid
 
-import boto3
+from src import context
+from src.documents.upload_document import upload_file_data
+from src.external.aws.s3 import S3
+from src.storage import CloudStorage
 
-s3 = boto3.client("s3")
-BUCKET_NAME = os.environ.get("S3_BUCKET_NAME", "ocr-poc-flex")
-DEFAULT_FOLDER = "input/"
-
-
-def generate_secure_filename(original_filename):
-    """
-    Generate a secure filename while preserving extension and adding uniqueness.
-    """
-    ext = os.path.splitext(original_filename)[1].lower() if "." in original_filename else ""
-
-    document_id = str(uuid.uuid4())
-
-    return f"{document_id}{ext}", document_id
+appContext = context.ApplicationContext()
+appContext.register(CloudStorage, S3())
 
 
 def lambda_handler(event, context):
@@ -30,32 +19,15 @@ def lambda_handler(event, context):
             }
 
         body = json.loads(event["body"])
-
-        if not all(k in body for k in ["file_content", "file_name"]):
-            return {
-                "statusCode": 400,
-                "body": json.dumps({"error": "Missing required fields"}),
-            }
-
         try:
-            file_data = base64.b64decode(body["file_content"])
-        except Exception:
+            bucket_name = os.environ.get("S3_BUCKET_NAME", "ocr-poc-flex")
+            default_folder = "input/"
+            document_id = upload_file_data(body["file_name"], body["file_content"], bucket_name, default_folder)
+        except Exception as e:
             return {
-                "statusCode": 400,
-                "body": json.dumps({"error": "Invalid file content encoding"}),
+                "statusCode": 500,
+                "body": json.dumps({"error": str(e)}),
             }
-
-        original_filename = body["file_name"]
-        secure_filename, document_id = generate_secure_filename(original_filename)
-
-        s3_key = f"{DEFAULT_FOLDER}{secure_filename}"
-
-        s3.put_object(
-            Bucket=BUCKET_NAME,
-            Key=s3_key,
-            Body=file_data,
-            Metadata={"original_filename": original_filename},
-        )
 
         return {
             "statusCode": 200,
