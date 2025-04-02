@@ -3,18 +3,18 @@ from decimal import Decimal
 from src.external.aws.dynamodb import DynamoDb
 
 
-def test_convert_decimal_direct_decimal():
+def test_convert_from_decimal_direct_decimal():
     output = DynamoDb._convert_from_decimal(Decimal("1.2"))
     assert output == 1.2
 
 
-def test_convert_decimal_list():
+def test_convert_from_decimal_list():
     test_input = [Decimal("1.2"), Decimal("2.3"), Decimal("3.4")]
     output = DynamoDb._convert_from_decimal(test_input)
     assert output == [1.2, 2.3, 3.4]
 
 
-def test_convert_decimal_dict():
+def test_convert_from_decimal_dict():
     test_input = {
         "a": Decimal("1.2"),
         "b": Decimal("2.3"),
@@ -28,7 +28,7 @@ def test_convert_decimal_dict():
     }
 
 
-def test_convert_decimal_complex():
+def test_convert_from_decimal_complex():
     test_input = {
         "a": Decimal("1.2"),
         "b": [
