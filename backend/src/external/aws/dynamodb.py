@@ -31,8 +31,11 @@ class DynamoDb(Database):
             raise DatabaseException(f"Failed to get the document {document_id}") from e
 
     def write_document(self, document: dict[str, Any]):
-        dynamodb_item = self._marshal_dynamodb_json(document)
-        self.dynamodb_client.put_item(TableName=self.table_name, Item=dynamodb_item)
+        try:
+            dynamodb_item = self._marshal_dynamodb_json(document)
+            self.dynamodb_client.put_item(TableName=self.table_name, Item=dynamodb_item)
+        except Exception as e:
+            raise DatabaseException("Failed to write the document") from e
 
     def _unmarshal_dynamodb_json(self, dynamodb_data: dict[str, Any]) -> dict[str, Any]:
         deserialized_data = {k: self.deserializer.deserialize(v) for k, v in dynamodb_data.items()}
