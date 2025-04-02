@@ -9,7 +9,6 @@ from src.documents.upload_document import (
     decode_file_content,
     generate_secure_filename,
     upload_file_data,
-    upload_file_to_cloud,
 )
 from src.storage import CloudStorage
 
@@ -63,18 +62,3 @@ def test_decode_file_content_with_bad_type():
     mock_file_content = 1234
     with pytest.raises(TypeError):
         decode_file_content(mock_file_content)
-
-
-def test_upload_to_cloud():
-    mock_file_content = b"Hello, this is a test file."
-    secure_file_name = "how secure of your sir"
-    original_file_name = "how original of you sir"
-    decoded_content = base64.b64encode(mock_file_content).decode("utf-8")
-
-    mock_cloud_storage = mock.MagicMock()
-    mock_cloud_storage.put_object.return_value = None
-    context.register(CloudStorage, mock_cloud_storage)
-
-    upload_file_to_cloud(decoded_content, secure_file_name, original_file_name, "mock_bucket", "mock_folder")
-
-    mock_cloud_storage.put_object.assert_called_once()

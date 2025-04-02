@@ -6,10 +6,20 @@ from src import context
 from src.storage import CloudStorage
 
 
-def upload_file_data(file_name, file_content, bucket_name, default_folder) -> str:
+@context.inject
+def upload_file_data(
+    file_name,
+    file_content,
+    bucket_name,
+    default_folder,
+    cloud_storage: CloudStorage = None,
+) -> str:
     decoded_file_content = decode_file_content(file_content)
     secure_filename, document_id = generate_secure_filename(file_name)
-    upload_file_to_cloud(decoded_file_content, secure_filename, file_name, bucket_name, default_folder)
+
+    key = f"{default_folder}{secure_filename}"
+    cloud_storage.put_object(bucket_name, key, decoded_file_content, {"original_filename": file_name})
+
     return document_id
 
 
@@ -30,17 +40,3 @@ def generate_secure_filename(original_filename):
     document_id = str(uuid.uuid4())
 
     return f"{document_id}{ext}", document_id
-
-
-@context.inject
-def upload_file_to_cloud(
-    decoded_file_content,
-    secure_file_name,
-    original_file_name,
-    bucket_name,
-    default_folder,
-    cloud_storage: CloudStorage = None,
-):
-    key = f"{default_folder}{secure_file_name}"
-
-    return cloud_storage.put_object(bucket_name, key, decoded_file_content, {"original_filename": original_file_name})
