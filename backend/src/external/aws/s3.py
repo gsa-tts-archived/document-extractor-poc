@@ -25,6 +25,17 @@ class S3(CloudStorage):
 
         return bucket_name, object_key
 
+    def put_object(self, bucket_name: str, key: str, body: bytes, metadata: dict[str, str]):
+        try:
+            self.s3_client.put_object(
+                Bucket=bucket_name,
+                Key=key,
+                Body=body,
+                Metadata=metadata,
+            )
+        except Exception as e:
+            raise CloudStorageException(f"Failed to upload into 's3://{bucket_name}/{key}'.") from e
+
     def file_exists_and_allowed_to_access(self, remote_url: str) -> bool:
         bucket_name, object_key = self.parse_s3_url(remote_url)
 
