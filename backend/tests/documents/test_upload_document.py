@@ -26,17 +26,13 @@ def teardown_function():
 
 def test_uploading_file_data_returns_document_id():
     mock_file_content = b"Hello, this is a test file."
-    encoded_content = base64.b64encode(mock_file_content).decode("utf-8")
-    body = {
-        "file_name": "mock_file",
-        "file_content": encoded_content,
-    }
+    decoded_file_content = base64.b64encode(mock_file_content).decode("utf-8")
 
     mock_cloud_storage = mock.MagicMock()
     mock_cloud_storage.put_object.return_value = None
     context.register(CloudStorage, mock_cloud_storage)
 
-    response = upload_file_data(body, "mock_bucket", "mock_folder")
+    response = upload_file_data("original.txt", decoded_file_content, "mock_bucket", "mock_folder")
 
     assert response is not None
 
