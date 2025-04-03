@@ -36,8 +36,13 @@ class W2(Form):
             "12d Code",
             "12d amount",
             "15 Employer's state ID number",
+            "second 15 Employer's state ID number",
             "16 State wages, tips, etc.",
+            "second 16 State wages, tips, etc.",
             "17 State income tax",
+            "second 17 State income tax",
             "18 Local wages, tips, etc.",
+            "second 18 Local wages, tips, etc.",
             "19 Local income tax",
+            "second 19 Local income tax",
         ]
