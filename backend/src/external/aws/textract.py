@@ -6,6 +6,7 @@ import boto3
 import iterator_chain
 
 from src.external.aws.s3 import S3
+from src.forms.form import Form
 from src.ocr import Ocr, OcrException
 
 
@@ -17,6 +18,36 @@ class Textract(Ocr):
         try:
             # Parse the S3 URL
             bucket_name, object_key = S3.parse_s3_url(s3_url)
+
+            if queries is None or len(queries) == 0:
+                print("Attempting AnalyzeDocument with forms and tables")
+                response = self.textract_client.analyze_document(
+                    Document={"S3Object": {"Bucket": bucket_name, "Name": object_key}},
+                    FeatureTypes=["FORMS"],
+                )
+                print("Parsing result")
+                extracted_data = self._parse_textract_forms(response)
+            else:
+                print("Attempting AnalyzeDocument with queries")
+                response_list = asyncio.run(self._paginated_textract_with_queries(queries, bucket_name, object_key))
+                print("Parsing result")
+                extracted_data = (
+                    iterator_chain.from_iterable(response_list)
+                    .map(self._parse_textract_queries)
+                    .reduce(lambda a_dict, b_dict: {**a_dict, **b_dict}, initial={})
+                )
+
+            return extracted_data
+
+        except Exception as e:
+            raise OcrException(f"Unable to OCR the image {s3_url}") from e
+
+    # we have a 1:1 relationship between queries and adapters due to aws.
+    def scan_(self, s3_url: str, form: Form) -> dict[str, dict[str, str | float]]:
+        try:
+            # Parse the S3 URL
+            bucket_name, object_key = S3.parse_s3_url(s3_url)
+            queries = form.queries() | None
 
             if queries is None or len(queries) == 0:
                 print("Attempting AnalyzeDocument with forms and tables")
@@ -77,6 +108,11 @@ class Textract(Ocr):
         return results_list
 
     async def _call_textract_with_queries(self, bucket_name, object_key, queries_config):
+        # Add call to adapter_id = os.environ.get(f"{form.identifier()}_TEXTRACT_ADAPTER_ID") here
+        # this is so we can utilize the textract.start_document_analysis add an adapter or default to None.
+        # we believe the 3rd party textract api will be smart enough to default to None when a None value is passed
+        # adapter_id = os.environ.get(f"{form.identifier()}_TEXTRACT_ADAPTER_ID")
+
         print("Initiating document analysis")
         initiate_response = self.textract_client.start_document_analysis(
             DocumentLocation={"S3Object": {"Bucket": bucket_name, "Name": object_key}},
