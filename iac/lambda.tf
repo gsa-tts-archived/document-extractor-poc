@@ -25,7 +25,10 @@ resource "aws_lambda_function" "text_extract" {
 
   environment {
     variables = {
-      SQS_QUEUE_URL = aws_sqs_queue.queue_to_dynamo.url
+      SQS_QUEUE_URL             = aws_sqs_queue.queue_to_dynamo.url
+      W2_TEXTRACT_ADAPTER_ID    = var.w2_textract_adapter_id
+      DD214_TEXTRACT_ADAPTER_ID = var.dd214_textract_adapter_id
+      TEN99_TEXTRACT_ADAPTER_ID = var.ten99_textract_adapter_id
     }
   }
 }
