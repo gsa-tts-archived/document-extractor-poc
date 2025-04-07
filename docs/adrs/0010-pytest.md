@@ -1,4 +1,4 @@
-# 10. Pytest for Python Unit Testing.
+# 10. Pytest for Python Unit Testing
 
 Date: 2025-04-07
 
