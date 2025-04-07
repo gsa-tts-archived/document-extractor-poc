@@ -111,7 +111,7 @@ export default function Headers() {
       {/* End banner section */}
 
       <div className="usa-overlay"></div>
-      <header className="usa-header usa-header--basic border-bottom border-gray-5">
+      <header className="usa-header usa-header--basic bg-white border-bottom border-gray-5">
         <div className="usa-nav-container">
           <div className="usa-navbar">
             <div className="usa-logo">
