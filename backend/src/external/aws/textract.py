@@ -1,4 +1,5 @@
 import asyncio
+import os
 import statistics
 from typing import Any
 
@@ -59,7 +60,9 @@ class Textract(Ocr):
                 extracted_data = self._parse_textract_forms(response)
             else:
                 print("Attempting AnalyzeDocument with queries")
-                response_list = asyncio.run(self._paginated_textract_with_queries(queries, bucket_name, object_key))
+                response_list = asyncio.run(
+                    self._paginated_textract_with_queries(queries, form.identifier(), bucket_name, object_key)
+                )
                 print("Parsing result")
                 extracted_data = (
                     iterator_chain.from_iterable(response_list)
@@ -95,29 +98,31 @@ class Textract(Ocr):
         sublist_size = 30
         return [the_list[i : i + sublist_size] for i in range(0, len(the_list), sublist_size)]
 
-    async def _paginated_textract_with_queries(self, queries, bucket_name, object_key) -> list[Any]:
+    async def _paginated_textract_with_queries(self, queries, form_identity, bucket_name, object_key) -> list[Any]:
         queries_config = [{"Text": query, "Pages": ["*"]} for query in queries]
 
         paginated_queries_config = self._split_list_by_30(queries_config)
 
         tasks = [
-            asyncio.create_task(self._call_textract_with_queries(bucket_name, object_key, sub_queries_config))
-            for sub_queries_config in paginated_queries_config
+            asyncio.create_task(
+                self._call_textract_with_queries(
+                    bucket_name, object_key, sub_queries_config, f"{form_identity}_TEXTRACT_ADAPTER_ID_{index}"
+                )
+            )
+            for index, sub_queries_config in enumerate(paginated_queries_config, start=0)
         ]
         results_list = await asyncio.gather(*tasks)
         return results_list
 
-    async def _call_textract_with_queries(self, bucket_name, object_key, queries_config):
-        # Add call to adapter_id = os.environ.get(f"{form.identifier()}_TEXTRACT_ADAPTER_ID") here
-        # this is so we can utilize the textract.start_document_analysis add an adapter or default to None.
-        # we believe the 3rd party textract api will be smart enough to default to None when a None value is passed
-        # adapter_id = os.environ.get(f"{form.identifier()}_TEXTRACT_ADAPTER_ID")
-
+    async def _call_textract_with_queries(self, bucket_name, object_key, queries_config, adapter_id_key):
         print("Initiating document analysis")
+        adapter_id = os.environ.get(adapter_id_key)
+        adapter_version = self.get_latest_adapter_version(adapter_id)
         initiate_response = self.textract_client.start_document_analysis(
             DocumentLocation={"S3Object": {"Bucket": bucket_name, "Name": object_key}},
             FeatureTypes=["QUERIES"],
             QueriesConfig={"Queries": queries_config},
+            AdaptersConfig={"AdapterId": adapter_id, "Verson": adapter_version},
         )
         job_id = initiate_response["JobId"]
         response = self.textract_client.get_document_analysis(JobId=job_id)
@@ -128,6 +133,15 @@ class Textract(Ocr):
 
         print(f"Completed document analysis for job {job_id}")
         return response
+
+    def get_latest_adapter_version(self, adapter_id):
+        response = self.textract_client.list_adapter_versions(AdapterId=adapter_id)
+        adapter_versions = response["AdapterVersions"]
+        if not adapter_versions:
+            raise ValueError("No versions found for the specified adapter.")
+        # Sort versions by CreationTime in descending order to get the latest version first
+        latest_version = max(adapter_versions, key=lambda x: x["CreationTime"])
+        return latest_version["AdapterVersion"]
 
     def _parse_textract_queries(self, textract_response):
         extracted_data = {}

@@ -7,7 +7,11 @@ variable "environment" {
   type = string
 }
 
-variable "w2_textract_adapter_id" {
+variable "w2_textract_adapter_id_0" {
+  type = string
+}
+
+variable "w2_textract_adapter_id_1" {
   type = string
 }
 
