@@ -48,9 +48,8 @@ class Textract(Ocr):
         try:
             # Parse the S3 URL
             bucket_name, object_key = S3.parse_s3_url(s3_url)
-            queries = form.queries() | None
 
-            if queries is None or len(queries) == 0:
+            if form.queries() is None or len(form.queries()) == 0:
                 print("Attempting AnalyzeDocument with forms and tables")
                 response = self.textract_client.analyze_document(
                     Document={"S3Object": {"Bucket": bucket_name, "Name": object_key}},
@@ -60,9 +59,7 @@ class Textract(Ocr):
                 extracted_data = self._parse_textract_forms(response)
             else:
                 print("Attempting AnalyzeDocument with queries")
-                response_list = asyncio.run(
-                    self._paginated_textract_with_queries(queries, form.identifier(), bucket_name, object_key)
-                )
+                response_list = asyncio.run(self._paginated_textract_with_queries(form, bucket_name, object_key))
                 print("Parsing result")
                 extracted_data = (
                     iterator_chain.from_iterable(response_list)
@@ -98,15 +95,15 @@ class Textract(Ocr):
         sublist_size = 30
         return [the_list[i : i + sublist_size] for i in range(0, len(the_list), sublist_size)]
 
-    async def _paginated_textract_with_queries(self, queries, form_identity, bucket_name, object_key) -> list[Any]:
-        queries_config = [{"Text": query, "Pages": ["*"]} for query in queries]
+    async def _paginated_textract_with_queries(self, form, bucket_name, object_key) -> list[Any]:
+        queries_config = [{"Text": query, "Pages": ["*"]} for query in form.queries()]
 
         paginated_queries_config = self._split_list_by_30(queries_config)
 
         tasks = [
             asyncio.create_task(
                 self._call_textract_with_queries(
-                    bucket_name, object_key, sub_queries_config, f"{form_identity}_TEXTRACT_ADAPTER_ID_{index}"
+                    bucket_name, object_key, sub_queries_config, f"{form.identifier()}_TEXTRACT_ADAPTER_ID_{index}"
                 )
             )
             for index, sub_queries_config in enumerate(paginated_queries_config, start=0)
@@ -122,7 +119,7 @@ class Textract(Ocr):
             DocumentLocation={"S3Object": {"Bucket": bucket_name, "Name": object_key}},
             FeatureTypes=["QUERIES"],
             QueriesConfig={"Queries": queries_config},
-            AdaptersConfig={"AdapterId": adapter_id, "Verson": adapter_version},
+            AdaptersConfig={"AdapterId": adapter_id, "Version": adapter_version},
         )
         job_id = initiate_response["JobId"]
         response = self.textract_client.get_document_analysis(JobId=job_id)
