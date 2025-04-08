@@ -106,12 +106,21 @@ class Textract(Ocr):
 
     async def _call_textract_with_queries(self, bucket_name, object_key, queries_config, adapters_config):
         print("Initiating document analysis")
-        initiate_response = self.textract_client.start_document_analysis(
-            DocumentLocation={"S3Object": {"Bucket": bucket_name, "Name": object_key}},
-            FeatureTypes=["QUERIES"],
-            QueriesConfig={"Queries": queries_config},
-            AdaptersConfig={"Adapters": adapters_config},
-        )
+        if len(adapters_config) > 0:
+            initiate_response = self.textract_client.start_document_analysis(
+                DocumentLocation={"S3Object": {"Bucket": bucket_name, "Name": object_key}},
+                FeatureTypes=["QUERIES"],
+                QueriesConfig={"Queries": queries_config},
+                AdaptersConfig={"Adapters": adapters_config},
+            )
+        else:
+            # Can't seem to set `AdaptersConfig` to `None` if the size of `adapters_config` is 0.  Best thing to do is
+            # just not pass it in.
+            initiate_response = self.textract_client.start_document_analysis(
+                DocumentLocation={"S3Object": {"Bucket": bucket_name, "Name": object_key}},
+                FeatureTypes=["QUERIES"],
+                QueriesConfig={"Queries": queries_config},
+            )
         job_id = initiate_response["JobId"]
         response = self.textract_client.get_document_analysis(JobId=job_id)
         while response["JobStatus"] == "IN_PROGRESS":
