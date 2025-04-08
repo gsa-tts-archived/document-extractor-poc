@@ -10,7 +10,7 @@ appContext.register(Ocr, Textract())
 if __name__ == "__main__":
     scanner = appContext.implementation(Ocr)
     form = DDTwoOneFour()
-    result = scanner.scan("s3://document-extractor-gsa-dev-documents/test_dd214.jpg", queries=form.queries())
+    result = scanner.scan("s3://document-extractor-gsa-dev-documents/test_dd214.jpg", form)
 
     for key, value in result.items():
         print(key)

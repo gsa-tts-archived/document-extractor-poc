@@ -16,8 +16,7 @@ def extract_text(remote_file_url: str, queue_url: str, ocr_engine: Ocr = None):
 
     identified_form = identify_form(document_text)
 
-    queries = identified_form.queries() if identified_form else None
-    extracted_data = ocr_engine.scan(remote_file_url, queries=queries)
+    extracted_data = ocr_engine.scan(remote_file_url, form=identified_form)
 
     document_type = identified_form.identifier() if identified_form else None
 

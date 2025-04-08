@@ -9,9 +9,5 @@ class Ocr(ABC):
         pass
 
     @abstractmethod
-    def scan(self, s3_url: str, queries: list[str] | None = None) -> dict[str, dict[str, str | float]]:
-        pass
-
-    @abstractmethod
-    def scan_(self, s3_url: str, form: Form) -> dict[str, dict[str, str | float]]:
+    def scan(self, s3_url: str, form: Form) -> dict[str, dict[str, str | float]]:
         pass

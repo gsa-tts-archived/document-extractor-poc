@@ -15,36 +15,7 @@ class Textract(Ocr):
     def __init__(self) -> None:
         self.textract_client = boto3.client("textract")
 
-    def scan(self, s3_url: str, queries: list[str] | None = None) -> dict[str, dict[str, str | float]]:
-        try:
-            # Parse the S3 URL
-            bucket_name, object_key = S3.parse_s3_url(s3_url)
-
-            if queries is None or len(queries) == 0:
-                print("Attempting AnalyzeDocument with forms and tables")
-                response = self.textract_client.analyze_document(
-                    Document={"S3Object": {"Bucket": bucket_name, "Name": object_key}},
-                    FeatureTypes=["FORMS"],
-                )
-                print("Parsing result")
-                extracted_data = self._parse_textract_forms(response)
-            else:
-                print("Attempting AnalyzeDocument with queries")
-                response_list = asyncio.run(self._paginated_textract_with_queries(queries, bucket_name, object_key))
-                print("Parsing result")
-                extracted_data = (
-                    iterator_chain.from_iterable(response_list)
-                    .map(self._parse_textract_queries)
-                    .reduce(lambda a_dict, b_dict: {**a_dict, **b_dict}, initial={})
-                )
-
-            return extracted_data
-
-        except Exception as e:
-            raise OcrException(f"Unable to OCR the image {s3_url}") from e
-
-    # we have a 1:1 relationship between queries and adapters due to aws.
-    def scan_(self, s3_url: str, form: Form) -> dict[str, dict[str, str | float]]:
+    def scan(self, s3_url: str, form: Form) -> dict[str, dict[str, str | float]]:
         try:
             # Parse the S3 URL
             bucket_name, object_key = S3.parse_s3_url(s3_url)
