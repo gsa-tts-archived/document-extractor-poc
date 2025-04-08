@@ -52,8 +52,7 @@ jobs:
         run: terraform init -backend-config="key=terraform_state_gsa_dev.tfstate"
 
       - working-directory: ./iac/
-        # add github adapter id environment variables here.
-        run: terraform apply -auto-approve -var 'environment=${{ vars.ENVIRONMENT }}'
+        run: terraform apply -auto-approve -var 'environment=${{ vars.ENVIRONMENT }}' -var 'textract_form_adapters_env_var_mapping=${{ secrets.TEXTRACT_FORM_ADAPTERS_ENV_VARS_MAPPING }}'
 
       - name: Extract Terraform Output
         working-directory: ./iac/

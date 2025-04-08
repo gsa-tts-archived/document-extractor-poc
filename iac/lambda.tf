@@ -1,6 +1,9 @@
 locals {
   lambda_filename         = "${path.module}/../backend/dist/lambda.zip"
   lambda_source_code_hash = filebase64sha256(local.lambda_filename)
+  textract_environment_variables = merge(var.textract_form_adapters_env_var_mapping, {
+    SQS_QUEUE_URL = aws_sqs_queue.queue_to_dynamo.url
+  })
 }
 
 resource "aws_lambda_function" "text_extract" {
@@ -24,13 +27,7 @@ resource "aws_lambda_function" "text_extract" {
   role = aws_iam_role.execution_role.arn
 
   environment {
-    variables = {
-      SQS_QUEUE_URL               = aws_sqs_queue.queue_to_dynamo.url
-      W2_TEXTRACT_ADAPTER_ID_0    = var.w2_textract_adapter_id_0
-      W2_TEXTRACT_ADAPTER_ID_1    = var.w2_textract_adapter_id_1
-      DD214_TEXTRACT_ADAPTER_ID_0 = var.dd214_textract_adapter_id
-      # TEN99_TEXTRACT_ADAPTER_ID = var.ten99_textract_adapter_id
-    }
+    variables = local.textract_environment_variables
   }
 }
 
