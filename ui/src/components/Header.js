@@ -1,6 +1,6 @@
-import iconDotGov from '../assets/icon-dot-gov.svg';
-import usFlagSmall from '../assets/us_flag_small.png';
-import iconHttps from '../assets/icon-https.svg';
+import iconDotGov from 'url:../assets/icon-dot-gov.svg';
+import usFlagSmall from 'url:../assets/us_flag_small.png';
+import iconHttps from 'url:../assets/icon-https.svg';
 
 export default function Headers() {
   return (

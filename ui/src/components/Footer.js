@@ -1,4 +1,4 @@
-import logo from '../assets/GSA-logo.svg';
+import logo from 'url:../assets/GSA-logo.svg';
 
 export default function Footer() {
   return (
