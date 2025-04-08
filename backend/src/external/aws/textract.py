@@ -78,7 +78,12 @@ class Textract(Ocr):
             if adapter_id is None:
                 continue
 
-            adapters_config.append(adapter_id)
+            adapters_config.append(
+                {
+                    "AdapterId": adapter_id,
+                    "Version": self.get_latest_adapter_version(adapter_id),
+                }
+            )
 
         tasks = [
             asyncio.create_task(
