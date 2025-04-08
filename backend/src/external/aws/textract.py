@@ -1,9 +1,11 @@
+import asyncio
 import os
 import statistics
 from typing import Any
 
 import boto3
 import iterator_chain
+from types_boto3_textract import TextractClient
 
 from src.external.aws.s3 import S3
 from src.forms.form import Form
@@ -12,7 +14,7 @@ from src.ocr import Ocr, OcrException
 
 class Textract(Ocr):
     def __init__(self) -> None:
-        self.textract_client = boto3.client("textract")
+        self.textract_client: TextractClient = boto3.client("textract")
 
     def scan(self, s3_url: str, form: Form) -> dict[str, dict[str, str | float]]:
         try:
@@ -29,15 +31,13 @@ class Textract(Ocr):
                 extracted_data = self._parse_textract_forms(response)
             else:
                 print("Attempting AnalyzeDocument with queries")
-                response = self._paginated_textract_with_queries(form, bucket_name, object_key)
+                response_list = asyncio.run(self._paginated_textract_with_queries(form, bucket_name, object_key))
                 print("Parsing result")
-                extracted_data = self._parse_textract_queries(response)
-                # response_list = asyncio.run(self._paginated_textract_with_queries(form, bucket_name, object_key))
-                # extracted_data = (
-                #     iterator_chain.from_iterable(response_list)
-                #     .map(self._parse_textract_queries)
-                #     .reduce(lambda a_dict, b_dict: {**a_dict, **b_dict}, initial={})
-                # )
+                extracted_data = (
+                    iterator_chain.from_iterable(response_list)
+                    .map(self._parse_textract_queries)
+                    .reduce(lambda a_dict, b_dict: {**a_dict, **b_dict}, initial={})
+                )
 
             return extracted_data
 
@@ -67,20 +67,28 @@ class Textract(Ocr):
         sublist_size = 30
         return [the_list[i : i + sublist_size] for i in range(0, len(the_list), sublist_size)]
 
-    def _paginated_textract_with_queries(self, form, bucket_name, object_key):
+    async def _paginated_textract_with_queries(self, form, bucket_name, object_key) -> list[Any]:
         queries_config = [{"Text": query, "Pages": ["*"]} for query in form.queries()]
 
         paginated_queries_config = self._split_list_by_30(queries_config)
-        adapters = [
-            {
-                "AdapterId": os.environ.get(f"{form.identifier()}_TEXTRACT_ADAPTER_ID_{index}"),
-                "Version": self.get_latest_adapter_version(
-                    os.environ.get(f"{form.identifier()}_TEXTRACT_ADAPTER_ID_{index}")
-                ),
-            }
-            for index, _ in enumerate(paginated_queries_config, start=0)
+
+        adapters_config = []
+        for index in range(len(paginated_queries_config)):
+            adapter_id = os.environ.get(f"{form.identifier()}_TEXTRACT_ADAPTER_ID_{index}")
+            if adapter_id is None:
+                continue
+
+            adapters_config.append(adapter_id)
+
+        tasks = [
+            asyncio.create_task(
+                self._call_textract_with_queries(bucket_name, object_key, sub_queries_config, adapters_config)
+            )
+            for sub_queries_config in paginated_queries_config
         ]
-        return self._call_textract_with_queries(bucket_name, object_key, adapters)
+        results_list = await asyncio.gather(*tasks)
+
+        return results_list
 
     def get_latest_adapter_version(self, adapter_id):
         response = self.textract_client.list_adapter_versions(AdapterId=adapter_id)
@@ -91,16 +99,18 @@ class Textract(Ocr):
         latest_version = max(adapter_versions, key=lambda x: x["CreationTime"])
         return latest_version["AdapterVersion"]
 
-    def _call_textract_with_queries(self, bucket_name, object_key, adapters):
+    async def _call_textract_with_queries(self, bucket_name, object_key, queries_config, adapters_config):
         print("Initiating document analysis")
         initiate_response = self.textract_client.start_document_analysis(
             DocumentLocation={"S3Object": {"Bucket": bucket_name, "Name": object_key}},
             FeatureTypes=["QUERIES"],
-            AdaptersConfig={"Adapters": adapters},
+            QueriesConfig={"Queries": queries_config},
+            AdaptersConfig={"Adapters": adapters_config},
         )
         job_id = initiate_response["JobId"]
         response = self.textract_client.get_document_analysis(JobId=job_id)
         while response["JobStatus"] == "IN_PROGRESS":
+            await asyncio.sleep(1)
             print(f"Checking if job {job_id} is complete")
             response = self.textract_client.get_document_analysis(JobId=job_id)
 
