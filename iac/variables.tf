@@ -8,17 +8,29 @@ variable "environment" {
 }
 
 variable "w2_textract_adapter_id_0" {
-  type = string
+  type      = string
+  nullable  = false
+  sensitive = true
 }
 
 variable "w2_textract_adapter_id_1" {
-  type = string
+  type      = string
+  nullable  = false
+  sensitive = true
 }
 
 variable "dd214_textract_adapter_id" {
-  type = string
+  type      = string
+  nullable  = false
+  sensitive = true
 }
 
-variable "ten99_textract_adapter_id" {
-  type = string
-}
+# variable "ten99_textract_adapter_id" {
+#   type = string
+#   nullable  = true
+#   sensitive = true
+# }
+
+# variable "map_from_gha" {
+#   type = map
+# }
