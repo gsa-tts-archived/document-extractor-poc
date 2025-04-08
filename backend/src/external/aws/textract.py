@@ -78,7 +78,7 @@ class Textract(Ocr):
                     os.environ.get(f"{form.identifier()}_TEXTRACT_ADAPTER_ID_{index}")
                 ),
             }
-            for index in enumerate(paginated_queries_config, start=0)
+            for index, _ in enumerate(paginated_queries_config, start=0)
         ]
         return self._call_textract_with_queries(bucket_name, object_key, adapters)
 
