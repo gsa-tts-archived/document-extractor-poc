@@ -82,94 +82,50 @@ def test_textract_parse_query_response():
 
 
 def test_textract_parse_textract_form():
-    # mocked_textract_response = {
-    #     "DocumentMetadata": {"Pages": 1},
-    #     "Blocks": [
-    #         {
-    #             "BlockType": "KEY_VALUE_SET"
-    #             | "PAGE"
-    #             | "LINE"
-    #             | "WORD"
-    #             | "TABLE"
-    #             | "CELL"
-    #             | "SELECTION_ELEMENT"
-    #             | "MERGED_CELL"
-    #             | "TITLE"
-    #             | "QUERY"
-    #             | "QUERY_RESULT"
-    #             | "SIGNATURE"
-    #             | "TABLE_TITLE"
-    #             | "TABLE_FOOTER"
-    #             | "LAYOUT_TEXT"
-    #             | "LAYOUT_TITLE"
-    #             | "LAYOUT_HEADER"
-    #             | "LAYOUT_FOOTER"
-    #             | "LAYOUT_SECTION_HEADER"
-    #             | "LAYOUT_PAGE_NUMBER"
-    #             | "LAYOUT_LIST"
-    #             | "LAYOUT_FIGURE"
-    #             | "LAYOUT_TABLE"
-    #             | "LAYOUT_KEY_VALUE",
-    #             "Confidence": ...,
-    #             "Text": "string",
-    #             "TextType": "PRINTED",
-    #             "RowIndex": 1,
-    #             "ColumnIndex": 1,
-    #             "RowSpan": 1,
-    #             "ColumnSpan": 1,
-    #             "Geometry": {
-    #                 "BoundingBox": {"Width": ..., "Height": ..., "Left": ..., "Top": ...},
-    #                 "Polygon": [
-    #                     {"X": ..., "Y": ...},
-    #                 ],
-    #             },
-    #             "Id": "string",
-    #             "Relationships": [
-    #                 {
-    #                     "Type": "VALUE"
-    #                     | "CHILD"
-    #                     | "COMPLEX_FEATURES"
-    #                     | "MERGED_CELL"
-    #                     | "TITLE"
-    #                     | "ANSWER"
-    #                     | "TABLE"
-    #                     | "TABLE_TITLE"
-    #                     | "TABLE_FOOTER",
-    #                     "Ids": [
-    #                         "string",
-    #                     ],
-    #                 },
-    #             ],
-    #             "EntityTypes": [
-    #                 "KEY"
-    #                 | "VALUE"
-    #                 | "COLUMN_HEADER"
-    #                 | "TABLE_TITLE"
-    #                 | "TABLE_FOOTER"
-    #                 | "TABLE_SECTION_TITLE"
-    #                 | "TABLE_SUMMARY"
-    #                 | "STRUCTURED_TABLE"
-    #                 | "SEMI_STRUCTURED_TABLE",
-    #             ],
-    #             "SelectionStatus": "SELECTED" | "NOT_SELECTED",
-    #             "Page": 123,
-    #             "Query": {
-    #                 "Text": "string",
-    #                 "Alias": "string",
-    #                 "Pages": [
-    #                     "string",
-    #                 ],
-    #             },
-    #         },
-    #     ],
-    #     "HumanLoopActivationOutput": {
-    #         "HumanLoopArn": "string",
-    #         "HumanLoopActivationReasons": [
-    #             "string",
-    #         ],
-    #         "HumanLoopActivationConditionsEvaluationResults": "string",
-    #     },
-    #     "AnalyzeDocumentModelVersion": "string",
-    # }
+    mocked_textract_response = {
+        "DocumentMetadata": {"Pages": 1},
+        "Blocks": [
+            {
+                "BlockType": "KEY_VALUE_SET",
+                "Confidence": 0.99,
+                "Text": "Dogcow",
+                "TextType": "PRINTED",
+                "RowIndex": 1,
+                "ColumnIndex": 1,
+                "RowSpan": 1,
+                "ColumnSpan": 1,
+                "Id": "1234",
+                "Relationships": [
+                    {
+                        "Type": "CHILD",
+                        "Ids": [
+                            "123",
+                        ],
+                    },
+                ],
+                "EntityTypes": ["KEY"],
+                "Page": 1,
+            },
+            {
+                "BlockType": "LINE",
+                "Confidence": 0.99,
+                "Text": "Moof!",
+                "TextType": "PRINTED",
+                "RowIndex": 1,
+                "ColumnIndex": 1,
+                "RowSpan": 1,
+                "ColumnSpan": 1,
+                "Id": "123",
+                "EntityTypes": ["VALUE"],
+                "Page": 1,
+            },
+        ],
+        "AnalyzeDocumentModelVersion": "1",
+    }
 
+    textract = Textract()
+
+    actual_parsed_response = textract._parse_textract_forms(mocked_textract_response)
+
+    print(actual_parsed_response)
     assert True

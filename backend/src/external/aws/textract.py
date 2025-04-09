@@ -86,15 +86,6 @@ class Textract(Ocr):
 
         return results_list
 
-    def get_latest_adapter_version(self, adapter_id):
-        response = self.textract_client.list_adapter_versions(AdapterId=adapter_id)
-        adapter_versions = response["AdapterVersions"]
-        if not adapter_versions:
-            raise ValueError("No versions found for the specified adapter.")
-        # Sort versions by CreationTime in descending order to get the latest version first
-        latest_version = max(adapter_versions, key=lambda x: x["CreationTime"])
-        return latest_version["AdapterVersion"]
-
     async def _call_textract_with_queries(self, bucket_name, object_key, queries_config, adapter_id):
         print("Initiating document analysis")
         if adapter_id is not None:
@@ -107,7 +98,7 @@ class Textract(Ocr):
                         {
                             "AdapterId": adapter_id,
                             "Pages": ["*"],
-                            "Version": self.get_latest_adapter_version(adapter_id),
+                            "Version": self._get_latest_adapter_version(adapter_id),
                         }
                     ]
                 },
@@ -129,6 +120,15 @@ class Textract(Ocr):
 
         print(f"Completed document analysis for job {job_id}")
         return response
+
+    def _get_latest_adapter_version(self, adapter_id) -> str:
+        response = self.textract_client.list_adapter_versions(AdapterId=adapter_id)
+        adapter_versions = response["AdapterVersions"]
+        if not adapter_versions:
+            raise ValueError("No versions found for the specified adapter.")
+        # Sort versions by CreationTime in descending order to get the latest version first
+        latest_version = max(adapter_versions, key=lambda x: x["CreationTime"])
+        return latest_version["AdapterVersion"]
 
     def _parse_textract_queries(self, textract_response):
         extracted_data = {}
@@ -159,6 +159,7 @@ class Textract(Ocr):
         """Parses structured data from AnalyzeDocument response into a simple key-value format."""
         extracted_data = {}
         block_map = {block["Id"]: block for block in response.get("Blocks", [])}
+        print(block_map)
 
         for block in response.get("Blocks", []):
             if block["BlockType"] != "KEY_VALUE_SET" or "KEY" not in block.get("EntityTypes", []):
