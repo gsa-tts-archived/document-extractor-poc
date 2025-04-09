@@ -2,6 +2,18 @@ import { useState } from 'react';
 
 import Layout from '../components/Layout';
 
+async function mockLogin(username, password) {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      if (username === 'admin' && password === 'password123') {
+        resolve({ token: 'mock-jwt-token' });
+      } else {
+        reject(new Error('The email or password you’ve entered is wrong.'));
+      }
+    }, 500);
+  });
+}
+
 export default function SignInPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -9,20 +21,35 @@ export default function SignInPage() {
   const [passwordError, setPasswordError] = useState('');
   const [formError, setFormError] = useState('');
 
-  function handleLogin(e) {
+  async function handleLogin(e) {
     e.preventDefault();
+    // Clear previous error messages:
+    setUsernameError('');
+    setPasswordError('');
+    setFormError('');
+
+    let hasError = false;
 
     if (!username) {
       setUsernameError('Please enter your username');
+      hasError = true;
     }
+
     if (!password) {
       setPasswordError('Please enter your password');
+      hasError = true;
     }
-    if (username && password && (username !== 'admin' || password !== 'password123')) {
-      setFormError('The email or password you’ve entered is wrong.');
-      return;
+
+    if (hasError) return;
+
+    try {
+      const response = await mockLogin(username, password);
+      console.log('Logged in! Token:', response.token);
+      sessionStorage.setItem('token', response.token);
+      // redirect to login page
+    } catch (err) {
+      setFormError(err.message);
     }
-    console.log('logging in with:', { username, password });
   }
 
   return (
