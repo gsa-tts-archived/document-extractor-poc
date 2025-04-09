@@ -3,7 +3,7 @@ from src.forms.form import Form
 
 class TenNinetyNineNec(Form):
     def identifier(self) -> str:
-        return "1099-NEC"
+        return "1099NEC"
 
     def form_matches(self) -> str:
         return "1099-NEC"
