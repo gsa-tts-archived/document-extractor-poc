@@ -81,15 +81,21 @@ class Textract(Ocr):
             adapters_config.append(
                 {
                     "AdapterId": adapter_id,
+                    "Pages": ["*"],
                     "Version": self.get_latest_adapter_version(adapter_id),
                 }
             )
 
         tasks = [
             asyncio.create_task(
-                self._call_textract_with_queries(bucket_name, object_key, sub_queries_config, adapters_config)
+                self._call_textract_with_queries(
+                    bucket_name,
+                    object_key,
+                    sub_queries_config,
+                    os.environ.get(f"{form.identifier()}_TEXTRACT_ADAPTER_ID_{index}"),
+                )
             )
-            for sub_queries_config in paginated_queries_config
+            for index, sub_queries_config in enumerate(paginated_queries_config, start=0)
         ]
         results_list = await asyncio.gather(*tasks)
 
@@ -104,9 +110,17 @@ class Textract(Ocr):
         latest_version = max(adapter_versions, key=lambda x: x["CreationTime"])
         return latest_version["AdapterVersion"]
 
-    async def _call_textract_with_queries(self, bucket_name, object_key, queries_config, adapters_config):
+    async def _call_textract_with_queries(self, bucket_name, object_key, queries_config, adapter_id):
         print("Initiating document analysis")
-        if len(adapters_config) > 0:
+        if adapter_id is not None:
+            adapters_config = []
+            adapters_config.append(
+                {
+                    "AdapterId": adapter_id,
+                    "Pages": ["*"],
+                    "Version": self.get_latest_adapter_version(adapter_id),
+                }
+            )
             initiate_response = self.textract_client.start_document_analysis(
                 DocumentLocation={"S3Object": {"Bucket": bucket_name, "Name": object_key}},
                 FeatureTypes=["QUERIES"],
@@ -134,11 +148,14 @@ class Textract(Ocr):
     def _parse_textract_queries(self, textract_response):
         extracted_data = {}
 
+        print(f"Attempting to extract block data from response: {textract_response}")
+
         blocks = textract_response.get("Blocks", [])
         query_blocks = []
         query_result_blocks = {}
 
         for block in blocks:
+            print(f"Extracting block data: {block}")
             if block["BlockType"] == "QUERY":
                 query_blocks.append(block)
             elif block["BlockType"] == "QUERY_RESULT":
