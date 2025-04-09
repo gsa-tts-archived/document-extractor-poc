@@ -69,22 +69,7 @@ class Textract(Ocr):
 
     async def _paginated_textract_with_queries(self, form, bucket_name, object_key) -> list[Any]:
         queries_config = [{"Text": query, "Pages": ["*"]} for query in form.queries()]
-
         paginated_queries_config = self._split_list_by_30(queries_config)
-
-        adapters_config = []
-        for index in range(len(paginated_queries_config)):
-            adapter_id = os.environ.get(f"{form.identifier()}_TEXTRACT_ADAPTER_ID_{index}")
-            if adapter_id is None:
-                continue
-
-            adapters_config.append(
-                {
-                    "AdapterId": adapter_id,
-                    "Pages": ["*"],
-                    "Version": self.get_latest_adapter_version(adapter_id),
-                }
-            )
 
         tasks = [
             asyncio.create_task(
@@ -113,19 +98,19 @@ class Textract(Ocr):
     async def _call_textract_with_queries(self, bucket_name, object_key, queries_config, adapter_id):
         print("Initiating document analysis")
         if adapter_id is not None:
-            adapters_config = []
-            adapters_config.append(
-                {
-                    "AdapterId": adapter_id,
-                    "Pages": ["*"],
-                    "Version": self.get_latest_adapter_version(adapter_id),
-                }
-            )
             initiate_response = self.textract_client.start_document_analysis(
                 DocumentLocation={"S3Object": {"Bucket": bucket_name, "Name": object_key}},
                 FeatureTypes=["QUERIES"],
                 QueriesConfig={"Queries": queries_config},
-                AdaptersConfig={"Adapters": adapters_config},
+                AdaptersConfig={
+                    "Adapters": [
+                        {
+                            "AdapterId": adapter_id,
+                            "Pages": ["*"],
+                            "Version": self.get_latest_adapter_version(adapter_id),
+                        }
+                    ]
+                },
             )
         else:
             # Can't seem to set `AdaptersConfig` to `None` if the size of `adapters_config` is 0.  Best thing to do is
