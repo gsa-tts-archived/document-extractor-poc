@@ -10,8 +10,8 @@ export default function App() {
       <Routes>
         <Route path="/verify-document" element={<VerifyPage />} />
         <Route path="/download-document" element={<DownloadPage />} />
-        <Route path="/signin" element={<SignInPage />} />
-        <Route path="/" element={<UploadPage />} />
+        <Route path="upload-document" element={<UploadPage />} />
+        <Route path="/" element={<SignInPage />} />
       </Routes>
     </BrowserRouter>
   );
