@@ -44,6 +44,6 @@ def test_extract_text_with_no_form_identified():
 
     extract_text.extract_text("httpssss://a_sweet/file/location.txt", "https://asdf/queue/url")
 
-    mock_ocr.scan.assert_called_with(mock.ANY, form=None)
+    mock_ocr.scan.assert_called_with(mock.ANY, None)
     args, kwargs = mock_queue.send_message.call_args
     assert """"document_type": null""" in kwargs["MessageBody"]

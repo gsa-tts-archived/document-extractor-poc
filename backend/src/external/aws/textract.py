@@ -16,12 +16,12 @@ class Textract(Ocr):
     def __init__(self) -> None:
         self.textract_client: TextractClient = boto3.client("textract")
 
-    def scan(self, s3_url: str, form: Form) -> dict[str, dict[str, str | float]]:
+    def scan(self, s3_url: str, form: Form | None) -> dict[str, dict[str, str | float]]:
         try:
             # Parse the S3 URL
             bucket_name, object_key = S3.parse_s3_url(s3_url)
 
-            if form.queries() is None or len(form.queries()) == 0:
+            if form is None or form.queries() is None or len(form.queries()) == 0:
                 print("Attempting AnalyzeDocument with forms and tables")
                 response = self.textract_client.analyze_document(
                     Document={"S3Object": {"Bucket": bucket_name, "Name": object_key}},
