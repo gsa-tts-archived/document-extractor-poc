@@ -135,8 +135,6 @@ class Textract(Ocr):
     def _parse_textract_queries(textract_response):
         extracted_data = {}
 
-        print(f"Attempting to extract block data from response: {textract_response}")
-
         blocks = textract_response.get("Blocks", [])
         query_blocks = []
         query_result_blocks = {}
