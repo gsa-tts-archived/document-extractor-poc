@@ -63,13 +63,9 @@ class Textract(Ocr):
         except Exception as e:
             raise OcrException(f"Failure while trying to detect the document type of {s3_url}") from e
 
-    def _split_list_by_30(self, the_list: list[Any]) -> list[list[Any]]:
-        sublist_size = 30
-        return [the_list[i : i + sublist_size] for i in range(0, len(the_list), sublist_size)]
-
     async def _paginated_textract_with_queries(self, form, bucket_name, object_key) -> list[Any]:
         queries_config = [{"Text": query, "Pages": ["*"]} for query in form.queries()]
-        paginated_queries_config = self._split_list_by_30(queries_config)
+        paginated_queries_config = Textract._split_list_by_30(queries_config)
 
         tasks = [
             asyncio.create_task(
@@ -85,6 +81,11 @@ class Textract(Ocr):
         results_list = await asyncio.gather(*tasks)
 
         return results_list
+
+    @staticmethod
+    def _split_list_by_30(the_list: list[Any]) -> list[list[Any]]:
+        sublist_size = 30
+        return [the_list[i : i + sublist_size] for i in range(0, len(the_list), sublist_size)]
 
     async def _call_textract_with_queries(self, bucket_name, object_key, queries_config, adapter_id):
         print("Initiating document analysis")
@@ -130,7 +131,8 @@ class Textract(Ocr):
         latest_version = max(adapter_versions, key=lambda x: x["CreationTime"])
         return latest_version["AdapterVersion"]
 
-    def _parse_textract_queries(self, textract_response):
+    @staticmethod
+    def _parse_textract_queries(textract_response):
         extracted_data = {}
 
         print(f"Attempting to extract block data from response: {textract_response}")
@@ -146,7 +148,7 @@ class Textract(Ocr):
                 query_result_blocks[block["Id"]] = block
 
         for query_block in query_blocks:
-            value, confidence = self._get_text_and_confidence_from_relationship_blocks(
+            value, confidence = Textract._get_text_and_confidence_from_relationship_blocks(
                 query_block, query_result_blocks, "ANSWER"
             )
 
@@ -154,7 +156,8 @@ class Textract(Ocr):
 
         return extracted_data
 
-    def _parse_textract_forms(self, response):
+    @staticmethod
+    def _parse_textract_forms(response):
         """Parses structured data from AnalyzeDocument response into a simple key-value format."""
         extracted_data = {}
         block_map = {block["Id"]: block for block in response.get("Blocks", [])}
@@ -163,7 +166,9 @@ class Textract(Ocr):
             if block["BlockType"] != "KEY_VALUE_SET" or "KEY" not in block.get("EntityTypes", []):
                 continue
 
-            key_text, key_confidence = self._get_text_and_confidence_from_relationship_blocks(block, block_map, "CHILD")
+            key_text, key_confidence = Textract._get_text_and_confidence_from_relationship_blocks(
+                block, block_map, "CHILD"
+            )
 
             relationships = block.get("Relationships", [])
 
@@ -176,7 +181,7 @@ class Textract(Ocr):
 
                 for related_value_block_id in relationship["Ids"]:
                     value_block = block_map[related_value_block_id]
-                    value_text, value_confidence = self._get_text_and_confidence_from_relationship_blocks(
+                    value_text, value_confidence = Textract._get_text_and_confidence_from_relationship_blocks(
                         value_block, block_map, "CHILD"
                     )
 
@@ -191,8 +196,9 @@ class Textract(Ocr):
 
         return extracted_data
 
+    @staticmethod
     def _get_text_and_confidence_from_relationship_blocks(
-        self, block: Any, blocks: dict[str, Any], wanted_relationship: str
+        block: Any, blocks: dict[str, Any], wanted_relationship: str
     ) -> tuple[str, float]:
         relationships = block.get("Relationships", [])
 

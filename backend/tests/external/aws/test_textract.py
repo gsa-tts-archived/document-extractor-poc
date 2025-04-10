@@ -4,9 +4,8 @@ from src.forms.w2 import W2
 
 def test_textract_split_w2_queries_by_30():
     w2 = W2()
-    textract = Textract()
 
-    response = textract._split_list_by_30(w2.queries())
+    response = Textract._split_list_by_30(w2.queries())
 
     assert len(response[0]) == 30
     assert len(response[1]) == 5
@@ -74,9 +73,7 @@ def test_textract_parse_query_response():
         "AnalyzeDocumentModelVersion": "1.0",
     }
 
-    textract = Textract()
-
-    actual_parsed_response = textract._parse_textract_queries(mock_textract_response)
+    actual_parsed_response = Textract._parse_textract_queries(mock_textract_response)
 
     assert actual_parsed_response == {"What did the DogCow say?": {"value": "Moof!", "confidence": 0.99}}
 
@@ -278,8 +275,6 @@ def test_textract_parse_textract_form():
         "AnalyzeDocumentModelVersion": "1",
     }
 
-    textract = Textract()
-
-    actual_parsed_response = textract._parse_textract_forms(mocked_textract_response)
+    actual_parsed_response = Textract._parse_textract_forms(mocked_textract_response)
 
     assert actual_parsed_response == {"What does DogCow say?": {"value": "Moof!", "confidence": 99.58535766601562}}
