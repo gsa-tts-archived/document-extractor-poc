@@ -140,7 +140,6 @@ class Textract(Ocr):
         query_result_blocks = {}
 
         for block in blocks:
-            print(f"Extracting block data: {block}")
             if block["BlockType"] == "QUERY":
                 query_blocks.append(block)
             elif block["BlockType"] == "QUERY_RESULT":
@@ -159,7 +158,6 @@ class Textract(Ocr):
         """Parses structured data from AnalyzeDocument response into a simple key-value format."""
         extracted_data = {}
         block_map = {block["Id"]: block for block in response.get("Blocks", [])}
-        print(block_map)
 
         for block in response.get("Blocks", []):
             if block["BlockType"] != "KEY_VALUE_SET" or "KEY" not in block.get("EntityTypes", []):
