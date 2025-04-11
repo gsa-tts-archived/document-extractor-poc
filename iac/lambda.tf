@@ -1,6 +1,9 @@
 locals {
   lambda_filename         = "${path.module}/../backend/dist/lambda.zip"
   lambda_source_code_hash = filebase64sha256(local.lambda_filename)
+  textract_environment_variables = merge(var.textract_form_adapters_env_var_mapping, {
+    SQS_QUEUE_URL = aws_sqs_queue.queue_to_dynamo.url
+  })
 }
 
 resource "aws_lambda_function" "text_extract" {
@@ -24,9 +27,7 @@ resource "aws_lambda_function" "text_extract" {
   role = aws_iam_role.execution_role.arn
 
   environment {
-    variables = {
-      SQS_QUEUE_URL = aws_sqs_queue.queue_to_dynamo.url
-    }
+    variables = local.textract_environment_variables
   }
 }
 

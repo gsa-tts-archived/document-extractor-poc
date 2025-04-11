@@ -3,7 +3,7 @@ from src.forms.form import Form
 
 class TenNinetyNineNec(Form):
     def identifier(self) -> str:
-        return "1099-NEC"
+        return "1099NEC"
 
     def form_matches(self) -> str:
         return "1099-NEC"
@@ -21,7 +21,7 @@ class TenNinetyNineNec(Form):
             "1 Nonemployee compensation",
             "3",
             "4 Federal income tax withheld",
-            "4 State tax withheld",
+            "5 State tax withheld",
             "6 State/Payer's state no.",
             "7 State income",
         ]
