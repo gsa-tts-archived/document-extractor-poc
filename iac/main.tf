@@ -26,3 +26,5 @@ terraform {
 locals {
   project = "document-extractor"
 }
+
+data "aws_caller_identity" "current" {}
