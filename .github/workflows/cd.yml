@@ -5,6 +5,8 @@ on:
   push:
     branches:
       - main
+      - gsa-ai-dev
+      - flexion-gsa-dev
 
 
 permissions:
@@ -22,6 +24,8 @@ jobs:
 
   deploy:
     name: Deploy
+    environment:
+      name: ${{ github.ref == 'refs/heads/flexion-gsa-dev' && 'flexion-gsa-dev' || github.ref == 'refs/heads/gsa-ai-dev' && 'gsa-ai-dev' || 'gsa-dev' }}
     runs-on: ubuntu-latest
     needs:
       - build
@@ -49,7 +53,7 @@ jobs:
           path: ui/dist/
 
       - working-directory: ./iac/
-        run: terraform init -backend-config="key=terraform_state_gsa_dev.tfstate"
+        run: terraform init -backend-config="bucket=document-extractor-${{ vars.ENVIRONMENT }}-terraform-state" -backend-config="key=terraform_state_${{ vars.ENVIRONMENT }}.tfstate"
 
       - working-directory: ./iac/
         run: terraform apply -auto-approve -var 'environment=${{ vars.ENVIRONMENT }}' -var 'textract_form_adapters_env_var_mapping=${{ secrets.TEXTRACT_FORM_ADAPTERS_ENV_VARS_MAPPING }}'
