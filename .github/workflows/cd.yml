@@ -5,6 +5,8 @@ on:
   push:
     branches:
       - main
+      - gsa-ai-dev
+      - flexion-gsa-dev
       - prepare-for-gsa-aws
 
 
