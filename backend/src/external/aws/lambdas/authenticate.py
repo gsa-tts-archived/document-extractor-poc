@@ -1,20 +1,34 @@
+import json
+import os
+
 import boto3
 import jwt
 
-# SECRET_KEY = os.environ.get("JWT_SECRET", "super-duper-secrets-are-just-legend")
-
 client = boto3.client("secretsmanager")
-SECRET_KEY = client.get_secret_value(SecretId="JWT_SECRET")["SecretString"]
+ENVIRONMENT = os.environ["ENVIRONMENT"]
+PUBLIC_KEY = client.get_secret_value(SecretId=f"document-extractor-{ENVIRONMENT}-public-key")["SecretString"]
 
 
 def lambda_handler(event, context):
     token = event["headers"].get("Authorization", "").replace("Bearer ", "")
     try:
-        decoded = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
-        return {"isAuthorized": True, "context": decoded}
+        jwt.decode(token, PUBLIC_KEY, algorithms=["HS256"])
+        return generatePolicy("user", "Allow", event["methodArn"])
     except Exception:
-        return {"isAuthorized": False}
+        return generatePolicy("user", "Deny", event["methodArn"])
 
 
-def verifyAccessToken(token: str):
-    return "valid-token"
+def generatePolicy(principalId, effect, resource):
+    authResponse = {}
+    authResponse["principalId"] = principalId
+    if effect and resource:
+        policyDocument = {}
+        policyDocument["Version"] = "2012-10-17"
+        policyDocument["Statement"] = []
+        statementOne = {}
+        statementOne["Action"] = "execute-api:Invoke"
+        statementOne["Effect"] = effect
+        statementOne["Resource"] = resource
+        policyDocument["Statement"] = [statementOne]
+        authResponse["policyDocument"] = policyDocument
+    return json.dumps(authResponse)
