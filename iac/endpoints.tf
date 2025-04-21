@@ -22,6 +22,8 @@ module "document_endpoints" {
     S3_BUCKET_NAME = aws_s3_bucket.document_storage.bucket
   }
 
+  authorizer = aws_api_gateway_authorizer.authorizer.id
+
   depends_on = [aws_api_gateway_rest_api.api]
 }
 
@@ -55,6 +57,8 @@ module "document_id_endpoints" {
     DYNAMODB_TABLE = aws_dynamodb_table.extract_table.name
     S3_BUCKET      = aws_s3_bucket.document_storage.bucket
   }
+
+  authorizer = aws_api_gateway_authorizer.authorizer.id
 
   depends_on = [aws_api_gateway_rest_api.api]
 }
