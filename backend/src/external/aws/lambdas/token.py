@@ -10,11 +10,12 @@ import jwt
 # Use AWS secrets
 client = boto3.client("secretsmanager")
 ENVIRONMENT = os.environ["ENVIRONMENT"]
-SECRET_KEY = client.get_secret_value(SecretId=f"document-extractor-{ENVIRONMENT}-private-key")["SecretString"]
 ALGORITHM = "RS512"
 
 
 def lambda_handler(event, context):
+    private_key = client.get_secret_value(SecretId=f"document-extractor-{ENVIRONMENT}-private-key")["SecretString"]
+
     if "body" not in event:
         return {
             "statusCode": 400,
@@ -44,7 +45,7 @@ def lambda_handler(event, context):
     # Create JWT token
     try:
         payload = {"sub": username, "exp": datetime.datetime.now(datetime.UTC) + datetime.timedelta(hours=1)}
-        token = jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
+        token = jwt.encode(payload, private_key, algorithm=ALGORITHM)
     except Exception as e:
         exception_message = "Failed to generate token"
         logging.error(exception_message)

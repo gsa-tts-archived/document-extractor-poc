@@ -7,13 +7,14 @@ import jwt
 
 client = boto3.client("secretsmanager")
 ENVIRONMENT = os.environ["ENVIRONMENT"]
-PUBLIC_KEY = client.get_secret_value(SecretId=f"document-extractor-{ENVIRONMENT}-public-key")["SecretString"]
 
 
 def lambda_handler(event, context):
+    public_key = client.get_secret_value(SecretId=f"document-extractor-{ENVIRONMENT}-public-key")["SecretString"]
+
     token = event["headers"].get("Authorization", "").replace("Bearer ", "")
     try:
-        jwt.decode(token, PUBLIC_KEY, algorithms=["HS256"])
+        jwt.decode(token, public_key, algorithms=["HS256"])
         return generatePolicy("user", "Allow", event["methodArn"])
     except Exception as e:
         exception_message = "Failed to authenticate token"
