@@ -104,6 +104,24 @@ resource "aws_iam_role_policy_attachment" "attach_sqs_permission_to_role" {
   policy_arn = aws_iam_policy.sqs_lambda_policy.arn
 }
 
+data "aws_iam_policy_document" "secrets_lambda_policy" {
+  statement {
+    effect    = "Allow"
+    actions   = ["secretsmanager:*"]
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_policy" "secrets_lambda_policy" {
+  name   = "${local.project}-${var.environment}-secrets-lambda-policy"
+  policy = data.aws_iam_policy_document.secrets_lambda_policy.json
+}
+
+resource "aws_iam_role_policy_attachment" "attach_secrets_permission_to_role" {
+  role       = aws_iam_role.execution_role.name
+  policy_arn = aws_iam_policy.secrets_lambda_policy.arn
+}
+
 data "aws_iam_policy" "lambda_textract_execution" {
   name = "AmazonTextractFullAccess"
 }
