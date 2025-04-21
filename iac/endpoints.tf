@@ -63,7 +63,7 @@ module "document_id_endpoints" {
   depends_on = [aws_api_gateway_rest_api.api]
 }
 
-module "document_endpoints" {
+module "token_endpoints" {
   source = "./endpoint"
 
   api_gateway_name = aws_api_gateway_rest_api.api.name
