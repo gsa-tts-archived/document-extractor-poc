@@ -44,4 +44,5 @@ variable "environment_variables" {
 variable "authorizer" {
   type     = string
   nullable = true
+  default  = null
 }
