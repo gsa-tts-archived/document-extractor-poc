@@ -1,4 +1,5 @@
 import json
+import logging
 import os
 
 import boto3
@@ -14,7 +15,10 @@ def lambda_handler(event, context):
     try:
         jwt.decode(token, PUBLIC_KEY, algorithms=["HS256"])
         return generatePolicy("user", "Allow", event["methodArn"])
-    except Exception:
+    except Exception as e:
+        exception_message = "Failed to authenticate token"
+        logging.error(exception_message)
+        logging.exception(e)
         return generatePolicy("user", "Deny", event["methodArn"])
 
 
