@@ -108,7 +108,9 @@ resource "aws_lambda_function" "authorizer" {
   role = aws_iam_role.execution_role.arn
 
   environment {
-    ENVIRONMENT = var.environment
+    variables = {
+      ENVIRONMENT = var.environment
+    }
   }
 }
 
