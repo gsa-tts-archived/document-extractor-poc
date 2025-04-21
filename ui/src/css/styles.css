@@ -1,3 +1,11 @@
+:root {
+  --usa-color-primary-lighter: #e3effb; /* your custom color */
+}
+
+.bg-primary-lighter {
+  background-color: var(--usa-color-primary-lighter);
+}
+
 .usa-card__heading {
   font-weight: 400;
 }
@@ -55,6 +63,31 @@
   border-left-color: #005ea2;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
+}
+
+.site-wrapper {
+  min-height: calc(100vh - 222px);
+}
+
+.usa-banner__button:after {
+  background-color: #ffffff;
+}
+
+#signin-form .usa-input {
+  background-color: #f2f9ff;
+  border-color: #cedced;
+  border-radius: 0.25rem;
+  font-weight: 700;
+}
+#signin-form .usa-input.usa-input--big {
+  height: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  font-size: 1.25rem;
+  line-height: 1.5;
+}
+#signin-form .usa-label {
+  font-weight: 700;
 }
 
 @keyframes spin {

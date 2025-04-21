@@ -11,7 +11,7 @@ export default function Headers() {
         aria-label="Official website of the United States government"
       >
         <div className="usa-accordion">
-          <header className="usa-banner__header">
+          <header className="usa-banner__header bg-primary text-white">
             <div className="usa-banner__inner">
               <div className="grid-col-auto">
                 <img
@@ -36,7 +36,7 @@ export default function Headers() {
                 aria-expanded="false"
                 aria-controls="gov-banner-default"
               >
-                <span className="usa-banner__button-text">
+                <span className="usa-banner__button-text text-white">
                   Here’s how you know
                 </span>
               </button>
@@ -111,7 +111,7 @@ export default function Headers() {
       {/* End banner section */}
 
       <div className="usa-overlay"></div>
-      <header className="usa-header usa-header--basic border-bottom border-gray-5">
+      <header className="usa-header usa-header--basic bg-white border-bottom border-gray-5">
         <div className="usa-nav-container">
           <div className="usa-navbar">
             <div className="usa-logo">

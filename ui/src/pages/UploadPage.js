@@ -64,7 +64,7 @@ export default function UploadPage() {
 
   return (
     <Layout>
-      <div className="grid-container margin-bottom-15">
+      <div className="site-wrapper grid-container padding-bottom-15">
         {/* Start alert section */}
         {alertMessage && (
           <div
