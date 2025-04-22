@@ -9,11 +9,13 @@ ENVIRONMENT = os.environ["ENVIRONMENT"]
 
 
 def lambda_handler(event, context):
+    logging.info("Getting public key from AWS Secrets Manager")
     public_key = client.get_secret_value(SecretId=f"document-extractor-{ENVIRONMENT}-public-key")["SecretString"]
 
     token = event["authorizationToken"].replace("Bearer ", "")
 
     try:
+        logging.info("Verifying JWT token")
         jwt.decode(token, public_key, algorithms=["RS512"])
         return generate_policy("user", "Allow", event["methodArn"])
     except Exception as e:
