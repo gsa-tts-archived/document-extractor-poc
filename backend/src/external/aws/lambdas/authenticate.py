@@ -1,4 +1,3 @@
-import json
 import logging
 import os
 
@@ -12,28 +11,21 @@ ENVIRONMENT = os.environ["ENVIRONMENT"]
 def lambda_handler(event, context):
     public_key = client.get_secret_value(SecretId=f"document-extractor-{ENVIRONMENT}-public-key")["SecretString"]
 
-    token = event["headers"].get("Authorization", "").replace("Bearer ", "")
+    token = event["authorizationToken"].replace("Bearer ", "")
+
     try:
         jwt.decode(token, public_key, algorithms=["HS256"])
-        return generatePolicy("user", "Allow", event["methodArn"])
+        return generate_policy("user", "Allow", event["methodArn"])
     except Exception as e:
         exception_message = "Failed to authenticate token"
         logging.error(exception_message)
         logging.exception(e)
-        return generatePolicy("user", "Deny", event["methodArn"])
+        return generate_policy("user", "Deny", event["methodArn"])
 
 
-def generatePolicy(principalId, effect, resource):
-    authResponse = {}
-    authResponse["principalId"] = principalId
-    if effect and resource:
-        policyDocument = {}
-        policyDocument["Version"] = "2012-10-17"
-        policyDocument["Statement"] = []
-        statementOne = {}
-        statementOne["Action"] = "execute-api:Invoke"
-        statementOne["Effect"] = effect
-        statementOne["Resource"] = resource
-        policyDocument["Statement"] = [statementOne]
-        authResponse["policyDocument"] = policyDocument
-    return json.dumps(authResponse)
+def generate_policy(principal_id, effect, resource):
+    statement_one = {"Action": "execute-api:Invoke", "Effect": effect, "Resource": resource}
+    policy_document = {"Version": "2012-10-17", "Statement": [statement_one]}
+    auth_response = {"principalId": principal_id, "policyDocument": policy_document}
+
+    return auth_response
