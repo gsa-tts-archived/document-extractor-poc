@@ -14,7 +14,7 @@ def lambda_handler(event, context):
     token = event["authorizationToken"].replace("Bearer ", "")
 
     try:
-        jwt.decode(token, public_key, algorithms=["HS256"])
+        jwt.decode(token, public_key, algorithms=["RS512"])
         return generate_policy("user", "Allow", event["methodArn"])
     except Exception as e:
         exception_message = "Failed to authenticate token"
