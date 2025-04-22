@@ -1,18 +1,7 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router';
 
 import Layout from '../components/Layout';
-
-async function mockLogin(username, password) {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      if (username === 'admin' && password === 'password123') {
-        resolve({ token: 'mock-jwt-token' });
-      } else {
-        reject(new Error('The email or password you’ve entered is wrong.'));
-      }
-    }, 500);
-  });
-}
 
 export default function SignInPage() {
   const [username, setUsername] = useState('');
@@ -20,6 +9,8 @@ export default function SignInPage() {
   const [usernameError, setUsernameError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [formError, setFormError] = useState('');
+
+  const navigate = useNavigate();
 
   async function handleLogin(e) {
     e.preventDefault();
@@ -43,10 +34,22 @@ export default function SignInPage() {
     if (hasError) return;
 
     try {
-      const response = await mockLogin(username, password);
-      console.log('Logged in! Token:', response.token);
-      sessionStorage.setItem('token', response.token);
-      // redirect to login page
+      const res = await fetch('/api/token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+      });
+
+      if (!res.ok) {
+        throw new Error('The email or password you’ve entered is wrong.');
+      }
+
+      const data = await res.json();
+
+      // store the token
+      sessionStorage.setItem('token', data.access_token);
+      // redirect to upload page
+      navigate('/upload-document');
     } catch (err) {
       setFormError(err.message);
     }
