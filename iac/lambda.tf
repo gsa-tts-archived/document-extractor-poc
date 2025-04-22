@@ -114,6 +114,15 @@ resource "aws_lambda_function" "authorizer" {
   }
 }
 
+resource "aws_lambda_permission" "api_gateway_invoke_authorizer" {
+  statement_id  = "AllowExecutionFromApiGateway"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.authorizer.function_name
+  principal     = "apigateway.amazonaws.com"
+
+  source_arn = "${aws_api_gateway_rest_api.api.execution_arn}/*/*"
+}
+
 resource "aws_lambda_provisioned_concurrency_config" "authorizer_concurrency" {
   function_name                     = aws_lambda_function.authorizer.function_name
   provisioned_concurrent_executions = 1
