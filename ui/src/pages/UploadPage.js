@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import Layout from '../components/Layout';
-import { authorizedFetch } from '../../utils/api';
+import { authorizedFetch } from '../utils/api';
 
 export default function UploadPage() {
   // state for alert messages
