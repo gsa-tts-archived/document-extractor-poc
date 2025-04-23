@@ -289,7 +289,7 @@ dependencies = [
     { name = "cryptography" },
     { name = "iterator-chain" },
     { name = "pyjwt" },
-    { name = "types-boto3", extra = ["apigateway", "dynamodb", "s3", "sqs", "textract"] },
+    { name = "types-boto3", extra = ["apigateway", "dynamodb", "s3", "secretsmanager", "sqs", "textract"] },
 ]
 
 [package.dev-dependencies]
@@ -305,7 +305,7 @@ requires-dist = [
     { name = "cryptography", specifier = ">=44.0.2" },
     { name = "iterator-chain", specifier = ">=1.1.0" },
     { name = "pyjwt", specifier = ">=2.10.1" },
-    { name = "types-boto3", extras = ["apigateway", "dynamodb", "s3", "sqs", "textract"], specifier = ">=1.37.22" },
+    { name = "types-boto3", extras = ["apigateway", "dynamodb", "s3", "secretsmanager", "sqs", "textract"], specifier = ">=1.37.22" },
 ]
 
 [package.metadata.requires-dev]
@@ -343,6 +343,9 @@ dynamodb = [
 s3 = [
     { name = "types-boto3-s3" },
 ]
+secretsmanager = [
+    { name = "types-boto3-secretsmanager" },
+]
 sqs = [
     { name = "types-boto3-sqs" },
 ]
@@ -375,6 +378,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/be/cc/b6b89ef7427c50138bdc980bb6656c123bf4aec34d93851f7ca98545f40e/types_boto3_s3-1.37.24.tar.gz", hash = "sha256:53eed086717bf853dda128e7ad7aae2470fe2b89fb1d3811fbca6fda3f871354", size = 73318 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/9c/7d/d9803fc30e93fe9d474b4d569eb7ef1ef68942ce7475e8526216a4bd2ba9/types_boto3_s3-1.37.24-py3-none-any.whl", hash = "sha256:a0ed402192379de22cd5cec97e35500bfddde1168ce3ef18dec06a6b4d3cddc2", size = 80129 },
+]
+
+[[package]]
+name = "types-boto3-secretsmanager"
+version = "1.37.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/6d/f4/7cea7f08ce38609bb75d74fa14ba493b2d67709ef8324a3909fdc64d945d/types_boto3_secretsmanager-1.37.0.tar.gz", hash = "sha256:02173b52bf0e28d9a76b20778d819b65e2a544695a285900135a4f05c7b7aa8b", size = 19920 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/81/8d/6fb40ae64942e31657d6c910a8a7addd99567c77fcf4a7af0dd2a9d6d50a/types_boto3_secretsmanager-1.37.0-py3-none-any.whl", hash = "sha256:f2f8835e3e8bdb581a93ec1d947aeee1341f5748d0872e9217859fd210f5707e", size = 26671 },
 ]
 
 [[package]]

@@ -1,0 +1,2 @@
+class CloudSecretManagerException(Exception):
+    pass
