@@ -1,10 +1,11 @@
 from unittest import mock
 
 import bcrypt
+import pytest
 
 from src import context
 from src.login import login
-from src.secret import CloudSecretManager
+from src.secret import CloudSecretManager, CloudSecretManagerException
 
 context = context.ApplicationContext()
 
@@ -69,3 +70,14 @@ def test_has_valid_credentials_returns_false_for_bad_password():
     valid = login.has_valid_credentials(expected_username, "something not correct", environment)
 
     assert valid is False
+
+
+def test_has_valid_credentials_raises_exception_when_secret_manager_raises_exception():
+    """has_valid_credentials raises an exception when the secret manager raises an exception."""
+
+    mock_cloud_secret_manager = mock.MagicMock()
+    mock_cloud_secret_manager.get_secret.side_effect = CloudSecretManagerException("something went wrong")
+    context.register(CloudSecretManager, mock_cloud_secret_manager)
+
+    with pytest.raises(CloudSecretManagerException):
+        login.has_valid_credentials("DogCow", "Moof", "test")
