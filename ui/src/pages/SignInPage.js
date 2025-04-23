@@ -51,7 +51,7 @@ export default function SignInPage() {
 
       const data = await res.json();
       // store the token
-      sessionStorage.setItem('token', data.access_token);
+      sessionStorage.setItem('auth_token', data.access_token);
       // redirect to upload page
       navigate('/upload-document');
     } catch (err) {

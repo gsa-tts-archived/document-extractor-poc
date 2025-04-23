@@ -1,5 +1,5 @@
 export async function authorizedFetch(url, options = {}) {
-  const token = sessionStorage.getItem('access_token');
+  const token = sessionStorage.getItem('auth_token');
 
   const headers = {
     ...options.headers,

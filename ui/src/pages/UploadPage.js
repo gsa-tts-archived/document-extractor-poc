@@ -13,13 +13,13 @@ export default function UploadPage() {
     setAlertType(type);
   }
 
-  // handle form submissiom
+  // handle form submission
   async function handleSubmit(event) {
     event.preventDefault();
 
     const file = fileInputRef.current?.files[0];
 
-    console.log('file upload successfule', file.name);
+    console.log('file upload successful', file.name);
 
     if (!file) {
       showAlert('Please select a file to upload!', 'error');
@@ -45,7 +45,7 @@ export default function UploadPage() {
         });
 
         const data = await response.json();
-        console.log('request respons', data, response);
+        console.log('request response', data, response);
 
         if (response.ok) {
           sessionStorage.setItem('documentId', data.documentId);
