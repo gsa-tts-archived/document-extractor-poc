@@ -26,7 +26,8 @@ def lambda_handler(event, context):
 
 
 def generate_policy(principal_id, effect, resource):
-    statement_one = {"Action": "execute-api:Invoke", "Effect": effect, "Resource": resource}
+    rest_api_arn = resource.split("/")[0]
+    statement_one = {"Action": "execute-api:Invoke", "Effect": effect, "Resource": f"{rest_api_arn}/*"}
     policy_document = {"Version": "2012-10-17", "Statement": [statement_one]}
     auth_response = {"principalId": principal_id, "policyDocument": policy_document}
 
