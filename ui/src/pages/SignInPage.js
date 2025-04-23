@@ -15,7 +15,7 @@ export default function SignInPage() {
 
   async function handleLogin(e) {
     e.preventDefault();
-    // Clear previous error messages:
+    // clear previous error messages:
     setUsernameError('');
     setPasswordError('');
     setFormError('');
@@ -39,23 +39,17 @@ export default function SignInPage() {
     }
 
     try {
-      const res = await fetch(
-        'https://dkn9r2qxrhvr7.cloudfront.net/api/token',
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username, password }),
-        }
-      );
+      const res = await fetch('/api/token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+      });
 
       if (!res.ok) {
         throw new Error('The email or password you’ve entered is wrong.');
       }
 
       const data = await res.json();
-      console.log('data', data);
-      console.log('Logged in! Token:', data.access_token);
-
       // store the token
       sessionStorage.setItem('token', data.access_token);
       // redirect to upload page
@@ -63,7 +57,7 @@ export default function SignInPage() {
     } catch (err) {
       setFormError(err.message);
     } finally {
-      setLoading(false); // ✅ Hide spinner in all cases after request finishes
+      setLoading(false); // remove spinner in all cases after request finishes
     }
   }
 
