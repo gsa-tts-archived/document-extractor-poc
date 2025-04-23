@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react';
 import Layout from '../components/Layout';
+import { authorizedFetch } from '../../utils/api';
 
 export default function UploadPage() {
   // state for alert messages
@@ -38,13 +39,11 @@ export default function UploadPage() {
 
       try {
         const apiUrl = '/api/document';
-        const response = await fetch(apiUrl, {
+        const response = await authorizedFetch(apiUrl, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
           body: JSON.stringify(requestBody),
         });
+
         const data = await response.json();
         console.log('request respons', data, response);
 

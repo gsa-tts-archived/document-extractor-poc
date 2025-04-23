@@ -1,18 +1,7 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router';
 
 import Layout from '../components/Layout';
-
-async function mockLogin(username, password) {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      if (username === 'admin' && password === 'password123') {
-        resolve({ token: 'mock-jwt-token' });
-      } else {
-        reject(new Error('The email or password you’ve entered is wrong.'));
-      }
-    }, 500);
-  });
-}
 
 export default function SignInPage() {
   const [username, setUsername] = useState('');
@@ -20,13 +9,17 @@ export default function SignInPage() {
   const [usernameError, setUsernameError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [formError, setFormError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const navigate = useNavigate();
 
   async function handleLogin(e) {
     e.preventDefault();
-    // Clear previous error messages:
+    // clear previous error messages:
     setUsernameError('');
     setPasswordError('');
     setFormError('');
+    setLoading(true);
 
     let hasError = false;
 
@@ -40,20 +33,46 @@ export default function SignInPage() {
       hasError = true;
     }
 
-    if (hasError) return;
+    if (hasError) {
+      setLoading(false); // hide spinner if validation failed
+      return;
+    }
 
     try {
-      const response = await mockLogin(username, password);
-      console.log('Logged in! Token:', response.token);
-      sessionStorage.setItem('token', response.token);
-      // redirect to login page
+      const res = await fetch('/api/token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+      });
+
+      if (!res.ok) {
+        throw new Error('The email or password you’ve entered is wrong.');
+      }
+
+      const data = await res.json();
+      // store the token
+      sessionStorage.setItem('token', data.access_token);
+      // redirect to upload page
+      navigate('/upload-document');
     } catch (err) {
       setFormError(err.message);
+    } finally {
+      setLoading(false); // remove spinner in all cases after request finishes
     }
   }
 
   return (
     <Layout>
+      {loading && (
+        <div className="loading-overlay">
+          <div className="loading-content-el">
+            <div className="loading-content">
+              <p className="font-body-lg text-semi-bold">Signing in...</p>
+              <div className="spinner" aria-label="loading"></div>
+            </div>
+          </div>
+        </div>
+      )}
       <div className="site-wrapper bg-primary-lighter grid-row flex-column minh-viewport flex-align-center flex-justify-center">
         <div className="bg-white margin-top-10 radius-md padding-y-4 card margin-x-auto width-tablet tablet:padding-y-8 padding-x-2 tablet:padding-x-10 tablet:margin-bottom-8">
           {formError && (
