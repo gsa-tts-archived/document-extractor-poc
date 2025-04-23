@@ -32,3 +32,40 @@ def test_has_valid_credentials_returns_true():
     valid = login.has_valid_credentials(expected_username, expected_password, environment)
 
     assert valid is True
+
+
+def test_has_valid_credentials_returns_false_for_bad_username():
+    """has_valid_credentials returns False for a bad username."""
+
+    environment = "test"
+    expected_password = "Moof"
+    hashed_password = bcrypt.hashpw(expected_password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+
+    mock_cloud_secret_manager = mock.MagicMock()
+    mock_cloud_secret_manager.get_secret.side_effect = (
+        lambda secret_name: "DogCow" if secret_name == f"document-extractor-{environment}-username" else hashed_password
+    )
+    context.register(CloudSecretManager, mock_cloud_secret_manager)
+
+    valid = login.has_valid_credentials("something not correct", expected_password, environment)
+
+    assert valid is False
+
+
+def test_has_valid_credentials_returns_false_for_bad_password():
+    """has_valid_credentials returns False for a bad password."""
+
+    environment = "test"
+    expected_username = "DogCow"
+
+    mock_cloud_secret_manager = mock.MagicMock()
+    mock_cloud_secret_manager.get_secret.side_effect = (
+        lambda secret_name: expected_username
+        if secret_name == f"document-extractor-{environment}-username"
+        else bcrypt.hashpw(b"Moof", bcrypt.gensalt()).decode("utf-8")
+    )
+    context.register(CloudSecretManager, mock_cloud_secret_manager)
+
+    valid = login.has_valid_credentials(expected_username, "something not correct", environment)
+
+    assert valid is False
