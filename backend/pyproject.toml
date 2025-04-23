@@ -29,5 +29,6 @@ select = [
 
 [dependency-groups]
 dev = [
+    "cryptography>=44.0.2",
     "pytest>=8.3.5",
 ]

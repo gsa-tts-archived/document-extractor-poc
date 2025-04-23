@@ -2,6 +2,9 @@ from unittest import mock
 
 import bcrypt
 import pytest
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric import rsa
 
 from src import context
 from src.login import login
@@ -81,3 +84,48 @@ def test_has_valid_credentials_raises_exception_when_secret_manager_raises_excep
 
     with pytest.raises(CloudSecretManagerException):
         login.has_valid_credentials("DogCow", "Moof", "test")
+
+
+def test_generate_token_returns_token():
+    """generate_token returns a token."""
+
+    mock_cloud_secret_manager = mock.MagicMock()
+    mock_cloud_secret_manager.get_secret.return_value = generate_rsa_private_key()
+    context.register(CloudSecretManager, mock_cloud_secret_manager)
+
+    token = login.generate_token("DogCow", "test")
+
+    assert token is not None
+    assert isinstance(token, str)
+
+
+def test_generate_token_raises_exception_when_secret_manager_raises_exception():
+    """generate_token raises an exception when the secret manager raises an exception."""
+
+    mock_cloud_secret_manager = mock.MagicMock()
+    mock_cloud_secret_manager.get_secret.side_effect = CloudSecretManagerException("something went wrong")
+    context.register(CloudSecretManager, mock_cloud_secret_manager)
+
+    with pytest.raises(CloudSecretManagerException):
+        login.generate_token("DogCow", "test")
+
+
+def test_generate_token_raises_exception_when_cannot_generate_token():
+    """generate_token raises an exception when JWT cannot be generated."""
+
+    mock_cloud_secret_manager = mock.MagicMock()
+    mock_cloud_secret_manager.get_secret.return_value = "not a private key"
+    context.register(CloudSecretManager, mock_cloud_secret_manager)
+
+    with pytest.raises(Exception, match="Failed to generate Token"):
+        login.generate_token("DogCow", "test")
+
+
+def generate_rsa_private_key() -> str:
+    private_key = rsa.generate_private_key(public_exponent=65537, key_size=2048, backend=default_backend())
+    pem = private_key.private_bytes(
+        encoding=serialization.Encoding.PEM,
+        format=serialization.PrivateFormat.PKCS8,
+        encryption_algorithm=serialization.NoEncryption(),
+    )
+    return pem.decode("utf-8")
