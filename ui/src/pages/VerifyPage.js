@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
+import { authorizedFetch } from '../utils/api';
 
 export default function VerifyPage() {
   const [documentId] = useState(() => sessionStorage.getItem('documentId'));
@@ -10,9 +11,8 @@ export default function VerifyPage() {
   async function pollApiRequest(attempts = 30, delay = 2000) {
     for (let i = 0; i < attempts; i++) {
       try {
-        const response = await fetch(`/api/document/${documentId}`, {
+        const response = await authorizedFetch(`/api/document/${documentId}`, {
           method: 'GET',
-          mode: 'cors',
           headers: {
             Accept: 'application/json',
           },
@@ -51,7 +51,7 @@ export default function VerifyPage() {
 
     try {
       const apiUrl = `/api/document/${responseData.document_id}`;
-      const response = await fetch(apiUrl, {
+      const response = await authorizedFetch(apiUrl, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
