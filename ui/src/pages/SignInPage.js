@@ -83,6 +83,12 @@ export default function SignInPage() {
             </div>
           )}
 
+          <div className="usa-alert usa-alert--info">
+            <div className="usa-alert__body">
+              <p className="usa-alert__text">Signed out successfully.</p>
+            </div>
+          </div>
+
           <h1>Sign in for existing users</h1>
 
           <form onSubmit={handleLogin} id="signin-form">

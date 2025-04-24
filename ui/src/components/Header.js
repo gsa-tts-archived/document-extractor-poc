@@ -1,7 +1,7 @@
 import iconDotGov from 'url:../assets/icon-dot-gov.svg';
 import usFlagSmall from 'url:../assets/us_flag_small.png';
 import iconHttps from 'url:../assets/icon-https.svg';
-import { logout } from '../utils/api';
+import { signout } from '../utils/api';
 
 export default function Headers() {
   return (
@@ -126,9 +126,9 @@ export default function Headers() {
             <button
               className="usa-button usa-button--outline"
               type="submit"
-              onClick={logout}
+              onClick={signout}
             >
-              Logout
+              Sign out
             </button>
           </nav>
         </div>

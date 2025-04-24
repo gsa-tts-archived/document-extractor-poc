@@ -17,7 +17,7 @@ export async function authorizedFetch(url, options = {}) {
   return res;
 }
 
-export async function logout() {
+export async function signout() {
   sessionStorage.removeItem('auth_token');
   window.location.href = '/';
 }
