@@ -1,3 +1,5 @@
+import { useNavigate } from 'react-router';
+
 export async function authorizedFetch(url, options = {}) {
   const token = sessionStorage.getItem('auth_token');
 
@@ -19,5 +21,7 @@ export async function authorizedFetch(url, options = {}) {
 
 export async function signout() {
   sessionStorage.removeItem('auth_token');
-  window.location.href = '/';
+  const navigate = useNavigate();
+  navigate('/');
+  // window.location.href = '/';
 }

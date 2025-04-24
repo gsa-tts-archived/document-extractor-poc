@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
-import { authorizedFetch } from '../utils/api';
+import { authorizedFetch } from '../utils/auth';
 
 export default function VerifyPage() {
   const [documentId] = useState(() => sessionStorage.getItem('documentId'));

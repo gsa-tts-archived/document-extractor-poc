@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router';
 
 import Layout from '../components/Layout';
 
-export default function SignInPage() {
+export default function SignInPage({ setAuthToken }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [usernameError, setUsernameError] = useState('');
@@ -50,8 +50,9 @@ export default function SignInPage() {
       }
 
       const data = await res.json();
+
       // store the token
-      sessionStorage.setItem('auth_token', data.access_token);
+      setAuthToken(data.access_token);
       // redirect to upload page
       navigate('/upload-document');
     } catch (err) {

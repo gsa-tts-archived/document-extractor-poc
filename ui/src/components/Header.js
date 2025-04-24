@@ -1,7 +1,7 @@
 import iconDotGov from 'url:../assets/icon-dot-gov.svg';
 import usFlagSmall from 'url:../assets/us_flag_small.png';
 import iconHttps from 'url:../assets/icon-https.svg';
-import { signout } from '../utils/api';
+import { signout } from '../utils/auth';
 
 export default function Headers() {
   return (
