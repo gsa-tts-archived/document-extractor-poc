@@ -86,3 +86,45 @@ resource "aws_lambda_provisioned_concurrency_config" "write_to_dynamodb_concurre
   provisioned_concurrent_executions = 1
   qualifier                         = aws_lambda_function.write_to_dynamodb.version
 }
+
+resource "aws_lambda_function" "authorizer" {
+  function_name = "${local.project}-${var.environment}-authorizer"
+
+  filename         = local.lambda_filename
+  source_code_hash = local.lambda_source_code_hash
+
+  handler = "src.external.aws.lambdas.authenticate.lambda_handler"
+
+  memory_size                    = 256
+  timeout                        = 30
+  runtime                        = "python3.13"
+  reserved_concurrent_executions = -1
+  publish                        = true
+
+  architectures = ["arm64"]
+
+  kms_key_arn = aws_kms_key.encryption.arn
+
+  role = aws_iam_role.execution_role.arn
+
+  environment {
+    variables = {
+      ENVIRONMENT = var.environment
+    }
+  }
+}
+
+resource "aws_lambda_permission" "api_gateway_invoke_authorizer" {
+  statement_id  = "AllowExecutionFromApiGateway"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.authorizer.function_name
+  principal     = "apigateway.amazonaws.com"
+
+  source_arn = "${aws_api_gateway_rest_api.api.execution_arn}/*/*"
+}
+
+resource "aws_lambda_provisioned_concurrency_config" "authorizer_concurrency" {
+  function_name                     = aws_lambda_function.authorizer.function_name
+  provisioned_concurrent_executions = 1
+  qualifier                         = aws_lambda_function.authorizer.version
+}

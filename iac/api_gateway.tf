@@ -21,3 +21,10 @@ resource "aws_api_gateway_stage" "stage" {
   stage_name    = "v1"
   deployment_id = aws_api_gateway_deployment.api_deployment.id
 }
+
+resource "aws_api_gateway_authorizer" "authorizer" {
+  name                             = "${local.project}-${var.environment}-authorizer"
+  rest_api_id                      = aws_api_gateway_rest_api.api.id
+  authorizer_uri                   = aws_lambda_function.authorizer.invoke_arn
+  authorizer_result_ttl_in_seconds = 300
+}

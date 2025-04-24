@@ -22,6 +22,8 @@ module "document_endpoints" {
     S3_BUCKET_NAME = aws_s3_bucket.document_storage.bucket
   }
 
+  authorizer = aws_api_gateway_authorizer.authorizer.id
+
   depends_on = [aws_api_gateway_rest_api.api]
 }
 
@@ -54,6 +56,35 @@ module "document_id_endpoints" {
   environment_variables = {
     DYNAMODB_TABLE = aws_dynamodb_table.extract_table.name
     S3_BUCKET      = aws_s3_bucket.document_storage.bucket
+  }
+
+  authorizer = aws_api_gateway_authorizer.authorizer.id
+
+  depends_on = [aws_api_gateway_rest_api.api]
+}
+
+module "token_endpoints" {
+  source = "./endpoint"
+
+  api_gateway_name = aws_api_gateway_rest_api.api.name
+
+  handler_method_mapping = [
+    {
+      name              = "token"
+      handler_file_path = local.lambda_filename
+      handler_package   = "src.external.aws.lambdas.token.lambda_handler"
+      http_method       = "POST"
+    },
+  ]
+
+  resource_prefix       = "${local.project}-${var.environment}"
+  path_part             = "token"
+  resource_parent_id    = aws_api_gateway_rest_api.api.root_resource_id
+  lambda_execution_role = aws_iam_role.execution_role.arn
+  kms_key_arn           = aws_kms_key.encryption.arn
+
+  environment_variables = {
+    ENVIRONMENT = var.environment
   }
 
   depends_on = [aws_api_gateway_rest_api.api]

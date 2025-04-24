@@ -13,7 +13,8 @@ resource "aws_api_gateway_method" "http_method" {
   rest_api_id   = data.aws_api_gateway_rest_api.api.id
   resource_id   = aws_api_gateway_resource.resource_path.id
   http_method   = var.handler_method_mapping[count.index].http_method
-  authorization = "NONE"
+  authorization = var.authorizer == null ? "NONE" : "CUSTOM"
+  authorizer_id = var.authorizer
 }
 
 resource "aws_api_gateway_integration" "lambda_integration" {
