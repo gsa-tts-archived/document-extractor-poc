@@ -1,12 +1,15 @@
 import { useState, useRef } from 'react';
 import Layout from '../components/Layout';
 import { authorizedFetch } from '../utils/auth';
+import { useNavigate } from 'react-router';
 
 export default function UploadPage({ signOut }) {
   // state for alert messages
   const [alertMessage, setAlertMessage] = useState(null);
   const [alertType, setAlertType] = useState(null);
   const fileInputRef = useRef(null);
+
+  const navigate = useNavigate();
 
   function showAlert(message, type) {
     setAlertMessage(message);
@@ -50,7 +53,7 @@ export default function UploadPage({ signOut }) {
         if (response.ok) {
           sessionStorage.setItem('documentId', data.documentId);
           showAlert('File uploaded successfully!', 'success, fake id', data.id);
-          window.location.href = `verify-document`;
+          navigate('/verify-document');
         } else {
           showAlert('File failed to upload!', 'error');
         }
@@ -114,7 +117,7 @@ export default function UploadPage({ signOut }) {
                   {/* Start file input section */}
                   <div className="usa-form-group">
                     <span className="usa-hint" id="file-input-specific-hint">
-                      Files must be under 10MB
+                      Files must be under 4 MB
                     </span>
                     <label
                       className="usa-label margin-top-1"

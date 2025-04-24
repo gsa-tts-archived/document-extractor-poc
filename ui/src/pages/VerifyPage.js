@@ -1,12 +1,15 @@
 import { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
 import { authorizedFetch } from '../utils/auth';
+import { useNavigate } from 'react-router';
 
 export default function VerifyPage({ signOut }) {
   const [documentId] = useState(() => sessionStorage.getItem('documentId'));
   const [responseData, setResponseData] = useState(null); // API response
   const [loading, setLoading] = useState(true); // tracks if page is loading
   const [error, setError] = useState(false); // tracks when there is an error
+
+  const navigate = useNavigate();
 
   async function pollApiRequest(attempts = 30, delay = 2000) {
     for (let i = 0; i < attempts; i++) {
@@ -63,7 +66,7 @@ export default function VerifyPage({ signOut }) {
 
       if (response.ok) {
         sessionStorage.setItem('verifiedData', JSON.stringify(result));
-        window.location.href = `download-document`;
+        navigate('/download-document');
         //TODO remove alert
         alert('Data saved successfully!');
       } else {
