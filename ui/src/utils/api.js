@@ -12,7 +12,5 @@ export async function authorizedFetch(url, options = {}) {
     headers,
   };
 
-  const res = await fetch(url, fetchOptions);
-
-  return res;
+  return await fetch(url, fetchOptions);
 }

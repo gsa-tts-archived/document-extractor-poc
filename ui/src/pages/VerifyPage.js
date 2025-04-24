@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
-import { authorizedFetch } from '../utils/auth';
+import { authorizedFetch } from '../utils/api';
 import { useNavigate } from 'react-router';
 
 export default function VerifyPage({ signOut }) {
@@ -27,6 +27,10 @@ export default function VerifyPage({ signOut }) {
           setResponseData(result); // store API data in state
           setLoading(false); // stop loading when data is received
           setError(false); // clear any previous errors
+          return;
+        } else if (response.status === 401 || response.status === 403) {
+          alert('You are no longer signed in!  Please sign in again.');
+          signOut();
           return;
         } else {
           console.warn(`Attempt ${i + 1} failed: ${response.statusText}`);
@@ -62,15 +66,18 @@ export default function VerifyPage({ signOut }) {
         body: JSON.stringify(formData),
       });
 
-      const result = await response.json();
-
       if (response.ok) {
+        const result = await response.json();
         sessionStorage.setItem('verifiedData', JSON.stringify(result));
         navigate('/download-document');
         //TODO remove alert
         alert('Data saved successfully!');
+      } else if (response.status === 401 || response.status === 403) {
+        alert('You are no longer signed in!  Please sign in again.');
+        signOut();
       } else {
         //TODO remove alert
+        const result = await response.json();
         alert('Failed to save data: ' + result.error);
       }
     } catch (error) {

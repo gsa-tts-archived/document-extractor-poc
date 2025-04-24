@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import Layout from '../components/Layout';
-import { authorizedFetch } from '../utils/auth';
+import { authorizedFetch } from '../utils/api';
 import { useNavigate } from 'react-router';
 
 export default function UploadPage({ signOut }) {
@@ -21,8 +21,6 @@ export default function UploadPage({ signOut }) {
     event.preventDefault();
 
     const file = fileInputRef.current?.files[0];
-
-    console.log('file upload successful', file.name);
 
     if (!file) {
       showAlert('Please select a file to upload!', 'error');
@@ -47,13 +45,19 @@ export default function UploadPage({ signOut }) {
           body: JSON.stringify(requestBody),
         });
 
-        const data = await response.json();
-        console.log('request response', data, response);
-
         if (response.ok) {
+          const data = await response.json();
           sessionStorage.setItem('documentId', data.documentId);
           showAlert('File uploaded successfully!', 'success, fake id', data.id);
           navigate('/verify-document');
+        } else if (response.status === 401 || response.status === 403) {
+          showAlert(
+            'You are no longer signed in!  Please sign in again.  You will be navigated to the sign in page in a few seconds.',
+            'error'
+          );
+          setTimeout(() => {
+            signOut();
+          }, 5000);
         } else {
           showAlert('File failed to upload!', 'error');
         }
