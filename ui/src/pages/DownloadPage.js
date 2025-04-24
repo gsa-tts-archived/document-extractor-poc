@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import Layout from '../components/Layout';
 
-export default function DownloadPage() {
+export default function DownloadPage({ signOut }) {
   // holds document data
   const [verifiedData] = useState(() => {
     const storedData = sessionStorage.getItem('verifiedData');
@@ -119,7 +119,7 @@ export default function DownloadPage() {
   }
 
   return (
-    <Layout>
+    <Layout signOut={signOut}>
       <div className="grid-container margin-bottom-15">
         {/* Start step indicator section  */}
         <div className="usa-step-indicator usa-step-indicator--counters margin-top-2 margin-bottom-6">

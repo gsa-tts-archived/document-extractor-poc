@@ -121,15 +121,17 @@ export default function Headers({ signOut }) {
             </div>
           </div>
 
-          <nav aria-label="Primary navigation" className="usa-nav">
-            <button
-              className="usa-button usa-button--outline"
-              type="submit"
-              onClick={signOut}
-            >
-              Sign out
-            </button>
-          </nav>
+          {signOut && (
+            <nav aria-label="Primary navigation" className="usa-nav">
+              <button
+                className="usa-button usa-button--outline"
+                type="submit"
+                onClick={signOut}
+              >
+                Sign out
+              </button>
+            </nav>
+          )}
         </div>
       </header>
     </>

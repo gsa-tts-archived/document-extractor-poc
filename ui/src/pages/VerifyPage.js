@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
 import { authorizedFetch } from '../utils/auth';
 
-export default function VerifyPage() {
+export default function VerifyPage({ signOut }) {
   const [documentId] = useState(() => sessionStorage.getItem('documentId'));
   const [responseData, setResponseData] = useState(null); // API response
   const [loading, setLoading] = useState(true); // tracks if page is loading
@@ -220,7 +220,7 @@ export default function VerifyPage() {
   }
 
   return (
-    <Layout>
+    <Layout signOut={signOut}>
       {/* Start step indicator section  */}
       <div className="grid-container">
         <div className="usa-step-indicator usa-step-indicator--counters margin-y-2">

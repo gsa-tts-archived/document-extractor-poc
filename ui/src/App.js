@@ -31,8 +31,14 @@ export default function App() {
 
   return (
     <Routes>
-      <Route path="/verify-document" element={<VerifyPage />} />
-      <Route path="/download-document" element={<DownloadPage />} />
+      <Route
+        path="/verify-document"
+        element={<VerifyPage signOut={signOut} />}
+      />
+      <Route
+        path="/download-document"
+        element={<DownloadPage signOut={signOut} />}
+      />
       <Route
         path="/upload-document"
         element={<UploadPage signOut={signOut} />}
