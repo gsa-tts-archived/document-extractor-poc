@@ -1,9 +1,8 @@
 import iconDotGov from 'url:../assets/icon-dot-gov.svg';
 import usFlagSmall from 'url:../assets/us_flag_small.png';
 import iconHttps from 'url:../assets/icon-https.svg';
-import { signout } from '../utils/auth';
 
-export default function Headers() {
+export default function Headers({ signOut }) {
   return (
     <>
       {/* Start banner section */}
@@ -126,7 +125,7 @@ export default function Headers() {
             <button
               className="usa-button usa-button--outline"
               type="submit"
-              onClick={signout}
+              onClick={signOut}
             >
               Sign out
             </button>

@@ -18,10 +18,3 @@ export async function authorizedFetch(url, options = {}) {
 
   return res;
 }
-
-export async function signout() {
-  sessionStorage.removeItem('auth_token');
-  const navigate = useNavigate();
-  navigate('/');
-  // window.location.href = '/';
-}

@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router';
 
 import Layout from '../components/Layout';
+import { useNavigate } from 'react-router';
 
-export default function SignInPage({ setAuthToken }) {
+export default function SignInPage({ setAuthToken, justSignedOut }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [usernameError, setUsernameError] = useState('');
@@ -84,11 +84,13 @@ export default function SignInPage({ setAuthToken }) {
             </div>
           )}
 
-          <div className="usa-alert usa-alert--info">
-            <div className="usa-alert__body">
-              <p className="usa-alert__text">Signed out successfully.</p>
+          {justSignedOut && (
+            <div className="usa-alert usa-alert--info">
+              <div className="usa-alert__body">
+                <p className="usa-alert__text">Signed out successfully.</p>
+              </div>
             </div>
-          </div>
+          )}
 
           <h1>Sign in for existing users</h1>
 

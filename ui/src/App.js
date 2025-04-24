@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router';
+import { Routes, Route, useNavigate } from 'react-router';
 import UploadPage from './pages/UploadPage';
 import VerifyPage from './pages/VerifyPage';
 import DownloadPage from './pages/DownloadPage';
@@ -10,18 +10,42 @@ export default function App() {
     return sessionStorage.getItem('auth_token') || '';
   });
 
+  const [justSignedOut, setJustSignedOut] = useState(false);
+
+  const navigate = useNavigate();
+
+  async function signOut() {
+    setAuthToken('');
+    setJustSignedOut(true);
+    navigate('/');
+  }
+
   useEffect(() => {
-    sessionStorage.setItem('auth_token', authToken);
+    if (authToken) {
+      sessionStorage.setItem('auth_token', authToken);
+      setJustSignedOut(false);
+    } else {
+      sessionStorage.removeItem('auth_token');
+    }
   }, [authToken]);
 
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/verify-document" element={<VerifyPage />} />
-        <Route path="/download-document" element={<DownloadPage />} />
-        <Route path="/upload-document" element={<UploadPage />} />
-        <Route path="/" element={<SignInPage setAuthToken={setAuthToken} />} />
-      </Routes>
-    </BrowserRouter>
+    <Routes>
+      <Route path="/verify-document" element={<VerifyPage />} />
+      <Route path="/download-document" element={<DownloadPage />} />
+      <Route
+        path="/upload-document"
+        element={<UploadPage signOut={signOut} />}
+      />
+      <Route
+        path="/"
+        element={
+          <SignInPage
+            setAuthToken={setAuthToken}
+            justSignedOut={justSignedOut}
+          />
+        }
+      />
+    </Routes>
   );
 }

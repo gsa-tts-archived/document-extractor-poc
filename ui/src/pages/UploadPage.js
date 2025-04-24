@@ -2,7 +2,7 @@ import { useState, useRef } from 'react';
 import Layout from '../components/Layout';
 import { authorizedFetch } from '../utils/auth';
 
-export default function UploadPage() {
+export default function UploadPage({ signOut }) {
   // state for alert messages
   const [alertMessage, setAlertMessage] = useState(null);
   const [alertType, setAlertType] = useState(null);
@@ -62,7 +62,7 @@ export default function UploadPage() {
   }
 
   return (
-    <Layout>
+    <Layout signOut={signOut}>
       <div className="site-wrapper grid-container padding-bottom-15">
         {/* Start alert section */}
         {alertMessage && (
