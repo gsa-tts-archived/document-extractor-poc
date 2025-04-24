@@ -1,5 +1,3 @@
-import { useNavigate } from 'react-router';
-
 export async function authorizedFetch(url, options = {}) {
   const token = sessionStorage.getItem('auth_token');
 
