@@ -126,7 +126,7 @@ export default function Headers() {
             <button
               className="usa-button usa-button--outline"
               type="submit"
-              onSubmit={logout}
+              onClick={logout}
             >
               Logout
             </button>
