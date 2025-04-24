@@ -1,6 +1,7 @@
 import iconDotGov from 'url:../assets/icon-dot-gov.svg';
 import usFlagSmall from 'url:../assets/us_flag_small.png';
 import iconHttps from 'url:../assets/icon-https.svg';
+import { logout } from '../utils/api';
 
 export default function Headers() {
   return (
@@ -120,6 +121,16 @@ export default function Headers() {
               </a>
             </div>
           </div>
+
+          <nav aria-label="Primary navigation" className="usa-nav">
+            <button
+              className="usa-button usa-button--outline"
+              type="submit"
+              onSubmit={logout}
+            >
+              Logout
+            </button>
+          </nav>
         </div>
       </header>
     </>
