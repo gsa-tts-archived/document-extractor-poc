@@ -2,33 +2,30 @@ import logging
 import os
 
 import boto3
-import jwt
+
+from src import context
+from src.external.aws.iam import Iam
+from src.external.aws.secret_manager import SecretManager
+from src.login.authenticate import generate_role, has_valid_token
+from src.login.user.role import Role
+from src.secret.cloud_secret_manager import CloudSecretManager
+
+appContext = context.ApplicationContext()
+appContext.register(CloudSecretManager, SecretManager())
+appContext.register(Role, Iam)
 
 client = boto3.client("secretsmanager")
 ENVIRONMENT = os.environ["ENVIRONMENT"]
 
 
 def lambda_handler(event, context):
-    logging.info("Getting public key from AWS Secrets Manager")
-    public_key = client.get_secret_value(SecretId=f"document-extractor-{ENVIRONMENT}-public-key")["SecretString"]
-
     token = event["authorizationToken"].replace("Bearer ", "")
+    logging.info("Getting public key from AWS Secrets Manager")
 
-    try:
-        logging.info("Verifying JWT token")
-        jwt.decode(token, public_key, algorithms=["RS512"])
-        return generate_policy("user", "Allow", event["methodArn"])
-    except Exception as e:
-        exception_message = "Failed to authenticate token"
-        logging.error(exception_message)
-        logging.exception(e)
-        return generate_policy("user", "Deny", event["methodArn"])
-
-
-def generate_policy(principal_id, effect, resource):
-    rest_api_arn = resource.split("/")[0]
-    statement_one = {"Action": "execute-api:Invoke", "Effect": effect, "Resource": f"{rest_api_arn}/*"}
-    policy_document = {"Version": "2012-10-17", "Statement": [statement_one]}
-    auth_response = {"principalId": principal_id, "policyDocument": policy_document}
-
-    return auth_response
+    logging.info("Verifying JWT token")
+    if has_valid_token(token, ENVIRONMENT):
+        logging.info("A valid token is present. Generating allow policy...")
+        return generate_role("user", "Allow", event["methodArn"])
+    else:
+        logging.info("A invalid token is present. Generating deny policy...")
+        return generate_role("user", "Deny", event["methodArn"])

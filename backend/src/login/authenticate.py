@@ -1,0 +1,27 @@
+import logging
+
+import jwt
+
+from src import context
+from src.login.user.role import Role
+from src.secret import CloudSecretManager
+
+# Validate token and provide access if a valid token is given.
+
+
+@context.inject
+def has_valid_token(token, environment, cloud_secret_manager: CloudSecretManager = None) -> bool:
+    public_key = cloud_secret_manager.get_secret(f"document-extractor-{environment}-public-key")["SecretString"]
+    try:
+        jwt.decode(token, public_key, algorithms=["RS512"])
+        return True
+    except jwt.PyJWTError as e:
+        exception_message = "Failed to authenticate token"
+        logging.error(exception_message)
+        logging.exception(e)
+        return False
+
+
+@context.inject
+def generate_role(principal_id, effect, resource, role: Role = None):
+    return role.get_role(principal_id, effect, resource)
