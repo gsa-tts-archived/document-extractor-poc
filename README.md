@@ -61,8 +61,6 @@ The additional requirements needed to contribute towards development are...
 
 ### Running Locally
 
-_To be implemented_.
-
 #### Frontend
 ```shell
 cd ./ui/
