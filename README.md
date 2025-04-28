@@ -71,7 +71,7 @@ npm run dev
 ```
 1. Navigate to the UI folder
 2. Install dependencies
-3. Start the development server 
+3. Start the development server
 
 And it runs on http://localhost:1234
 
