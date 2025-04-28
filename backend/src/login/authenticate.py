@@ -15,7 +15,7 @@ def has_valid_token(token, environment, cloud_secret_manager: CloudSecretManager
         return True
     except jwt.PyJWTError as e:
         exception_message = "Failed to authenticate token"
-        logging.error(exception_message)
+        logging.warning(exception_message)
         logging.exception(e)
         return False
 

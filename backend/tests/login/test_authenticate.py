@@ -85,8 +85,5 @@ def generate_rsa_public_private_key_pair():
 
 
 def generate_token(private_key):
-    try:
-        payload = {"sub": "username", "exp": datetime.datetime.now(datetime.UTC) + datetime.timedelta(hours=1)}
-        return jwt.encode(payload, private_key, algorithm="RS512")
-    except Exception as e:
-        print(f"Unable to generate token: {e}")
+    payload = {"sub": "username", "exp": datetime.datetime.now(datetime.UTC) + datetime.timedelta(hours=1)}
+    return jwt.encode(payload, private_key, algorithm="RS512")

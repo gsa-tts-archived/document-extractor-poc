@@ -17,8 +17,6 @@ ENVIRONMENT = os.environ["ENVIRONMENT"]
 
 def lambda_handler(event, context):
     token = event["authorizationToken"].replace("Bearer ", "")
-    logging.info("Getting public key from AWS Secrets Manager")
-
     logging.info("Verifying JWT token")
     if has_valid_token(token, ENVIRONMENT):
         logging.info("A valid token is present. Generating allow policy...")
