@@ -61,7 +61,26 @@ The additional requirements needed to contribute towards development are...
 
 ### Running Locally
 
-_To be implemented_.
+#### Frontend
+```shell
+cd ./ui/
+npm install
+npm run dev
+```
+1. Navigate to the UI folder
+2. Install dependencies
+3. Start the development server
+
+And it runs on http://localhost:1234
+
+#### Known issues and future improvements
+- Replace browser system alert messages with user-friendly error handling.
+- Improve page transitions for smoother user experience.
+- Display the uploaded filename in the UI.
+
+#### Future considerations
+- Add frontend unit tests
+- As the project grows, consider using USWDS Sass for better CSS organization and customization.
 
 ### Pre-Commit Hooks
 
