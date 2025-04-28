@@ -10,7 +10,7 @@ from src.secret.cloud_secret_manager import CloudSecretManager
 
 appContext = context.ApplicationContext()
 appContext.register(CloudSecretManager, SecretManager())
-appContext.register(Role, Iam)
+appContext.register(Role, Iam())
 
 ENVIRONMENT = os.environ["ENVIRONMENT"]
 
