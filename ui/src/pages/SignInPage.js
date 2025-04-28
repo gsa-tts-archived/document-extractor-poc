@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router';
 
 import Layout from '../components/Layout';
+import { useNavigate } from 'react-router';
 
-export default function SignInPage() {
+export default function SignInPage({ setAuthToken, justSignedOut }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [usernameError, setUsernameError] = useState('');
@@ -50,8 +50,9 @@ export default function SignInPage() {
       }
 
       const data = await res.json();
+
       // store the token
-      sessionStorage.setItem('auth_token', data.access_token);
+      setAuthToken(data.access_token);
       // redirect to upload page
       navigate('/upload-document');
     } catch (err) {
@@ -79,6 +80,14 @@ export default function SignInPage() {
             <div className="usa-alert usa-alert--error">
               <div className="usa-alert__body">
                 <p className="usa-alert__text">{formError}</p>
+              </div>
+            </div>
+          )}
+
+          {justSignedOut && (
+            <div className="usa-alert usa-alert--info">
+              <div className="usa-alert__body">
+                <p className="usa-alert__text">Signed out successfully.</p>
               </div>
             </div>
           )}

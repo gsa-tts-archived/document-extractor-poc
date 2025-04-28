@@ -2,7 +2,7 @@ import iconDotGov from 'url:../assets/icon-dot-gov.svg';
 import usFlagSmall from 'url:../assets/us_flag_small.png';
 import iconHttps from 'url:../assets/icon-https.svg';
 
-export default function Headers() {
+export default function Headers({ signOut }) {
   return (
     <>
       {/* Start banner section */}
@@ -120,6 +120,18 @@ export default function Headers() {
               </a>
             </div>
           </div>
+
+          {signOut && (
+            <nav aria-label="Primary navigation" className="usa-nav">
+              <button
+                className="usa-button usa-button--outline"
+                type="submit"
+                onClick={signOut}
+              >
+                Sign out
+              </button>
+            </nav>
+          )}
         </div>
       </header>
     </>

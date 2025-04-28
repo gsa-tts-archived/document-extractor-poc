@@ -1,12 +1,15 @@
 import { useState, useRef } from 'react';
 import Layout from '../components/Layout';
 import { authorizedFetch } from '../utils/api';
+import { useNavigate } from 'react-router';
 
-export default function UploadPage() {
+export default function UploadPage({ signOut }) {
   // state for alert messages
   const [alertMessage, setAlertMessage] = useState(null);
   const [alertType, setAlertType] = useState(null);
   const fileInputRef = useRef(null);
+
+  const navigate = useNavigate();
 
   function showAlert(message, type) {
     setAlertMessage(message);
@@ -18,8 +21,6 @@ export default function UploadPage() {
     event.preventDefault();
 
     const file = fileInputRef.current?.files[0];
-
-    console.log('file upload successful', file.name);
 
     if (!file) {
       showAlert('Please select a file to upload!', 'error');
@@ -44,13 +45,19 @@ export default function UploadPage() {
           body: JSON.stringify(requestBody),
         });
 
-        const data = await response.json();
-        console.log('request response', data, response);
-
         if (response.ok) {
+          const data = await response.json();
           sessionStorage.setItem('documentId', data.documentId);
           showAlert('File uploaded successfully!', 'success, fake id', data.id);
-          window.location.href = `verify-document`;
+          navigate('/verify-document');
+        } else if (response.status === 401 || response.status === 403) {
+          showAlert(
+            'You are no longer signed in!  Please sign in again.  You will be navigated to the sign in page in a few seconds.',
+            'error'
+          );
+          setTimeout(() => {
+            signOut();
+          }, 5000);
         } else {
           showAlert('File failed to upload!', 'error');
         }
@@ -62,7 +69,7 @@ export default function UploadPage() {
   }
 
   return (
-    <Layout>
+    <Layout signOut={signOut}>
       <div className="site-wrapper grid-container padding-bottom-15">
         {/* Start alert section */}
         {alertMessage && (
@@ -114,7 +121,7 @@ export default function UploadPage() {
                   {/* Start file input section */}
                   <div className="usa-form-group">
                     <span className="usa-hint" id="file-input-specific-hint">
-                      Files must be under 10MB
+                      Files must be under 4 MB
                     </span>
                     <label
                       className="usa-label margin-top-1"
