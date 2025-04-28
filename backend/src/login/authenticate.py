@@ -6,12 +6,10 @@ from src import context
 from src.login.user.role import Role
 from src.secret import CloudSecretManager
 
-# Validate token and provide access if a valid token is given.
-
 
 @context.inject
 def has_valid_token(token, environment, cloud_secret_manager: CloudSecretManager = None) -> bool:
-    public_key = cloud_secret_manager.get_secret(f"document-extractor-{environment}-public-key")["SecretString"]
+    public_key = cloud_secret_manager.get_secret(f"document-extractor-{environment}-public-key")
     try:
         jwt.decode(token, public_key, algorithms=["RS512"])
         return True

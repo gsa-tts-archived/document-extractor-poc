@@ -1,8 +1,6 @@
 import logging
 import os
 
-import boto3
-
 from src import context
 from src.external.aws.iam import Iam
 from src.external.aws.secret_manager import SecretManager
@@ -14,7 +12,6 @@ appContext = context.ApplicationContext()
 appContext.register(CloudSecretManager, SecretManager())
 appContext.register(Role, Iam)
 
-client = boto3.client("secretsmanager")
 ENVIRONMENT = os.environ["ENVIRONMENT"]
 
 
