@@ -77,8 +77,8 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v6
         with:
+          working-directory: backend
           enable-cache: true
-          cache-dependency-glob: ./backend/uv.lock
 
       - name: Python unit testing
         working-directory: ./backend/
