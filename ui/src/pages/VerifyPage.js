@@ -1,12 +1,15 @@
 import { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
 import { authorizedFetch } from '../utils/api';
+import { useNavigate } from 'react-router';
 
-export default function VerifyPage() {
+export default function VerifyPage({ signOut }) {
   const [documentId] = useState(() => sessionStorage.getItem('documentId'));
   const [responseData, setResponseData] = useState(null); // API response
   const [loading, setLoading] = useState(true); // tracks if page is loading
   const [error, setError] = useState(false); // tracks when there is an error
+
+  const navigate = useNavigate();
 
   async function pollApiRequest(attempts = 30, delay = 2000) {
     for (let i = 0; i < attempts; i++) {
@@ -24,6 +27,10 @@ export default function VerifyPage() {
           setResponseData(result); // store API data in state
           setLoading(false); // stop loading when data is received
           setError(false); // clear any previous errors
+          return;
+        } else if (response.status === 401 || response.status === 403) {
+          alert('You are no longer signed in!  Please sign in again.');
+          signOut();
           return;
         } else {
           console.warn(`Attempt ${i + 1} failed: ${response.statusText}`);
@@ -59,15 +66,18 @@ export default function VerifyPage() {
         body: JSON.stringify(formData),
       });
 
-      const result = await response.json();
-
       if (response.ok) {
+        const result = await response.json();
         sessionStorage.setItem('verifiedData', JSON.stringify(result));
-        window.location.href = `download-document`;
+        navigate('/download-document');
         //TODO remove alert
         alert('Data saved successfully!');
+      } else if (response.status === 401 || response.status === 403) {
+        alert('You are no longer signed in!  Please sign in again.');
+        signOut();
       } else {
         //TODO remove alert
+        const result = await response.json();
         alert('Failed to save data: ' + result.error);
       }
     } catch (error) {
@@ -220,7 +230,7 @@ export default function VerifyPage() {
   }
 
   return (
-    <Layout>
+    <Layout signOut={signOut}>
       {/* Start step indicator section  */}
       <div className="grid-container">
         <div className="usa-step-indicator usa-step-indicator--counters margin-y-2">
