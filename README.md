@@ -27,6 +27,15 @@ The basic steps to accomplish this are...
 2. Build the frontend.
 3. Deploy using the Infrastructure as Code (IaC).
 
+#### Authentication
+
+One username and password is supported currently.  To set this up, do a deployment and then do the following...
+
+1. Generate an RSA private key.  Use the PEM encoding.  Upload it to AWS Secrets Manager with `private-key` in the name.
+2. Generate a public key from the aforementioned private key.  Use the PEM encoding.  Upload it to AWS Secrets Manager with `public-key` in the name.
+3. Come up with a username you want to use.  Upload it to AWS Secrets Manager with `username` in the name.
+4. Come up with a strong password you want to use.  Do not store the plaintext version of the password in AWS Secrets Manager because it is not ideal and doesn't work anyway.  From the `backend` folder, run `echo 'import bcrypt;print(bcrypt.hashpw(b"<your password>", bcrypt.gensalt()).decode())' | uv run -` and replace `<your password>` with the password you want to use.  Upload what is printed out to AWS Secrets Manager with `password` in the name.
+
 ### Building
 
 #### Backend
