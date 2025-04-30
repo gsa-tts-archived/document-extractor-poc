@@ -131,7 +131,7 @@ export default function VerifyPage({ signOut }) {
       .map(([key, field]) => {
         return (
           <div key={key}>
-            <label className="usa-label" htmlFor="input-type-text">
+            <label className="usa-label" htmlFor={`field-${key}`}>
               {key}{' '}
               <span className="text-accent-cool-darker display-inline-block width-full padding-top-2px">
                 {field.confidence
@@ -142,7 +142,8 @@ export default function VerifyPage({ signOut }) {
             {shouldUseTextarea(field.value) ? (
               <textarea
                 className="usa-textarea"
-                id="textarea-type-text"
+                id={`field-${key}`}
+                name={`field-${key}`}
                 rows={2}
                 value={field.value || ''}
                 onChange={(event) => handleInputChange(event, key, field)}
@@ -150,8 +151,8 @@ export default function VerifyPage({ signOut }) {
             ) : (
               <input
                 className="usa-input"
-                id="input-type-text"
-                name="input-type-text"
+                id={`field-${key}`}
+                name={`field-${key}`}
                 value={field.value || ''}
                 onChange={(event) => handleInputChange(event, key, field)}
               />

@@ -113,9 +113,9 @@ export default function UploadPage({ signOut }) {
             <li className="usa-card tablet:grid-col-6 widescreen:grid-col-4">
               <div className="usa-card__container">
                 <div className="usa-card__header">
-                  <h4 className="usa-card__heading font-body-md">
+                  <h2 className="usa-card__heading font-body-md">
                     File upload
-                  </h4>
+                  </h2>
                 </div>
                 <div className="usa-card__body">
                   {/* Start file input section */}
