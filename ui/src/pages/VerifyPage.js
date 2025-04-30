@@ -234,23 +234,30 @@ export default function VerifyPage({ signOut }) {
     <Layout signOut={signOut}>
       {/* Start step indicator section  */}
       <div className="grid-container">
-        <div className="usa-step-indicator usa-step-indicator--counters margin-y-2">
+        <div
+          className="usa-step-indicator usa-step-indicator--counters margin-y-2"
+          aria-label="Document processing steps"
+        >
           <ol className="usa-step-indicator__segments">
             <li className="usa-step-indicator__segment usa-step-indicator__segment--complete">
               <span className="usa-step-indicator__segment-label">
-                Upload documents <span className="usa-sr-only">completed</span>
+                Upload documents{' '}
+                <span className="usa-sr-only">— completed</span>
               </span>
             </li>
-            <li className="usa-step-indicator__segment usa-step-indicator__segment--current">
+            <li
+              className="usa-step-indicator__segment usa-step-indicator__segment--current"
+              aria-current="step"
+            >
               <span className="usa-step-indicator__segment-label">
                 Verify documents and data
-                <span className="usa-sr-only">not completed</span>
+                <span className="usa-sr-only">— current step</span>
               </span>
             </li>
             <li className="usa-step-indicator__segment">
               <span className="usa-step-indicator__segment-label">
                 Save and download CSV file
-                <span className="usa-sr-only">not completed</span>
+                <span className="usa-sr-only">— not completed</span>
               </span>
             </li>
           </ol>
