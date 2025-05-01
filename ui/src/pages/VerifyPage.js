@@ -131,7 +131,7 @@ export default function VerifyPage({ signOut }) {
       .map(([key, field]) => {
         return (
           <div key={key}>
-            <label className="usa-label" htmlFor="input-type-text">
+            <label className="usa-label" htmlFor={`field-${key}`}>
               {key}{' '}
               <span className="text-accent-cool-darker display-inline-block width-full padding-top-2px">
                 {field.confidence
@@ -142,7 +142,8 @@ export default function VerifyPage({ signOut }) {
             {shouldUseTextarea(field.value) ? (
               <textarea
                 className="usa-textarea"
-                id="textarea-type-text"
+                id={`field-${key}`}
+                name={`field-${key}`}
                 rows={2}
                 value={field.value || ''}
                 onChange={(event) => handleInputChange(event, key, field)}
@@ -150,8 +151,8 @@ export default function VerifyPage({ signOut }) {
             ) : (
               <input
                 className="usa-input"
-                id="input-type-text"
-                name="input-type-text"
+                id={`field-${key}`}
+                name={`field-${key}`}
                 value={field.value || ''}
                 onChange={(event) => handleInputChange(event, key, field)}
               />
@@ -233,23 +234,30 @@ export default function VerifyPage({ signOut }) {
     <Layout signOut={signOut}>
       {/* Start step indicator section  */}
       <div className="grid-container">
-        <div className="usa-step-indicator usa-step-indicator--counters margin-y-2">
+        <div
+          className="usa-step-indicator usa-step-indicator--counters margin-y-2"
+          aria-label="Document processing steps"
+        >
           <ol className="usa-step-indicator__segments">
             <li className="usa-step-indicator__segment usa-step-indicator__segment--complete">
               <span className="usa-step-indicator__segment-label">
-                Upload documents <span className="usa-sr-only">completed</span>
+                Upload documents{' '}
+                <span className="usa-sr-only">— completed</span>
               </span>
             </li>
-            <li className="usa-step-indicator__segment usa-step-indicator__segment--current">
+            <li
+              className="usa-step-indicator__segment usa-step-indicator__segment--current"
+              aria-current="step"
+            >
               <span className="usa-step-indicator__segment-label">
                 Verify documents and data
-                <span className="usa-sr-only">not completed</span>
+                <span className="usa-sr-only">— current step</span>
               </span>
             </li>
             <li className="usa-step-indicator__segment">
               <span className="usa-step-indicator__segment-label">
                 Save and download CSV file
-                <span className="usa-sr-only">not completed</span>
+                <span className="usa-sr-only">— not completed</span>
               </span>
             </li>
           </ol>

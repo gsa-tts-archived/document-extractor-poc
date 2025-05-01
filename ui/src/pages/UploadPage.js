@@ -83,23 +83,30 @@ export default function UploadPage({ signOut }) {
         )}
         {/* End alert section */}
         {/* Start step indicator section */}
-        <div className="usa-step-indicator usa-step-indicator--counters margin-bottom-6">
+        <div
+          className="usa-step-indicator usa-step-indicator--counters margin-bottom-6"
+          aria-label="Document processing steps"
+        >
           <ol className="usa-step-indicator__segments">
-            <li className="usa-step-indicator__segment usa-step-indicator__segment--current">
+            <li
+              className="usa-step-indicator__segment usa-step-indicator__segment--current"
+              aria-current="step"
+            >
               <span className="usa-step-indicator__segment-label">
-                Upload documents <span className="usa-sr-only">completed</span>
+                Upload documents{' '}
+                <span className="usa-sr-only">— current step</span>
               </span>
             </li>
             <li className="usa-step-indicator__segment">
               <span className="usa-step-indicator__segment-label">
                 Verify documents and data{' '}
-                <span className="usa-sr-only">not completed</span>
+                <span className="usa-sr-only">— not completed</span>
               </span>
             </li>
             <li className="usa-step-indicator__segment">
               <span className="usa-step-indicator__segment-label">
                 Save and download CSV file{' '}
-                <span className="usa-sr-only">not completed</span>
+                <span className="usa-sr-only">— not completed</span>
               </span>
             </li>
           </ol>
@@ -113,9 +120,9 @@ export default function UploadPage({ signOut }) {
             <li className="usa-card tablet:grid-col-6 widescreen:grid-col-4">
               <div className="usa-card__container">
                 <div className="usa-card__header">
-                  <h4 className="usa-card__heading font-body-md">
+                  <h2 className="usa-card__heading font-body-md">
                     File upload
-                  </h4>
+                  </h2>
                 </div>
                 <div className="usa-card__body">
                   {/* Start file input section */}
