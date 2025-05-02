@@ -21,26 +21,35 @@ export default function VerifyPage({ signOut }) {
           },
         });
 
-        if (response.ok) {
-          const result = await response.json(); // parse response
-
-          setResponseData(result); // store API data in state
-          setLoading(false); // stop loading when data is received
-          setError(false); // clear any previous errors
-          return;
-        } else if (response.status === 401 || response.status === 403) {
+        if (response.status === 401 || response.status === 403) {
           alert('You are no longer signed in!  Please sign in again.');
           signOut();
           return;
-        } else {
+        } else if (!response.ok) {
           console.warn(`Attempt ${i + 1} failed: ${response.statusText}`);
+          continue;
         }
+
+        const result = await response.json(); // parse response
+
+        if (result.status !== 'complete') {
+          console.info(
+            `Attempt ${i + 1} is not complete.  Trying again in a little bit.`
+          );
+          continue;
+        }
+
+        setResponseData(result); // store API data in state
+        setLoading(false); // stop loading when data is received
+        setError(false); // clear any previous errors
+        return;
       } catch (error) {
         console.error(`Attempt ${i + 1} failed:`, error);
       }
 
       await new Promise((resolve) => setTimeout(resolve, delay));
     }
+
     console.error('Attempt failed after max attempts');
     setLoading(false);
     setError(true);
