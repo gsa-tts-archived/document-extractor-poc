@@ -12,6 +12,9 @@ export default function VerifyPage({ signOut }) {
   const navigate = useNavigate();
 
   async function pollApiRequest(attempts = 30, delay = 2000) {
+    // Helper function to sleep for the specified delay
+    const sleep = () => new Promise((resolve) => setTimeout(resolve, delay));
+
     for (let i = 0; i < attempts; i++) {
       try {
         const response = await authorizedFetch(`/api/document/${documentId}`, {
@@ -27,6 +30,7 @@ export default function VerifyPage({ signOut }) {
           return;
         } else if (!response.ok) {
           console.warn(`Attempt ${i + 1} failed: ${response.statusText}`);
+          await sleep();
           continue;
         }
 
@@ -36,6 +40,7 @@ export default function VerifyPage({ signOut }) {
           console.info(
             `Attempt ${i + 1} is not complete.  Trying again in a little bit.`
           );
+          await sleep();
           continue;
         }
 
@@ -45,9 +50,8 @@ export default function VerifyPage({ signOut }) {
         return;
       } catch (error) {
         console.error(`Attempt ${i + 1} failed:`, error);
+        await sleep();
       }
-
-      await new Promise((resolve) => setTimeout(resolve, delay));
     }
 
     console.error('Attempt failed after max attempts');
