@@ -25,7 +25,7 @@ resource "aws_cloudfront_distribution" "distribution" {
   }
 
   origin {
-    domain_name = split("/", aws_api_gateway_deployment.api_deployment.invoke_url)[2] # grabs the domain name from something like this `https://asdf.execute-api.us-east-1.amazonaws.com/`
+    domain_name = split("/", aws_api_gateway_stage.stage.invoke_url)[2] # grabs the domain name from something like this `https://asdf.execute-api.us-east-1.amazonaws.com/`
     origin_id   = local.api_gateway_origin_id
     origin_path = "/${aws_api_gateway_stage.stage.stage_name}"
 
