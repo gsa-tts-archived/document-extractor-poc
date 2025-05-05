@@ -44,3 +44,21 @@ def test_write_document_fails():
 
     with pytest.raises(DatabaseException):
         write_document.write_document("s3://bucket/moof/DogCow.txt", "W2", {"name": "Clarus"})
+
+
+def test_write_document_does_works_2():
+    mock_database = mock.MagicMock()
+    context.register(Database, mock_database)
+
+    expected_document_id = "DogCow"
+    expected_document_status = "Processing"
+
+    expected_item = {"document_id": expected_document_id, "status": expected_document_status}
+
+    # write_document.write_document(expected_document_url, expected_document_type, expected_extracted_data)
+
+    mock_database.write_document.assert_called_with(expected_item)
+
+
+def test_update_document_works():
+    pass
