@@ -40,8 +40,7 @@ class DynamoDb(Database):
             dynamodb_item = self._marshal_dynamodb_json(document)
             key = self._create_document_key(dynamodb_item)
             dynamodb_item.pop("document_id")
-            update_expression = self._create_document_update_expression(dynamodb_item)
-            attribute_values = self._create_expression_values_from_document_data(dynamodb_item)
+            update_expression, attribute_values = self._create_document_update_expression(dynamodb_item)
 
             self.dynamodb_client.update_item(
                 TableName=self.table,
@@ -90,29 +89,35 @@ class DynamoDb(Database):
     @staticmethod
     def _create_document_update_expression(document: dict[str, Any]):
         update_expression = "SET"
+        expression_values = {}
         for key in document:
             if key == "document_id":
                 pass
             else:
-                update_expression = update_expression + f" {key} = :dt,"
+                variable_name_words = key.split("_")
+                truncated_variable_name = ":"
+                for word in variable_name_words:
+                    truncated_variable_name = truncated_variable_name + word[0]
+                update_expression = update_expression + f" {key} = {truncated_variable_name},"
+                expression_values[truncated_variable_name] = {
+                    f"{DynamoDb.get_value_type(document[key])}: {document[key]}"
+                }
 
-        return "SET document_type = :dt, document_url = :du, status = :s, extracted_data = :ed"
-
-    @staticmethod
-    def _create_expression_values_from_document_data(document: dict[str, Any]):
-        expression_values = {}
-        for key in document:
-            if isinstance(document[key], str):
-                value_type = "S"
-            elif isinstance(document[key], dict):
-                value_type = "M"
-            else:
-                value_type = ""
-            expression_values[":dt"] = {value_type: document[key]}
-        # return {
+        # Return "SET document_type = :dt, document_url = :dt, status = :s, extracted_data = :ed
+        # AND Value map
+        # {
         #     ":dt": {"S": document["document_type"]},
         #     ":du": {"S": document["document_url"]},
         #     ":s": {"S": document["status"]},
         #     ":ed": {"M": document["extracted_data"]},
         # }
-        return expression_values
+        return update_expression[:-1], expression_values  # remove the last extra comma in the update expression
+
+    @staticmethod
+    def get_value_type(value: Any):
+        value_type = ""
+        if isinstance(value, str):
+            value_type = "S"
+        elif isinstance(value, dict):
+            value_type = "M"
+        return value_type
