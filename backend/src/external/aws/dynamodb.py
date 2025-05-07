@@ -103,7 +103,7 @@ class DynamoDb(Database):
                     f"{DynamoDb.get_value_type(document[key])}: {document[key]}"
                 }
 
-        # Return "SET document_type = :dt, document_url = :dt, status = :s, extracted_data = :ed
+        # Return "SET document_type = :dt, document_url = :du, status = :s, extracted_data = :ed
         # AND Value map
         # {
         #     ":dt": {"S": document["document_type"]},

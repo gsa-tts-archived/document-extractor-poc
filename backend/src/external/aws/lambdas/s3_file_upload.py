@@ -26,8 +26,9 @@ def lambda_handler(event, context):
         try:
             bucket_name = os.environ.get("S3_BUCKET_NAME", "ocr-poc-flex")
             default_folder = "input/"
-            document_id = upload_file_data(body["file_name"], body["file_content"], bucket_name, default_folder)
-            write_document.write_document(document_id)
+            document_id, key = upload_file_data(body["file_name"], body["file_content"], bucket_name, default_folder)
+            s3_url = f"s3://{bucket_name}/{key}"
+            write_document.write_document(document_id, s3_url)
         except Exception as e:
             return {
                 "statusCode": 500,
