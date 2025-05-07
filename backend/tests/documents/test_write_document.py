@@ -20,14 +20,13 @@ def test_write_document_works():
 
     expected_document_id = "DogCow"
     expected_status = "processing"
-    expected_document_url = f"s3://bucket/moof/{expected_document_id}.txt"
 
     expected_item = {
         "document_id": expected_document_id,
         "status": expected_status,
     }
 
-    write_document.write_document(expected_document_url)
+    write_document.write_document(expected_document_id)
 
     mock_database.write_document.assert_called_with(expected_item)
 
@@ -39,7 +38,7 @@ def test_write_document_fails():
     context.register(Database, mock_database)
 
     with pytest.raises(DatabaseException):
-        write_document.write_document("s3://bucket/moof/DogCow.txt")
+        write_document.write_document("CowDog")
 
 
 def test_update_document_works():

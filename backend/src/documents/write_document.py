@@ -6,9 +6,7 @@ from src.database.database import Database
 
 
 @context.inject
-def write_document(document_url: str, database: Database = None):
-    document_id = convert_document_url_to_id(document_url)
-
+def write_document(document_id: str, database: Database = None):
     document_to_store = {
         "document_id": document_id,
         "status": "processing",
