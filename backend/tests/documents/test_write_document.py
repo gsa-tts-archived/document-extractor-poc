@@ -61,5 +61,4 @@ def test_update_document_works():
     }
 
     write_document.update_document(expected_document_url, expected_document_type, expected_extracted_data)
-
-    mock_database.write_document.assert_called_with(expected_item)
+    mock_database.update_document.assert_called_with(expected_item)
