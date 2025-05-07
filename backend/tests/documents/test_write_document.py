@@ -20,13 +20,15 @@ def test_write_document_works():
 
     expected_document_id = "DogCow"
     expected_status = "processing"
+    expected_document_url = "s3://DogCow/Key"
 
     expected_item = {
         "document_id": expected_document_id,
         "status": expected_status,
+        "document_url": expected_document_url,
     }
 
-    write_document.write_document(expected_document_id)
+    write_document.write_document(expected_document_id, expected_document_url)
 
     mock_database.write_document.assert_called_with(expected_item)
 
@@ -38,7 +40,7 @@ def test_write_document_fails():
     context.register(Database, mock_database)
 
     with pytest.raises(DatabaseException):
-        write_document.write_document("CowDog")
+        write_document.write_document("CowDog", "s3://CowDogUrl")
 
 
 def test_update_document_works():
@@ -61,4 +63,4 @@ def test_update_document_works():
     }
 
     write_document.update_document(expected_document_url, expected_document_type, expected_extracted_data)
-    mock_database.update_document.assert_called_with(expected_item)
+    mock_database.write_document.assert_called_with(expected_item)

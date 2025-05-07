@@ -35,22 +35,6 @@ class DynamoDb(Database):
         except Exception as e:
             raise DatabaseException("Failed to write the document") from e
 
-    def update_document(self, document: dict[str, Any]):
-        try:
-            dynamodb_item = self._marshal_dynamodb_json(document)
-            key = self._create_document_key(dynamodb_item)
-            dynamodb_item.pop("document_id")
-            update_expression, attribute_values = self._create_document_update_expression(dynamodb_item)
-
-            self.dynamodb_client.update_item(
-                TableName=self.table,
-                Key=key,
-                UpdateExpression=update_expression,
-                ExpressionAttributeValues=attribute_values,
-            )
-        except Exception as e:
-            raise DatabaseException("Failed to update the document") from e
-
     def _unmarshal_dynamodb_json(self, dynamodb_data: dict[str, Any]) -> dict[str, Any]:
         deserialized_data = {k: self.deserializer.deserialize(v) for k, v in dynamodb_data.items()}
         return self._convert_from_decimal(deserialized_data)
@@ -81,43 +65,3 @@ class DynamoDb(Database):
         elif isinstance(value, dict):
             return {k: DynamoDb._convert_to_decimal(v) for k, v in value.items()}
         return value
-
-    @staticmethod
-    def _create_document_key(document: dict[str, Any]):
-        return {"document_id": {"S": document["document_id"]}}
-
-    @staticmethod
-    def _create_document_update_expression(document: dict[str, Any]):
-        update_expression = "SET"
-        expression_values = {}
-        for key in document:
-            if key == "document_id":
-                pass
-            else:
-                variable_name_words = key.split("_")
-                truncated_variable_name = ":"
-                for word in variable_name_words:
-                    truncated_variable_name = truncated_variable_name + word[0]
-                update_expression = update_expression + f" {key} = {truncated_variable_name},"
-                expression_values[truncated_variable_name] = {
-                    f"{DynamoDb.get_value_type(document[key])}: {document[key]}"
-                }
-
-        # Return "SET document_type = :dt, document_url = :du, status = :s, extracted_data = :ed
-        # AND Value map
-        # {
-        #     ":dt": {"S": document["document_type"]},
-        #     ":du": {"S": document["document_url"]},
-        #     ":s": {"S": document["status"]},
-        #     ":ed": {"M": document["extracted_data"]},
-        # }
-        return update_expression[:-1], expression_values  # remove the last extra comma in the update expression
-
-    @staticmethod
-    def get_value_type(value: Any):
-        value_type = ""
-        if isinstance(value, str):
-            value_type = "S"
-        elif isinstance(value, dict):
-            value_type = "M"
-        return value_type

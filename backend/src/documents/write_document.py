@@ -28,7 +28,7 @@ def update_document(document_url: str, document_type: str | None, extracted_data
         "status": "complete",
     }
 
-    database.update_document(document_to_store)
+    database.write_document(document_to_store)
 
 
 def write_document_initialization(document_id: str, status: str, database: Database = None):
