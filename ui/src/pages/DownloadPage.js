@@ -65,10 +65,7 @@ export default function DownloadPage({ signOut }) {
     const link = document.createElement('a');
 
     link.setAttribute('href', encodedUri);
-    link.setAttribute(
-      'download',
-      verifiedData.document_key.replace(/\.[^/.]+$/, '') + '.csv'
-    );
+    link.setAttribute('download', 'document.csv');
     document.body.appendChild(link);
     link.click();
   }
@@ -84,9 +81,7 @@ export default function DownloadPage({ signOut }) {
 
     const link = document.createElement('a');
     link.href = url;
-    link.download =
-      verifiedData.document_key.replace(/\.[^/.]+$/, '') + '.json';
-    document.body.appendChild(link);
+    link.download = 'document.json';
     link.click();
   }
 
