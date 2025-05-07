@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
 import { authorizedFetch } from '../utils/api';
 import { useNavigate } from 'react-router';
+import { shouldUseTextarea } from '../utils/formUtils';
 
 export default function VerifyPage({ signOut }) {
   const [documentId] = useState(() => sessionStorage.getItem('documentId'));
@@ -125,11 +126,6 @@ export default function VerifyPage({ signOut }) {
         [key]: { ...field, value: event.target.value },
       },
     }));
-  }
-
-  function shouldUseTextarea(value) {
-    if (typeof value !== 'string') return false;
-    return value.includes('\n');
   }
 
   function displayExtractedData() {
