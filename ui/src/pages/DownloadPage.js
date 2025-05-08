@@ -65,10 +65,7 @@ export default function DownloadPage({ signOut }) {
     const link = document.createElement('a');
 
     link.setAttribute('href', encodedUri);
-    link.setAttribute(
-      'download',
-      verifiedData.document_key.replace(/\.[^/.]+$/, '') + '.csv'
-    );
+    link.setAttribute('download', 'document.csv');
     document.body.appendChild(link);
     link.click();
   }
@@ -84,9 +81,7 @@ export default function DownloadPage({ signOut }) {
 
     const link = document.createElement('a');
     link.href = url;
-    link.download =
-      verifiedData.document_key.replace(/\.[^/.]+$/, '') + '.json';
-    document.body.appendChild(link);
+    link.download = 'document.json';
     link.click();
   }
 
@@ -158,9 +153,9 @@ export default function DownloadPage({ signOut }) {
             <li className="usa-card tablet:grid-col-6 widescreen:grid-col-4">
               <div className="usa-card__container">
                 <div className="usa-card__header">
-                  <h4 className="usa-card__heading font-body-md">
+                  <h2 className="usa-card__heading font-body-md">
                     File download
-                  </h4>
+                  </h2>
                 </div>
                 <div className="usa-card__body">
                   {/* Start radio button section  */}
@@ -223,7 +218,7 @@ export default function DownloadPage({ signOut }) {
         </form>
         <div id="preview-section">
           <h2 id="preview-section-title">File Preview</h2>
-          <h4 id="preview-section-file-name">File name</h4>
+          <h3 id="preview-section-file-name">File name</h3>
           <div>{displayPreviewTable()}</div>
         </div>
       </div>
