@@ -29,7 +29,7 @@ def lambda_handler(event, context):
             document_type = message_body.get("document_type")
             extracted_data = message_body.get("extracted_data", {})
 
-            write_document.write_document(document_url, document_type, extracted_data)
+            write_document.update_document(document_url, document_type, extracted_data)
 
             sqs_client = appContext.implementation(SQSClient)
             sqs_client.delete_message(QueueUrl=sqs_queue_url, ReceiptHandle=record["receiptHandle"])

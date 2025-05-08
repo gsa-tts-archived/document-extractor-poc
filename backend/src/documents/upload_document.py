@@ -13,14 +13,14 @@ def upload_file_data(
     bucket_name,
     default_folder,
     cloud_storage: CloudStorage = None,
-) -> str:
+) -> (str, str):
     decoded_file_content = decode_file_content(file_content)
     secure_filename, document_id = generate_secure_filename(file_name)
 
     key = f"{default_folder}{secure_filename}"
     cloud_storage.put_object(bucket_name, key, decoded_file_content, {"original_filename": file_name})
 
-    return document_id
+    return document_id, key
 
 
 def decode_file_content(file_content) -> bytes:

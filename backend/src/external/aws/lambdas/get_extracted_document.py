@@ -32,9 +32,10 @@ def lambda_handler(event, context):
             }
 
         response = {
+            "status": document_info["status"],
             "document_id": document_id,
-            "document_key": document_info["document_url"],
-            "document_type": document_info["document_type"],
+            "document_key": document_info.get("document_url"),
+            "document_type": document_info.get("document_type"),
             "extracted_data": document_info.get("extracted_data", {}),
             "signed_url": storage_access_url,
             "base64_encoded_file": base64.b64encode(document_data).decode("utf-8"),

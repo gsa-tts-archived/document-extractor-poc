@@ -20,6 +20,7 @@ module "document_endpoints" {
 
   environment_variables = {
     S3_BUCKET_NAME = aws_s3_bucket.document_storage.bucket
+    DYNAMODB_TABLE = aws_dynamodb_table.extract_table.name
   }
 
   authorizer = aws_api_gateway_authorizer.authorizer.id

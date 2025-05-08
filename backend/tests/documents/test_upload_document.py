@@ -27,16 +27,18 @@ def teardown_function():
 def test_uploading_file_data_returns_document_id():
     mock_file_content = b"Hello, this is a test file."
     decoded_file_content = base64.b64encode(mock_file_content).decode("utf-8")
+    expected_folder = "mock_folder/"
 
     mock_cloud_storage = mock.MagicMock()
     mock_cloud_storage.put_object.return_value = None
     context.register(CloudStorage, mock_cloud_storage)
 
-    actual_document_id = upload_file_data("original.txt", decoded_file_content, "mock_bucket", "mock_folder")
+    actual_document_id, actual_key = upload_file_data(
+        "original.txt", decoded_file_content, "mock_bucket", expected_folder
+    )
 
-    assert actual_document_id is not None
-    assert isinstance(actual_document_id, str)
     assert str(uuid.UUID(actual_document_id)) == actual_document_id
+    assert actual_key.startswith(expected_folder)
 
 
 def test_generating_secure_filename_works():
