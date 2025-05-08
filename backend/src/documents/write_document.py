@@ -31,11 +31,6 @@ def update_document(document_url: str, document_type: str | None, extracted_data
     database.write_document(document_to_store)
 
 
-def write_document_initialization(document_id: str, status: str, database: Database = None):
-    item_to_store = {"document_id": document_id, "status": "processing"}
-    database.write_document(item_to_store)
-
-
 def convert_document_url_to_id(document_url: str):
     parsed_url = parse.urlparse(document_url)
     document_key = parsed_url.path

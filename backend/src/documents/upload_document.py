@@ -6,7 +6,6 @@ from src import context
 from src.storage import CloudStorage
 
 
-# rename create_document
 @context.inject
 def upload_file_data(
     file_name,
