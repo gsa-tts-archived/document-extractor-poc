@@ -10,7 +10,3 @@ class Database(ABC):
     @abstractmethod
     def write_document(self, document: dict[str, Any]):
         pass
-
-    @abstractmethod
-    def update_document(self, document: dict[str, Any]):
-        pass
