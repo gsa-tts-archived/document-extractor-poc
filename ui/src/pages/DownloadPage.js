@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import Layout from '../components/Layout';
+import { generateCsvData } from '../utils/downloadPageController';
 
 export default function DownloadPage({ signOut }) {
   // holds document data
@@ -49,17 +50,8 @@ export default function DownloadPage({ signOut }) {
       console.error('No data available for CSV download');
       return;
     }
-    let csvContent = 'data:text/csv;charset=utf-8,Field,Value\n';
 
-    const sortedEntries = Object.entries(verifiedData.extracted_data).sort(
-      ([keyA], [keyB]) => keyA.localeCompare(keyB, undefined, { numeric: true })
-    );
-
-    // Construct CSV content
-    sortedEntries.forEach(([key, field]) => {
-      let value = field.value !== undefined ? `"${field.value}"` : '""';
-      csvContent += `"${key}",${value}\n`;
-    });
+    const csvContent = generateCsvData(verifiedData.extracted_data);
 
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement('a');
