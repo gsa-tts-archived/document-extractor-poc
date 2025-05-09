@@ -1,6 +1,6 @@
 import { describe, expect, it } from '@jest/globals';
 
-import { shouldUseTextarea } from '../utils/formUtils';
+import { shouldUseTextarea } from './formUtils';
 
 describe('shouldUseTextarea', () => {
   it('returns true if value contains a newline', () => {
